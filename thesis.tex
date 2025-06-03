@@ -1,0 +1,247 @@
+% Do not change document class, margins, fonts, etc.
+\documentclass[a4paper,oneside,bibliography=totoc]{scrbook}
+
+% some useful packages (add more as needed)
+\usepackage{scrhack}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{latexsym}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{algorithm}
+\counterwithin{algorithm}{chapter}
+\usepackage{algorithmic}
+\usepackage{csquotes}
+\renewcommand{\algorithmiccomment}[1]{\hfill\textit{// #1}}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage[colorlinks,citecolor=Green]{hyperref}
+\usepackage{lipsum}
+
+% chicago citation style
+\usepackage{natbib}
+\bibliographystyle{chicagoa}
+\setcitestyle{authoryear,round,semicolon,aysep={},yysep={,}} \let\cite\citep
+
+% example enviroments (add more as needed)
+\newtheorem{definition}{Definition} \newtheorem{proposition}{Proposition}
+
+\begin{document}
+
+\frontmatter
+\subject{Master Thesis}
+\title{Title of Your Master Thesis}
+\author{Max Lautenbach\\
+  (matriculation number XXXXXXXX)}
+\date{\today}
+\publishers{{\small Submitted to}\\
+  Data and Web Science Group\\
+  Prof.\ Dr.\ Right-Name-Here\\
+  University of Mannheim\\}
+\maketitle
+
+\chapter{Abstract}
+
+% Your abstract goes here
+
+\begingroup%
+\hypersetup{hidelinks}%
+\tableofcontents%
+\endgroup
+
+\mainmatter
+
+\chapter{Introduction}
+\label{ch:intro}
+
+% Your introduction goes here
+
+\chapter{Background}
+\label{ch:related_work}
+\section{Knowledge Graphs}
+\begin{itemize}
+  \item What are Knowledge Graphs
+  \item How are Knowledge Graphs Designed (OWL, Restrictions - Domain \& Ranges)?
+  \item How are Knowledge Graphs Stored (RDF, Vector Store - Fuseki)
+  \item How are Knowledge Graphs Queried (SPARQL)
+  \item What is the Use Case of Knowledge Graphs
+  \item Common Public Knowledge Graphs (Wikidata)
+\end{itemize}
+\section{Closed Information Extraction}
+\begin{itemize}
+  \item What is Information Extraction
+  \item What is Closed Information Extraction
+  \item What types of approaches exist
+\end{itemize}
+\section{AI Agents and Tools}
+\begin{itemize}
+  \item What is an Agent
+  \item What is an AI Agent
+  \item How are Tools incorporated
+  \item Which Frameworks do exist
+\end{itemize}
+\section{Multi-Agent-Systems}
+\begin{itemize}
+  \item What are Multi-Agent Systems
+  \item What Architectures exist for MAS
+\end{itemize}
+\section{Related Work}
+\begin{itemize}
+  \item GenIE \cite{Josifoski2021}
+  \item synthIE \cite{Josifoski2023}
+  \item REBEL \cite{HuguetCabot2021}
+  \item DISCIE \cite{Moeller2024}
+  \item AgentRE \cite{Shi2024}
+\end{itemize}
+
+% Your literature review goes here
+
+\chapter{Methodology}
+\section{Agent Design}
+\begin{itemize}
+  \item Building effective agents \cite{Anthropic2024}
+  \item Prompt Engineering \cite{Schulhoff2025}
+\end{itemize}
+\section{Datasets}
+\subsection{synthIE}
+\subsection{REBEL}
+\section{Evaluation Metrics}
+\begin{itemize}
+  \item Definition Positive/Negative Triple \cite{Josifoski2021}
+  \item F1-Score, Precision, Recall
+  \item With Parents, With Related
+\end{itemize}
+
+% Your first main chapter goes here
+
+\chapter{Evaluation}
+\section{Evaluation Setup}
+\begin{itemize}
+  \item Langgraph
+  \item 4 Datasplits on synthIE (Train, Train\_Text, Test, Test\_Text)
+  \item Results on 5/50 Examples
+  \item Cerebras, SambaNova Cloud, vLLM on 2x A100
+  \item Models: Llama 3.3 70B (Mainly), Tests with o3-mini, Llama 4 ...
+\end{itemize}
+\section{Agent Architectures}
+\subsection{Baseline}
+\subsection{Supervisor}
+\subsection{ReAct}
+\subsection{Network}
+
+\section{Agent Tools}
+\subsection{URI Search}
+\subsection{Network Traversal}
+\subsection{Message Deletion}
+\subsection{Semantic Validation}
+\subsection{Turtle to Label}
+
+\section{Results (A)}
+\subsection{Baseline}
+\subsection{Supervisor}
+\subsection{ReAct}
+\subsection{Network}
+
+\section{Results (B)}
+\subsection{Initial Baseline Setup}
+\begin{itemize}
+  \item Supervisor Agent
+  \item Entity Extractor
+  \item Relation Extractor
+  \item URI Retrieval Agent
+\end{itemize}
+
+\subsection{Step 1: Modularization of Agent Tasks}
+\begin{itemize}
+  \item Decomposition of the Supervisor Agent into:
+        \begin{itemize}
+          \item Planner
+          \item Agent Instructor
+          \item Result Checker
+          \item Result Formatter
+        \end{itemize}
+  \item Optional: Predicate Extractor
+\end{itemize}
+
+\subsection{Step 2: Handling Errors and Improving Robustness}
+\begin{itemize}
+  \item Integration of error messages
+  \item Improved state monitoring and feedback
+\end{itemize}
+
+\subsection{Step 3: Task Simplification and State Refinement}
+\begin{itemize}
+  \item Simplification of agent state representations (e.g., Gen1 → Gen1v2)
+\end{itemize}
+
+\subsection{Step 4: One-Agent Architecture with Tool Usage}
+\begin{itemize}
+  \item Centralization of all tasks into a single agent
+  \item Use of external tools to perform sub-tasks
+\end{itemize}
+
+\subsection{Step 5: Knowledge Graph Integration}
+\begin{itemize}
+  \item Incorporation of domain-specific knowledge via:
+        \begin{itemize}
+          \item Network Traversal
+          \item Semantic Validation
+          \item Turtle to Label conversion
+        \end{itemize}
+\end{itemize}
+
+\subsection{Step 6: Gen2 Network Agent – Final Architecture}
+\begin{itemize}
+  \item Combination of insights from Baseline, Gen1, and One-Agent approaches
+  \item Network-based collaboration between specialized agents
+  \item Dynamic use of tools and agent interactions
+\end{itemize}
+
+\subsection{Step 7: Model Variation}
+\begin{itemize}
+  \item Various models at various stages and show results
+  \item Elaborate on why to choose Llama 3.3 70B over other models
+\end{itemize}
+
+\section{Discussion}
+
+
+\chapter{Conclusion and Outlook}
+
+% Your conclusions go here
+
+\bibliography{references/references}
+
+\appendix
+\chapter{Additional Material}
+
+% Your additional material goes here
+
+\backmatter
+\chapter{Ehrenwörtliche Erklärung}
+
+Ich versichere, dass ich die beiliegende Bachelor-, Master-, Seminar-, oder
+Projektarbeit ohne Hilfe Dritter und ohne Benutzung anderer als der angegebenen
+Quellen und in der untenstehenden Tabelle angegebenen Hilfsmittel angefertigt
+und die den benutzten Quellen wörtlich oder inhaltlich entnommenen Stellen als
+solche kenntlich gemacht habe. Diese Arbeit hat in gleicher oder ähnlicher Form
+noch keiner Prüfungsbehörde vorgelegen. Ich bin mir bewusst, dass eine falsche
+Erklärung rechtliche Folgen haben wird.
+
+\begin{center}
+  \textbf{Declaration of Used AI Tools} \\[.3em]
+  \begin{tabularx}{\textwidth}{lXlc}
+    \toprule
+    Tool & Purpose & Where? & Useful? \\
+    \midrule
+    % Add your AI tools here
+    \bottomrule
+  \end{tabularx}
+\end{center}
+
+\vspace{2cm}
+\noindent Unterschrift\\
+\noindent Mannheim, den XX.~XXXX 2024 \hfill
+
+\end{document}
