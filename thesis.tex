@@ -62,9 +62,9 @@
 \section{Knowledge Graphs}
 \begin{itemize}
   \item What are Knowledge Graphs
-  \item How are Knowledge Graphs Designed (OWL, Restrictions - Domain \& Ranges)?
-  \item How are Knowledge Graphs Stored (RDF, Vector Store - Fuseki)
+  \item How are Knowledge Graphs Designed (OWL, Restrictions - Domain \& Ranges, RDF)?
   \item How are Knowledge Graphs Queried (SPARQL)
+  \item How can Knowledge Graphs be stored and retrieved (Vector Store - Jena)
   \item What is the Use Case of Knowledge Graphs
   \item Common Public Knowledge Graphs (Wikidata)
 \end{itemize}
@@ -74,23 +74,35 @@
   \item What is Closed Information Extraction
   \item What types of approaches exist
 \end{itemize}
+
+\section{Large Language Models}
+\begin{itemize}
+  \item What are LLMs?
+  \item How do they work?
+  \item What capabilities do they have?
+\end{itemize}
 \section{AI Agents and Tools}
 \begin{itemize}
   \item What is an Agent
   \item What is an AI Agent
   \item How are Tools incorporated
   \item Which Frameworks do exist
+  \item Building effective agents \cite{Anthropic2024}
+  \item Prompt Engineering \cite{Schulhoff2025}
 \end{itemize}
 \section{Multi-Agent-Systems}
 \begin{itemize}
   \item What are Multi-Agent Systems
   \item What Architectures exist for MAS
 \end{itemize}
-\section{Related Work}
+
+\chapter{Related Work}
 \begin{itemize}
+  \item What Models or Work do exists in the cIE and MAS Context?
+  \item What Dataset do exist in the cIE Context? How are they compared? How are they extracted?
   \item GenIE \cite{Josifoski2021}
-  \item synthIE \cite{Josifoski2023}
-  \item REBEL \cite{HuguetCabot2021}
+  \item synthIE (Model and Dataset) \cite{Josifoski2023}
+  \item REBEL (Model and Dataset) \cite{HuguetCabot2021}
   \item DISCIE \cite{Moeller2024}
   \item AgentRE \cite{Shi2024}
 \end{itemize}
@@ -98,32 +110,6 @@
 % Your literature review goes here
 
 \chapter{Methodology}
-\section{Agent Design}
-\begin{itemize}
-  \item Building effective agents \cite{Anthropic2024}
-  \item Prompt Engineering \cite{Schulhoff2025}
-\end{itemize}
-\section{Datasets}
-\subsection{synthIE}
-\subsection{REBEL}
-\section{Evaluation Metrics}
-\begin{itemize}
-  \item Definition Positive/Negative Triple \cite{Josifoski2021}
-  \item F1-Score, Precision, Recall
-  \item With Parents, With Related
-\end{itemize}
-
-% Your first main chapter goes here
-
-\chapter{Evaluation}
-\section{Evaluation Setup}
-\begin{itemize}
-  \item Langgraph
-  \item 4 Datasplits on synthIE (Train, Train\_Text, Test, Test\_Text)
-  \item Results on 5/50 Examples
-  \item Cerebras, SambaNova Cloud, vLLM on 2x A100
-  \item Models: Llama 3.3 70B (Mainly), Tests with o3-mini, Llama 4 ...
-\end{itemize}
 \section{Agent Architectures}
 \subsection{Baseline}
 \subsection{Supervisor}
@@ -136,14 +122,27 @@
 \subsection{Message Deletion}
 \subsection{Semantic Validation}
 \subsection{Turtle to Label}
+\section{Evaluation Setup}
+\begin{itemize}
+  \item Langgraph
+  \item 2 Datasplits on synthIE Text (Train Val, Test)
+  \item 2 Datasplits on synthIE Code (Train , Test) (optional)
+  \item Results on 5/50 Examples
+  \item Cerebras, SambaNova Cloud, vLLM on 2x A100
+  \item Models: Llama 3.3 70B (Mainly), Tests with o3-mini, Llama 4 ...
+\end{itemize}
+% Your first main chapter goes here
 
-\section{Results (A)}
-\subsection{Baseline}
-\subsection{Supervisor}
-\subsection{ReAct}
-\subsection{Network}
+\chapter{Evaluation}
+\section{Evaluation Metrics}
+\begin{itemize}
+  \item Definition Positive/Negative Triple \cite{Josifoski2021}
+  \item F1-Score, Precision, Recall
+  \item With Parents, With Related
+\end{itemize}
 
-\section{Results (B)}
+
+\section{Evaluation Configurations}
 \subsection{Initial Baseline Setup}
 \begin{itemize}
   \item Supervisor Agent
@@ -152,7 +151,7 @@
   \item URI Retrieval Agent
 \end{itemize}
 
-\subsection{Step 1: Modularization of Agent Tasks}
+\subsection{Modularization of Agent Tasks}
 \begin{itemize}
   \item Decomposition of the Supervisor Agent into:
         \begin{itemize}
@@ -164,24 +163,24 @@
   \item Optional: Predicate Extractor
 \end{itemize}
 
-\subsection{Step 2: Handling Errors and Improving Robustness}
+\subsection{Error Message Incorporation}
 \begin{itemize}
   \item Integration of error messages
   \item Improved state monitoring and feedback
 \end{itemize}
 
-\subsection{Step 3: Task Simplification and State Refinement}
+\subsection{Task Simplification and State Refinement}
 \begin{itemize}
   \item Simplification of agent state representations (e.g., Gen1 → Gen1v2)
 \end{itemize}
 
-\subsection{Step 4: One-Agent Architecture with Tool Usage}
+\subsection{One-Agent Architecture with Tool Usage}
 \begin{itemize}
   \item Centralization of all tasks into a single agent
   \item Use of external tools to perform sub-tasks
 \end{itemize}
 
-\subsection{Step 5: Knowledge Graph Integration}
+\subsection{Knowledge Graph Integration}
 \begin{itemize}
   \item Incorporation of domain-specific knowledge via:
         \begin{itemize}
@@ -191,14 +190,14 @@
         \end{itemize}
 \end{itemize}
 
-\subsection{Step 6: Gen2 Network Agent – Final Architecture}
+\subsection{Full Network Agent Architecture}
 \begin{itemize}
   \item Combination of insights from Baseline, Gen1, and One-Agent approaches
   \item Network-based collaboration between specialized agents
   \item Dynamic use of tools and agent interactions
 \end{itemize}
 
-\subsection{Step 7: Model Variation}
+\subsection{LLM Model Variation}
 \begin{itemize}
   \item Various models at various stages and show results
   \item Elaborate on why to choose Llama 3.3 70B over other models
