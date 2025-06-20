@@ -9,7 +9,9 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{tabularx}
+\usepackage{csquotes}
 \usepackage{booktabs}
+\usepackage{listings}
 \usepackage{algorithm}
 \counterwithin{algorithm}{chapter}
 \usepackage{algorithmic}
@@ -18,6 +20,7 @@
 \usepackage[usenames,dvipsnames]{xcolor}
 \usepackage[colorlinks,citecolor=Green]{hyperref}
 \usepackage{lipsum}
+\usepackage[printonlyused]{acronym}
 
 % chicago citation style
 \usepackage{natbib}
@@ -26,6 +29,36 @@
 
 % example enviroments (add more as needed)
 \newtheorem{definition}{Definition} \newtheorem{proposition}{Proposition}
+
+% Definition einer Turtle‑Sprache
+\lstdefinelanguage{Turtle}{
+  morekeywords={@prefix,@base,a},
+  morekeywords=[2]{ex,exp,rdfs},
+  morestring=[b]",
+  morestring=[b]',
+  sensitive=true,
+  basicstyle=\small\ttfamily,
+  keywordstyle=\color{blue},
+  keywordstyle=[2]\color{magenta},
+  commentstyle=\color{gray}\itshape,
+  stringstyle=\color{OliveGreen},
+  columns=fullflexible,
+  breaklines=true,
+  breakatwhitespace=false,
+  literate={:}{{{\color{orange}:}}}1,
+}
+
+% Globales Styling für alle Listings
+\lstset{
+  language=Turtle,
+  frame=single,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  numbersep=5pt,
+  tabsize=2,
+  captionpos=b,
+  basicstyle=\small\ttfamily,
+}
 
 \begin{document}
 
@@ -37,7 +70,7 @@
 \date{\today}
 \publishers{{\small Submitted to}\\
   Data and Web Science Group\\
-  Prof.\ Dr.\ Right-Name-Here\\
+  Dr.\ Sven Hertling\\
   University of Mannheim\\}
 \maketitle
 
@@ -50,6 +83,12 @@
 \tableofcontents%
 \endgroup
 
+\chapter{List of Abbreviations}
+\begin{acronym}
+  \acro{RDF}{Resource Description Framework}
+  \acro{URI}{Uniform Resource Identifier}
+\end{acronym}
+
 \mainmatter
 
 \chapter{Introduction}
@@ -59,7 +98,45 @@
 
 \chapter{Background}
 \label{ch:related_work}
+In the following chapter, the necessary theoretical background to understand core concepts of this approach will be described. Therefore, the chapter will start with an explanation of knowledge graphs (section \ref{sec:knowledge_graphs}). Building on that foundation, a section on closed information extraction (section \ref{sec:closed_information_extraction}), which is the problem that is approached in this work, will follow. Afterwards the theoretical background on the multi-agent-system approach will be defined starting with the core language and embedding models (section \ref{sec:large_language_models} and \ref{sec:sentence_embeddings_vector_stores}) over to defining what AI agents and multi-agent-systems are (section \ref{sec:ai_agents} and \ref{sec:multi_agent_systems}), leading to a section on agent design best practises (section \ref{sec:agent_design}).
 \section{Knowledge Graphs}
+\label{sec:knowledge_graphs}
+Knowledge graphs are a concept to store knowledge in a way that the semantic in the knowledge is machine-retrievable \cite{GomezPerez2017}. In order to accomplish this goal, knowledge graphs are directed graphs, whereas the nodes define real world entities and the edges define the relationsship between the entities \cite{Paulheim2016}. To define the domain and give a knowledge graph a set of rules, the types of entities and relations are predefined in what is called an ontology \cite{GomezPerez2017,Paulheim2016}. Following those definition, the ecosystem of knowledge graphs is build from three building blocks: knowledge graph construction, knowledge graph storage, knowledge graph consumption \cite{GomezPerez2017}.
+
+Starting from the construction, knowledge graphs are represented in \ac{RDF}, which is the standard to represent knowledge graphs. \ac{RDF} is build of triples, whereas each triple could be seen as description of a relation by the three parts \textit{Start Node, Edge and Target Node}. All parts of the triple are either a resource identifier, a blank node or a literal. In the case of this work, the used resource identifier is a \ac{URI} like for example \textit{\url{http://example.org/entity/Angela_Merkel}}, that is why all chapters the term \ac{URI} will used consisent instead of change to more general or more specific identifiers. Exception to the general denotation by \acp{URI} are blank nodes and literals. Blank nodes is a concept where a resource could not be specified. This could be the case, if the relation that is described by the triple includes concepts like \textit{someone} or \textit{something}. Literals are simple values, like integers or strings \cite{VillazonTerrazas2017}.
+
+The relation described by the triples can also be seen as a simple english sentence consisting of subject matching the start node, predicate matching the edge and object matching the target node. For each of those there are common rules, when defining the knowledge graph. Subjects can be either an \ac{URI} or a blank node. Predicates, which are called properties from now on as predicates are named properties throughout in knowledge graphs, can only be \acp{URI}. An Object can be an \ac{URI}, a blank node or a literal. Inheriting this concept the \ac{RDF} contains multiple syntactical representations of knowledge graphs, one of which Turtle is \cite{VillazonTerrazas2017}.
+
+Turtle is build up of simple triple statements consisting of subject, property and object, where each part is separated by either a space, tabluation or whitespace. Each statement in turtle is terminated like a normal sentence using a dot. A \ac{URI} must be enclosed in angle brackets, whereas blank nodes can be represented with an underscore follow with a colon and an arbitrary name for the blank node instead of a \ac{URI} and Literals are enclosed in quote, where turtle interpreter either define the datatype of the value themselves or the datatype can be defined by the user. In the follow example, it can be seen how four sentences can be defined within the turtle format \cite{Tomaszuk2020}.
+
+
+\begin{lstlisting}[language=Turtle, caption=Example of a Knowledge Graph in Turtle Format, label=lst:turtle_example, escapechar=@]
+@\textcolor{gray}{\# Angela Merkel is member of the CDU.}@
+<http://example.org/entity/Angela_Merkel> <http://example.org/property/member_of> <http://example.org/entity/CDU>.
+
+@\textcolor{gray}{\# Angela Merkel is written "Angela Merkel".}@
+<http://example.org/entity/Angela_Merkel> <http://www.w3.org/2000/01/rdf-schema#label> "Angela Merkel".
+
+@\textcolor{gray}{\# Angela Merkel is greeted by someone.}@
+<http://example.org/entity/Angela_Merkel> <http://example.org/property/greeted_by> _:b1.
+
+@\textcolor{gray}{\# This someone works for Friedrich Merz.}@
+_:b1 <http://example.org/property/works_for> <http://example.org/entity/Friedrich_Merz>.
+\end{lstlisting}
+
+In order to simplify the turtle statements, prefixes can be defined. Those prefixes corralate to a namespace, which is a path in the \ac{URI} which multiple resource are stored under. A prefix is defined using \textit{@prefix}, the name of the prefix followed by a colon (i.e. \textit{ex:}) and the namespace itself. In the shown example using prefixes could simplify the turtle statements to the following:
+
+\begin{lstlisting}[language=Turtle, caption=Example of a Knowledge Graph in Turtle Format, label=lst:turtle_example]
+@prefix ex: <http://example.org/entity/>
+@prefix exp: <http://example.org/property/>
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+ex:Angela_Merkel exp:member_of ex:CDU.
+ex:Angela_Merkel rdfs:label "Angela Merkel".
+ex:Angela_Merkel exp:greeted_by _:b1.
+_:b1 exp:works_for ex:Friedrich_Merz.
+\end{lstlisting}
+
 \begin{itemize}
   \item What are Knowledge Graphs
   \item How are Knowledge Graphs Designed (OWL, Restrictions - Domain \& Ranges, RDF)?
@@ -69,34 +146,45 @@
   \item Common Public Knowledge Graphs (Wikidata)
 \end{itemize}
 \section{Closed Information Extraction}
+\label{sec:closed_information_extraction}
 \begin{itemize}
   \item What is Information Extraction
   \item What is Closed Information Extraction
   \item What types of approaches exist
 \end{itemize}
-
 \section{Large Language Models}
+\label{sec:large_language_models}
 \begin{itemize}
   \item What are LLMs?
   \item How do they work?
   \item What capabilities do they have?
+  \item Softmax Temperature and Seeds
 \end{itemize}
-\section{AI Agents and Tools}
+\section{Sentence Embeddings and Vector Stores}
+\label{sec:sentence_embeddings_vector_stores}
+\section{AI Agents}
+\label{sec:ai_agents}
 \begin{itemize}
   \item What is an Agent
   \item What is an AI Agent
   \item How are Tools incorporated
   \item Which Frameworks do exist
-  \item Building effective agents \cite{Anthropic2024}
-  \item Prompt Engineering \cite{Schulhoff2025}
 \end{itemize}
 \section{Multi-Agent-Systems}
+\label{sec:multi_agent_systems}
 \begin{itemize}
   \item What are Multi-Agent Systems
   \item What Architectures exist for MAS
 \end{itemize}
+\section{Agent Design}
+\label{sec:agent_design}
+\begin{itemize}
+  \item Building effective agents \cite{Anthropic2024}
+  \item Prompt Engineering \cite{Schulhoff2025}
+\end{itemize}
 
 \chapter{Related Work}
+\label{ch:related_work_chapter}
 \begin{itemize}
   \item What Models or Work do exists in the cIE and MAS Context?
   \item What Dataset do exist in the cIE Context? How are they compared? How are they extracted?
@@ -109,20 +197,33 @@
 
 % Your literature review goes here
 
-\chapter{Methodology}
+\chapter{Approach}
+\label{ch:approach}
 \section{Agent Architectures}
+\label{sec:agent_architectures}
 \subsection{Baseline}
+\label{subsec:baseline}
 \subsection{Supervisor}
+\label{subsec:supervisor}
 \subsection{ReAct}
+\label{subsec:react}
 \subsection{Network}
+\label{subsec:network}
 
 \section{Agent Tools}
+\label{sec:agent_tools}
 \subsection{URI Search}
+\label{subsec:uri_search}
 \subsection{Network Traversal}
+\label{subsec:network_traversal}
 \subsection{Message Deletion}
+\label{subsec:message_deletion}
 \subsection{Semantic Validation}
+\label{subsec:semantic_validation}
 \subsection{Turtle to Label}
+\label{subsec:turtle_to_label}
 \section{Evaluation Setup}
+\label{sec:evaluation_setup}
 \begin{itemize}
   \item Langgraph
   \item 2 Datasplits on synthIE Text (Train Val, Test)
@@ -134,7 +235,9 @@
 % Your first main chapter goes here
 
 \chapter{Evaluation}
+\label{ch:evaluation}
 \section{Evaluation Metrics}
+\label{sec:evaluation_metrics}
 \begin{itemize}
   \item Definition Positive/Negative Triple \cite{Josifoski2021}
   \item F1-Score, Precision, Recall
@@ -143,7 +246,9 @@
 
 
 \section{Evaluation Configurations}
+\label{sec:evaluation_configurations}
 \subsection{Initial Baseline Setup}
+\label{subsec:initial_baseline_setup}
 \begin{itemize}
   \item Supervisor Agent
   \item Entity Extractor
@@ -152,6 +257,7 @@
 \end{itemize}
 
 \subsection{Modularization of Agent Tasks}
+\label{subsec:modularization_agent_tasks}
 \begin{itemize}
   \item Decomposition of the Supervisor Agent into:
         \begin{itemize}
@@ -160,53 +266,80 @@
           \item Result Checker
           \item Result Formatter
         \end{itemize}
-  \item Optional: Predicate Extractor
+
+  \item Introduction of URI-Search Filters (On Label OR Description)
 \end{itemize}
 
 \subsection{Error Message Incorporation}
+\label{subsec:error_message_incorporation}
 \begin{itemize}
   \item Integration of error messages
   \item Improved state monitoring and feedback
+  \item Predicate Extractor in Gen1
+  \item Baseline extended with URI Response Summary
 \end{itemize}
 
 \subsection{Task Simplification and State Refinement}
+\label{subsec:task_simplification_state_refinement}
 \begin{itemize}
   \item Simplification of agent state representations (e.g., Gen1 → Gen1v2)
 \end{itemize}
 
 \subsection{One-Agent Architecture with Tool Usage}
+\label{subsec:one_agent_architecture_tool_usage}
 \begin{itemize}
   \item Centralization of all tasks into a single agent
   \item Use of external tools to perform sub-tasks
 \end{itemize}
 
+\subsection{URI Retrieval Filtering}
+\label{subsec:uri_retrieval_filtering}
+\begin{itemize}
+  \item Switch to Filtering on Entities and Properties
+\end{itemize}
+
 \subsection{Knowledge Graph Integration}
+\label{subsec:knowledge_graph_integration}
 \begin{itemize}
   \item Incorporation of domain-specific knowledge via:
         \begin{itemize}
-          \item Network Traversal
-          \item Semantic Validation
-          \item Turtle to Label conversion
+          \item Network Traversal (and why deleted later)
+
         \end{itemize}
 \end{itemize}
 
 \subsection{Full Network Agent Architecture}
+\label{subsec:full_network_agent_architecture}
 \begin{itemize}
   \item Combination of insights from Baseline, Gen1, and One-Agent approaches
   \item Network-based collaboration between specialized agents
   \item Dynamic use of tools and agent interactions
+  \item Few-Shot Prompting
+  \item Update URI Search Modes
+  \item Semantic Validation
+  \item Turtle to Label conversion
+\end{itemize}
+
+\subsection{Performance Increases of Gen2 to One Agent and Baseline Architecture}
+\label{subsec:performance_increases_gen2}
+\begin{itemize}
+  \item One Agent
+  \item Baseline
 \end{itemize}
 
 \subsection{LLM Model Variation}
+\label{subsec:llm_model_variation}
 \begin{itemize}
   \item Various models at various stages and show results
   \item Elaborate on why to choose Llama 3.3 70B over other models
 \end{itemize}
 
 \section{Discussion}
+\label{sec:discussion}
 
 
 \chapter{Conclusion and Outlook}
+\label{ch:conclusion_outlook}
 
 % Your conclusions go here
 
@@ -214,11 +347,13 @@
 
 \appendix
 \chapter{Additional Material}
+\label{ch:additional_material}
 
 % Your additional material goes here
 
 \backmatter
 \chapter{Ehrenwörtliche Erklärung}
+\label{ch:declaration}
 
 Ich versichere, dass ich die beiliegende Bachelor-, Master-, Seminar-, oder
 Projektarbeit ohne Hilfe Dritter und ohne Benutzung anderer als der angegebenen

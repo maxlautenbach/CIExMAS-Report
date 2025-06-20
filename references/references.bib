@@ -38,22 +38,6 @@
   publisher = {Association for Computing Machinery (ACM)},
 }
 
-@Article{Brown2020,
-  author        = {Brown, Tom B. and Mann, Benjamin and Ryder, Nick and Subbiah, Melanie and Kaplan, Jared and Dhariwal, Prafulla and Neelakantan, Arvind and Shyam, Pranav and Sastry, Girish and Askell, Amanda and Agarwal, Sandhini and Herbert-Voss, Ariel and Krueger, Gretchen and Henighan, Tom and Child, Rewon and Ramesh, Aditya and Ziegler, Daniel M. and Wu, Jeffrey and Winter, Clemens and Hesse, Christopher and Chen, Mark and Sigler, Eric and Litwin, Mateusz and Gray, Scott and Chess, Benjamin and Clark, Jack and Berner, Christopher and McCandlish, Sam and Radford, Alec and Sutskever, Ilya and Amodei, Dario},
-  title         = {Language Models are Few-Shot Learners},
-  year          = {2020},
-  month         = may,
-  abstract      = {Recent work has demonstrated substantial gains on many NLP tasks and benchmarks by pre-training on a large corpus of text followed by fine-tuning on a specific task. While typically task-agnostic in architecture, this method still requires task-specific fine-tuning datasets of thousands or tens of thousands of examples. By contrast, humans can generally perform a new language task from only a few examples or from simple instructions - something which current NLP systems still largely struggle to do. Here we show that scaling up language models greatly improves task-agnostic, few-shot performance, sometimes even reaching competitiveness with prior state-of-the-art fine-tuning approaches. Specifically, we train GPT-3, an autoregressive language model with 175 billion parameters, 10x more than any previous non-sparse language model, and test its performance in the few-shot setting. For all tasks, GPT-3 is applied without any gradient updates or fine-tuning, with tasks and few-shot demonstrations specified purely via text interaction with the model. GPT-3 achieves strong performance on many NLP datasets, including translation, question-answering, and cloze tasks, as well as several tasks that require on-the-fly reasoning or domain adaptation, such as unscrambling words, using a novel word in a sentence, or performing 3-digit arithmetic. At the same time, we also identify some datasets where GPT-3's few-shot learning still struggles, as well as some datasets where GPT-3 faces methodological issues related to training on large web corpora. Finally, we find that GPT-3 can generate samples of news articles which human evaluators have difficulty distinguishing from articles written by humans. We discuss broader societal impacts of this finding and of GPT-3 in general.},
-  archiveprefix = {arXiv},
-  copyright     = {arXiv.org perpetual, non-exclusive license},
-  doi           = {10.48550/ARXIV.2005.14165},
-  eprint        = {2005.14165},
-  file          = {:Brown2020 - Language Models Are Few Shot Learners.pdf:PDF:http\://arxiv.org/pdf/2005.14165v4},
-  keywords      = {Computation and Language (cs.CL), FOS: Computer and information sciences},
-  primaryclass  = {cs.CL},
-  publisher     = {arXiv},
-}
-
 @Article{Wadhwa2023,
   author        = {Somin Wadhwa and Silvio Amir and Byron C. Wallace},
   journal       = {CoRR},
@@ -338,6 +322,334 @@
   booktitle = {Exploiting Linked Data and Knowledge Graphs in Large Organisations},
   doi       = {10.1007/978-3-319-45654-6_8},
   url       = {https://doi.org/10.1007/978-3-319-45654-6_8},
+}
+
+@InProceedings{Erxleben2014,
+  author    = {Erxleben, Fredo and G{\"u}nther, Michael and Kr{\"o}tzsch, Markus and Mendez, Julian and Vrande{\v{c}}i{\'{c}}, Denny},
+  booktitle = {The Semantic Web -- ISWC 2014},
+  title     = {Introducing Wikidata to the Linked Data Web},
+  year      = {2014},
+  address   = {Cham},
+  editor    = {Mika, Peter and Tudorache, Tania and Bernstein, Abraham and Welty, Chris and Knoblock, Craig and Vrande{\v{c}}i{\'{c}}, Denny and Groth, Paul and Noy, Natasha and Janowicz, Krzysztof and Goble, Carole},
+  pages     = {50--65},
+  publisher = {Springer International Publishing},
+  abstract  = {Wikidata is the central data management platform of Wikipedia. By the efforts of thousands of volunteers, the project has produced a large, open knowledge base with many interesting applications. The data is highly interlinked and connected to many other datasets, but it is also very rich, complex, and not available in RDF. To address this issue, we introduce new RDF exports that connect Wikidata to the Linked Data Web. We explain the data model of Wikidata and discuss its encoding in RDF. Moreover, we introduce several partial exports that provide more selective or simplified views on the data. This includes a class hierarchy and several other types of ontological axioms that we extract from the site. All datasets we discuss here are freely available online and updated regularly.},
+  isbn      = {978-3-319-11964-9},
+}
+
+@Misc{Wikidata2025,
+  author       = {{Wikidata}},
+  howpublished = {\url{https://www.wikidata.org/wiki/Help:Qualifiers}},
+  note         = {Zugegriffen: 10. Juni 2025},
+  title        = {{Help:Qualifiers}},
+  year         = {2025},
+}
+
+@Misc{Vaswani2023,
+  author        = {Ashish Vaswani and Noam Shazeer and Niki Parmar and Jakob Uszkoreit and Llion Jones and Aidan N. Gomez and Lukasz Kaiser and Illia Polosukhin},
+  title         = {Attention Is All You Need},
+  year          = {2023},
+  archiveprefix = {arXiv},
+  eprint        = {1706.03762},
+  primaryclass  = {cs.CL},
+  url           = {https://arxiv.org/abs/1706.03762},
+}
+
+@Misc{Brown2020,
+  author        = {Tom B. Brown and Benjamin Mann and Nick Ryder and Melanie Subbiah and Jared Kaplan and Prafulla Dhariwal and Arvind Neelakantan and Pranav Shyam and Girish Sastry and Amanda Askell and Sandhini Agarwal and Ariel Herbert-Voss and Gretchen Krueger and Tom Henighan and Rewon Child and Aditya Ramesh and Daniel M. Ziegler and Jeffrey Wu and Clemens Winter and Christopher Hesse and Mark Chen and Eric Sigler and Mateusz Litwin and Scott Gray and Benjamin Chess and Jack Clark and Christopher Berner and Sam McCandlish and Alec Radford and Ilya Sutskever and Dario Amodei},
+  title         = {Language Models are Few-Shot Learners},
+  year          = {2020},
+  archiveprefix = {arXiv},
+  eprint        = {2005.14165},
+  primaryclass  = {cs.CL},
+  url           = {https://arxiv.org/abs/2005.14165},
+}
+
+@Misc{Grattafiori2024,
+  author        = {Aaron Grattafiori and Abhimanyu Dubey and Abhinav Jauhri and Abhinav Pandey and Abhishek Kadian and Ahmad Al-Dahle and Aiesha Letman and Akhil Mathur and Alan Schelten and Alex Vaughan and Amy Yang and Angela Fan and Anirudh Goyal and Anthony Hartshorn and Aobo Yang and Archi Mitra and Archie Sravankumar and Artem Korenev and Arthur Hinsvark and Arun Rao and Aston Zhang and Aurelien Rodriguez and Austen Gregerson and Ava Spataru and Baptiste Roziere and Bethany Biron and Binh Tang and Bobbie Chern and Charlotte Caucheteux and Chaya Nayak and Chloe Bi and Chris Marra and Chris McConnell and Christian Keller and Christophe Touret and Chunyang Wu and Corinne Wong and Cristian Canton Ferrer and Cyrus Nikolaidis and Damien Allonsius and Daniel Song and Danielle Pintz and Danny Livshits and Danny Wyatt and David Esiobu and Dhruv Choudhary and Dhruv Mahajan and Diego Garcia-Olano and Diego Perino and Dieuwke Hupkes and Egor Lakomkin and Ehab AlBadawy and Elina Lobanova and Emily Dinan and Eric Michael Smith and Filip Radenovic and Francisco Guzmán and Frank Zhang and Gabriel Synnaeve and Gabrielle Lee and Georgia Lewis Anderson and Govind Thattai and Graeme Nail and Gregoire Mialon and Guan Pang and Guillem Cucurell and Hailey Nguyen and Hannah Korevaar and Hu Xu and Hugo Touvron and Iliyan Zarov and Imanol Arrieta Ibarra and Isabel Kloumann and Ishan Misra and Ivan Evtimov and Jack Zhang and Jade Copet and Jaewon Lee and Jan Geffert and Jana Vranes and Jason Park and Jay Mahadeokar and Jeet Shah and Jelmer van der Linde and Jennifer Billock and Jenny Hong and Jenya Lee and Jeremy Fu and Jianfeng Chi and Jianyu Huang and Jiawen Liu and Jie Wang and Jiecao Yu and Joanna Bitton and Joe Spisak and Jongsoo Park and Joseph Rocca and Joshua Johnstun and Joshua Saxe and Junteng Jia and Kalyan Vasuden Alwala and Karthik Prasad and Kartikeya Upasani and Kate Plawiak and Ke Li and Kenneth Heafield and Kevin Stone and Khalid El-Arini and Krithika Iyer and Kshitiz Malik and Kuenley Chiu and Kunal Bhalla and Kushal Lakhotia and Lauren Rantala-Yeary and Laurens van der Maaten and Lawrence Chen and Liang Tan and Liz Jenkins and Louis Martin and Lovish Madaan and Lubo Malo and Lukas Blecher and Lukas Landzaat and Luke de Oliveira and Madeline Muzzi and Mahesh Pasupuleti and Mannat Singh and Manohar Paluri and Marcin Kardas and Maria Tsimpoukelli and Mathew Oldham and Mathieu Rita and Maya Pavlova and Melanie Kambadur and Mike Lewis and Min Si and Mitesh Kumar Singh and Mona Hassan and Naman Goyal and Narjes Torabi and Nikolay Bashlykov and Nikolay Bogoychev and Niladri Chatterji and Ning Zhang and Olivier Duchenne and Onur Çelebi and Patrick Alrassy and Pengchuan Zhang and Pengwei Li and Petar Vasic and Peter Weng and Prajjwal Bhargava and Pratik Dubal and Praveen Krishnan and Punit Singh Koura and Puxin Xu and Qing He and Qingxiao Dong and Ragavan Srinivasan and Raj Ganapathy and Ramon Calderer and Ricardo Silveira Cabral and Robert Stojnic and Roberta Raileanu and Rohan Maheswari and Rohit Girdhar and Rohit Patel and Romain Sauvestre and Ronnie Polidoro and Roshan Sumbaly and Ross Taylor and Ruan Silva and Rui Hou and Rui Wang and Saghar Hosseini and Sahana Chennabasappa and Sanjay Singh and Sean Bell and Seohyun Sonia Kim and Sergey Edunov and Shaoliang Nie and Sharan Narang and Sharath Raparthy and Sheng Shen and Shengye Wan and Shruti Bhosale and Shun Zhang and Simon Vandenhende and Soumya Batra and Spencer Whitman and Sten Sootla and Stephane Collot and Suchin Gururangan and Sydney Borodinsky and Tamar Herman and Tara Fowler and Tarek Sheasha and Thomas Georgiou and Thomas Scialom and Tobias Speckbacher and Todor Mihaylov and Tong Xiao and Ujjwal Karn and Vedanuj Goswami and Vibhor Gupta and Vignesh Ramanathan and Viktor Kerkez and Vincent Gonguet and Virginie Do and Vish Vogeti and Vítor Albiero and Vladan Petrovic and Weiwei Chu and Wenhan Xiong and Wenyin Fu and Whitney Meers and Xavier Martinet and Xiaodong Wang and Xiaofang Wang and Xiaoqing Ellen Tan and Xide Xia and Xinfeng Xie and Xuchao Jia and Xuewei Wang and Yaelle Goldschlag and Yashesh Gaur and Yasmine Babaei and Yi Wen and Yiwen Song and Yuchen Zhang and Yue Li and Yuning Mao and Zacharie Delpierre Coudert and Zheng Yan and Zhengxing Chen and Zoe Papakipos and Aaditya Singh and Aayushi Srivastava and Abha Jain and Adam Kelsey and Adam Shajnfeld and Adithya Gangidi and Adolfo Victoria and Ahuva Goldstand and Ajay Menon and Ajay Sharma and Alex Boesenberg and Alexei Baevski and Allie Feinstein and Amanda Kallet and Amit Sangani and Amos Teo and Anam Yunus and Andrei Lupu and Andres Alvarado and Andrew Caples and Andrew Gu and Andrew Ho and Andrew Poulton and Andrew Ryan and Ankit Ramchandani and Annie Dong and Annie Franco and Anuj Goyal and Aparajita Saraf and Arkabandhu Chowdhury and Ashley Gabriel and Ashwin Bharambe and Assaf Eisenman and Azadeh Yazdan and Beau James and Ben Maurer and Benjamin Leonhardi and Bernie Huang and Beth Loyd and Beto De Paola and Bhargavi Paranjape and Bing Liu and Bo Wu and Boyu Ni and Braden Hancock and Bram Wasti and Brandon Spence and Brani Stojkovic and Brian Gamido and Britt Montalvo and Carl Parker and Carly Burton and Catalina Mejia and Ce Liu and Changhan Wang and Changkyu Kim and Chao Zhou and Chester Hu and Ching-Hsiang Chu and Chris Cai and Chris Tindal and Christoph Feichtenhofer and Cynthia Gao and Damon Civin and Dana Beaty and Daniel Kreymer and Daniel Li and David Adkins and David Xu and Davide Testuggine and Delia David and Devi Parikh and Diana Liskovich and Didem Foss and Dingkang Wang and Duc Le and Dustin Holland and Edward Dowling and Eissa Jamil and Elaine Montgomery and Eleonora Presani and Emily Hahn and Emily Wood and Eric-Tuan Le and Erik Brinkman and Esteban Arcaute and Evan Dunbar and Evan Smothers and Fei Sun and Felix Kreuk and Feng Tian and Filippos Kokkinos and Firat Ozgenel and Francesco Caggioni and Frank Kanayet and Frank Seide and Gabriela Medina Florez and Gabriella Schwarz and Gada Badeer and Georgia Swee and Gil Halpern and Grant Herman and Grigory Sizov and Guangyi and Zhang and Guna Lakshminarayanan and Hakan Inan and Hamid Shojanazeri and Han Zou and Hannah Wang and Hanwen Zha and Haroun Habeeb and Harrison Rudolph and Helen Suk and Henry Aspegren and Hunter Goldman and Hongyuan Zhan and Ibrahim Damlaj and Igor Molybog and Igor Tufanov and Ilias Leontiadis and Irina-Elena Veliche and Itai Gat and Jake Weissman and James Geboski and James Kohli and Janice Lam and Japhet Asher and Jean-Baptiste Gaya and Jeff Marcus and Jeff Tang and Jennifer Chan and Jenny Zhen and Jeremy Reizenstein and Jeremy Teboul and Jessica Zhong and Jian Jin and Jingyi Yang and Joe Cummings and Jon Carvill and Jon Shepard and Jonathan McPhie and Jonathan Torres and Josh Ginsburg and Junjie Wang and Kai Wu and Kam Hou U and Karan Saxena and Kartikay Khandelwal and Katayoun Zand and Kathy Matosich and Kaushik Veeraraghavan and Kelly Michelena and Keqian Li and Kiran Jagadeesh and Kun Huang and Kunal Chawla and Kyle Huang and Lailin Chen and Lakshya Garg and Lavender A and Leandro Silva and Lee Bell and Lei Zhang and Liangpeng Guo and Licheng Yu and Liron Moshkovich and Luca Wehrstedt and Madian Khabsa and Manav Avalani and Manish Bhatt and Martynas Mankus and Matan Hasson and Matthew Lennie and Matthias Reso and Maxim Groshev and Maxim Naumov and Maya Lathi and Meghan Keneally and Miao Liu and Michael L. Seltzer and Michal Valko and Michelle Restrepo and Mihir Patel and Mik Vyatskov and Mikayel Samvelyan and Mike Clark and Mike Macey and Mike Wang and Miquel Jubert Hermoso and Mo Metanat and Mohammad Rastegari and Munish Bansal and Nandhini Santhanam and Natascha Parks and Natasha White and Navyata Bawa and Nayan Singhal and Nick Egebo and Nicolas Usunier and Nikhil Mehta and Nikolay Pavlovich Laptev and Ning Dong and Norman Cheng and Oleg Chernoguz and Olivia Hart and Omkar Salpekar and Ozlem Kalinli and Parkin Kent and Parth Parekh and Paul Saab and Pavan Balaji and Pedro Rittner and Philip Bontrager and Pierre Roux and Piotr Dollar and Polina Zvyagina and Prashant Ratanchandani and Pritish Yuvraj and Qian Liang and Rachad Alao and Rachel Rodriguez and Rafi Ayub and Raghotham Murthy and Raghu Nayani and Rahul Mitra and Rangaprabhu Parthasarathy and Raymond Li and Rebekkah Hogan and Robin Battey and Rocky Wang and Russ Howes and Ruty Rinott and Sachin Mehta and Sachin Siby and Sai Jayesh Bondu and Samyak Datta and Sara Chugh and Sara Hunt and Sargun Dhillon and Sasha Sidorov and Satadru Pan and Saurabh Mahajan and Saurabh Verma and Seiji Yamamoto and Sharadh Ramaswamy and Shaun Lindsay and Shaun Lindsay and Sheng Feng and Shenghao Lin and Shengxin Cindy Zha and Shishir Patil and Shiva Shankar and Shuqiang Zhang and Shuqiang Zhang and Sinong Wang and Sneha Agarwal and Soji Sajuyigbe and Soumith Chintala and Stephanie Max and Stephen Chen and Steve Kehoe and Steve Satterfield and Sudarshan Govindaprasad and Sumit Gupta and Summer Deng and Sungmin Cho and Sunny Virk and Suraj Subramanian and Sy Choudhury and Sydney Goldman and Tal Remez and Tamar Glaser and Tamara Best and Thilo Koehler and Thomas Robinson and Tianhe Li and Tianjun Zhang and Tim Matthews and Timothy Chou and Tzook Shaked and Varun Vontimitta and Victoria Ajayi and Victoria Montanez and Vijai Mohan and Vinay Satish Kumar and Vishal Mangla and Vlad Ionescu and Vlad Poenaru and Vlad Tiberiu Mihailescu and Vladimir Ivanov and Wei Li and Wenchen Wang and Wenwen Jiang and Wes Bouaziz and Will Constable and Xiaocheng Tang and Xiaojian Wu and Xiaolan Wang and Xilun Wu and Xinbo Gao and Yaniv Kleinman and Yanjun Chen and Ye Hu and Ye Jia and Ye Qi and Yenda Li and Yilin Zhang and Ying Zhang and Yossi Adi and Youngjin Nam and Yu and Wang and Yu Zhao and Yuchen Hao and Yundi Qian and Yunlu Li and Yuzi He and Zach Rait and Zachary DeVito and Zef Rosnbrick and Zhaoduo Wen and Zhenyu Yang and Zhiwei Zhao and Zhiyu Ma},
+  title         = {The Llama 3 Herd of Models},
+  year          = {2024},
+  archiveprefix = {arXiv},
+  eprint        = {2407.21783},
+  primaryclass  = {cs.AI},
+  url           = {https://arxiv.org/abs/2407.21783},
+}
+
+@Misc{Met2024,
+  author       = {{Meta}},
+  howpublished = {\url{https://github.com/meta-llama/llama-models/blob/main/models/llama3_3/MODEL_CARD.md}},
+  note         = {Zugegriffen: 10. Juni 2025},
+  title        = {{Llama 3.3 Model Card}},
+  year         = {2024},
+}
+
+@Misc{Chiang2024,
+  author        = {Wei-Lin Chiang and Lianmin Zheng and Ying Sheng and Anastasios Nikolas Angelopoulos and Tianle Li and Dacheng Li and Hao Zhang and Banghua Zhu and Michael Jordan and Joseph E. Gonzalez and Ion Stoica},
+  title         = {Chatbot Arena: An Open Platform for Evaluating LLMs by Human Preference},
+  year          = {2024},
+  archiveprefix = {arXiv},
+  eprint        = {2403.04132},
+  primaryclass  = {cs.AI},
+  url           = {https://arxiv.org/abs/2403.04132},
+}
+
+@Misc{Radford2018,
+  author       = {Radford, Alec and Narasimhan, Karthik and Salimans, Tim and Sutskever, Ilya},
+  howpublished = {\url{https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf}},
+  note         = {OpenAI Technical Report},
+  title        = {Improving Language Understanding by Generative Pre-Training},
+  year         = {2018},
+  publisher    = {OpenAI},
+}
+
+@Misc{Sennrich2016,
+  author        = {Rico Sennrich and Barry Haddow and Alexandra Birch},
+  title         = {Neural Machine Translation of Rare Words with Subword Units},
+  year          = {2016},
+  archiveprefix = {arXiv},
+  eprint        = {1508.07909},
+  primaryclass  = {cs.CL},
+  url           = {https://arxiv.org/abs/1508.07909},
+}
+
+@Misc{Ouyang2022,
+  author        = {Long Ouyang and Jeff Wu and Xu Jiang and Diogo Almeida and Carroll L. Wainwright and Pamela Mishkin and Chong Zhang and Sandhini Agarwal and Katarina Slama and Alex Ray and John Schulman and Jacob Hilton and Fraser Kelton and Luke Miller and Maddie Simens and Amanda Askell and Peter Welinder and Paul Christiano and Jan Leike and Ryan Lowe},
+  title         = {Training language models to follow instructions with human feedback},
+  year          = {2022},
+  archiveprefix = {arXiv},
+  eprint        = {2203.02155},
+  primaryclass  = {cs.CL},
+  url           = {https://arxiv.org/abs/2203.02155},
+}
+
+@Misc{OpenAI2023,
+  author       = {{OpenAI}},
+  howpublished = {\url{https://openai.com/index/chatgpt/}},
+  note         = {Einführende Webseite},
+  title        = {Introducing {ChatGPT}},
+  year         = {2023},
+}
+
+@Misc{Team2025,
+  author        = {Gemma Team and Aishwarya Kamath and Johan Ferret and Shreya Pathak and Nino Vieillard and Ramona Merhej and Sarah Perrin and Tatiana Matejovicova and Alexandre Ramé and Morgane Rivière and Louis Rouillard and Thomas Mesnard and Geoffrey Cideron and Jean-bastien Grill and Sabela Ramos and Edouard Yvinec and Michelle Casbon and Etienne Pot and Ivo Penchev and Gaël Liu and Francesco Visin and Kathleen Kenealy and Lucas Beyer and Xiaohai Zhai and Anton Tsitsulin and Robert Busa-Fekete and Alex Feng and Noveen Sachdeva and Benjamin Coleman and Yi Gao and Basil Mustafa and Iain Barr and Emilio Parisotto and David Tian and Matan Eyal and Colin Cherry and Jan-Thorsten Peter and Danila Sinopalnikov and Surya Bhupatiraju and Rishabh Agarwal and Mehran Kazemi and Dan Malkin and Ravin Kumar and David Vilar and Idan Brusilovsky and Jiaming Luo and Andreas Steiner and Abe Friesen and Abhanshu Sharma and Abheesht Sharma and Adi Mayrav Gilady and Adrian Goedeckemeyer and Alaa Saade and Alex Feng and Alexander Kolesnikov and Alexei Bendebury and Alvin Abdagic and Amit Vadi and András György and André Susano Pinto and Anil Das and Ankur Bapna and Antoine Miech and Antoine Yang and Antonia Paterson and Ashish Shenoy and Ayan Chakrabarti and Bilal Piot and Bo Wu and Bobak Shahriari and Bryce Petrini and Charlie Chen and Charline Le Lan and Christopher A. Choquette-Choo and CJ Carey and Cormac Brick and Daniel Deutsch and Danielle Eisenbud and Dee Cattle and Derek Cheng and Dimitris Paparas and Divyashree Shivakumar Sreepathihalli and Doug Reid and Dustin Tran and Dustin Zelle and Eric Noland and Erwin Huizenga and Eugene Kharitonov and Frederick Liu and Gagik Amirkhanyan and Glenn Cameron and Hadi Hashemi and Hanna Klimczak-Plucińska and Harman Singh and Harsh Mehta and Harshal Tushar Lehri and Hussein Hazimeh and Ian Ballantyne and Idan Szpektor and Ivan Nardini and Jean Pouget-Abadie and Jetha Chan and Joe Stanton and John Wieting and Jonathan Lai and Jordi Orbay and Joseph Fernandez and Josh Newlan and Ju-yeong Ji and Jyotinder Singh and Kat Black and Kathy Yu and Kevin Hui and Kiran Vodrahalli and Klaus Greff and Linhai Qiu and Marcella Valentine and Marina Coelho and Marvin Ritter and Matt Hoffman and Matthew Watson and Mayank Chaturvedi and Michael Moynihan and Min Ma and Nabila Babar and Natasha Noy and Nathan Byrd and Nick Roy and Nikola Momchev and Nilay Chauhan and Noveen Sachdeva and Oskar Bunyan and Pankil Botarda and Paul Caron and Paul Kishan Rubenstein and Phil Culliton and Philipp Schmid and Pier Giuseppe Sessa and Pingmei Xu and Piotr Stanczyk and Pouya Tafti and Rakesh Shivanna and Renjie Wu and Renke Pan and Reza Rokni and Rob Willoughby and Rohith Vallu and Ryan Mullins and Sammy Jerome and Sara Smoot and Sertan Girgin and Shariq Iqbal and Shashir Reddy and Shruti Sheth and Siim Põder and Sijal Bhatnagar and Sindhu Raghuram Panyam and Sivan Eiger and Susan Zhang and Tianqi Liu and Trevor Yacovone and Tyler Liechty and Uday Kalra and Utku Evci and Vedant Misra and Vincent Roseberry and Vlad Feinberg and Vlad Kolesnikov and Woohyun Han and Woosuk Kwon and Xi Chen and Yinlam Chow and Yuvein Zhu and Zichuan Wei and Zoltan Egyed and Victor Cotruta and Minh Giang and Phoebe Kirk and Anand Rao and Kat Black and Nabila Babar and Jessica Lo and Erica Moreira and Luiz Gustavo Martins and Omar Sanseviero and Lucas Gonzalez and Zach Gleicher and Tris Warkentin and Vahab Mirrokni and Evan Senter and Eli Collins and Joelle Barral and Zoubin Ghahramani and Raia Hadsell and Yossi Matias and D. Sculley and Slav Petrov and Noah Fiedel and Noam Shazeer and Oriol Vinyals and Jeff Dean and Demis Hassabis and Koray Kavukcuoglu and Clement Farabet and Elena Buchatskaya and Jean-Baptiste Alayrac and Rohan Anil and Dmitry and Lepikhin and Sebastian Borgeaud and Olivier Bachem and Armand Joulin and Alek Andreev and Cassidy Hardin and Robert Dadashi and Léonard Hussenot},
+  title         = {Gemma 3 Technical Report},
+  year          = {2025},
+  archiveprefix = {arXiv},
+  eprint        = {2503.19786},
+  primaryclass  = {cs.CL},
+  url           = {https://arxiv.org/abs/2503.19786},
+}
+
+@Misc{Wang2024,
+  author        = {Yubo Wang and Xueguang Ma and Ge Zhang and Yuansheng Ni and Abhranil Chandra and Shiguang Guo and Weiming Ren and Aaran Arulraj and Xuan He and Ziyan Jiang and Tianle Li and Max Ku and Kai Wang and Alex Zhuang and Rongqi Fan and Xiang Yue and Wenhu Chen},
+  title         = {MMLU-Pro: A More Robust and Challenging Multi-Task Language Understanding Benchmark},
+  year          = {2024},
+  archiveprefix = {arXiv},
+  eprint        = {2406.01574},
+  primaryclass  = {cs.CL},
+  url           = {https://arxiv.org/abs/2406.01574},
+}
+
+@Misc{Peeperkorn2024,
+  author        = {Max Peeperkorn and Tom Kouwenhoven and Dan Brown and Anna Jordanous},
+  title         = {Is Temperature the Creativity Parameter of Large Language Models?},
+  year          = {2024},
+  archiveprefix = {arXiv},
+  eprint        = {2405.00492},
+  file          = {:Peeperkorn2024 - Is Temperature the Creativity Parameter of Large Language Models_.ris:ris},
+  primaryclass  = {cs.CL},
+  url           = {https://arxiv.org/abs/2405.00492},
+}
+
+@Misc{OpenAI2025,
+  author       = {{OpenAI}},
+  howpublished = {\\url{https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf}},
+  month        = apr,
+  note         = {Whitepaper, OpenAI},
+  title        = {A Practical Guide to Building Agents},
+  year         = {2025},
+}
+
+@Misc{Kapoor2024,
+  author        = {Sayash Kapoor and Benedikt Stroebl and Zachary S. Siegel and Nitya Nadgir and Arvind Narayanan},
+  title         = {AI Agents That Matter},
+  year          = {2024},
+  archiveprefix = {arXiv},
+  eprint        = {2407.01502},
+  primaryclass  = {cs.LG},
+  url           = {https://arxiv.org/abs/2407.01502},
+}
+
+@Misc{Gao2024,
+  author        = {Yunfan Gao and Yun Xiong and Xinyu Gao and Kangxiang Jia and Jinliu Pan and Yuxi Bi and Yi Dai and Jiawei Sun and Meng Wang and Haofen Wang},
+  title         = {Retrieval-Augmented Generation for Large Language Models: A Survey},
+  year          = {2024},
+  archiveprefix = {arXiv},
+  eprint        = {2312.10997},
+  primaryclass  = {cs.CL},
+  url           = {https://arxiv.org/abs/2312.10997},
+}
+
+@InProceedings{Chen2024a,
+  author    = {Chen, Jianlyu and Xiao, Shitao and Zhang, Peitian and Luo, Kun and Lian, Defu and Liu, Zheng},
+  booktitle = {Findings of the Association for Computational Linguistics: ACL 2024},
+  title     = {{M}3-Embedding: Multi-Linguality, Multi-Functionality, Multi-Granularity Text Embeddings Through Self-Knowledge Distillation},
+  year      = {2024},
+  address   = {Bangkok, Thailand},
+  editor    = {Ku, Lun-Wei and Martins, Andre and Srikumar, Vivek},
+  month     = aug,
+  pages     = {2318--2335},
+  publisher = {Association for Computational Linguistics},
+  abstract  = {In this paper, we introduce a new embedding model called M3-Embedding, which is distinguished for its versatility in Multi-Linguality, Multi-Functionality, and Multi-Granularity. It provides a uniform support for the semantic retrieval of more than 100 working languages. It can simultaneously accomplish the three common retrieval functionalities: dense retrieval, multi-vector retrieval, and sparse retrieval. Besides, it is also capable of processing inputs of different granularities, spanning from short sentences to long documents of up to 8,192 tokens. The effective training of M3-Embedding presents a series of technical contributions. Notably, we propose a novel self-knowledge distillation approach, where the relevance scores from different retrieval functionalities can be integrated as the teacher signal to enhance the training quality. We also optimize the batching strategy, which enables a large batch size and high training throughput to improve the discriminativeness of embeddings. M3-Embedding exhibits a superior performance in our experiment, leading to new state-of-the-art results on multilingual, cross-lingual, and long-document retrieval benchmarks.},
+  doi       = {10.18653/v1/2024.findings-acl.137},
+  url       = {https://aclanthology.org/2024.findings-acl.137/},
+}
+
+@Misc{Park2023,
+  author        = {Joon Sung Park and Joseph C. O'Brien and Carrie J. Cai and Meredith Ringel Morris and Percy Liang and Michael S. Bernstein},
+  title         = {Generative Agents: Interactive Simulacra of Human Behavior},
+  year          = {2023},
+  archiveprefix = {arXiv},
+  eprint        = {2304.03442},
+  file          = {:Park2023 - Generative Agents_ Interactive Simulacra of Human Behavior.ris:ris},
+  primaryclass  = {cs.HC},
+  url           = {https://arxiv.org/abs/2304.03442},
+}
+
+@Article{Dorri2018,
+  author   = {Dorri, Ali and Kanhere, Salil S. and Jurdak, Raja},
+  journal  = {IEEE Access},
+  title    = {Multi-Agent Systems: A Survey},
+  year     = {2018},
+  pages    = {28573-28593},
+  volume   = {6},
+  doi      = {10.1109/ACCESS.2018.2831228},
+  keywords = {Task analysis;Multi-agent systems;Computer science;Security;Australia;Computational modeling;Decision making;Multi-agent systems;survey;MAS applications;challenges},
+}
+
+@Misc{Sapkota2025,
+  author        = {Ranjan Sapkota and Konstantinos I. Roumeliotis and Manoj Karkee},
+  title         = {AI Agents vs. Agentic AI: A Conceptual Taxonomy, Applications and Challenges},
+  year          = {2025},
+  archiveprefix = {arXiv},
+  eprint        = {2505.10468},
+  primaryclass  = {cs.AI},
+  url           = {https://arxiv.org/abs/2505.10468},
+}
+
+@Misc{Yao2023,
+  author        = {Shunyu Yao and Jeffrey Zhao and Dian Yu and Nan Du and Izhak Shafran and Karthik Narasimhan and Yuan Cao},
+  title         = {ReAct: Synergizing Reasoning and Acting in Language Models},
+  year          = {2023},
+  archiveprefix = {arXiv},
+  eprint        = {2210.03629},
+  primaryclass  = {cs.CL},
+  url           = {https://arxiv.org/abs/2210.03629},
+}
+
+@Misc{LangChain2025,
+  author       = {{LangChain Inc.}},
+  howpublished = {\url{https://langchain-ai.github.io/langgraph/concepts/why-langgraph/}},
+  month        = {June},
+  note         = {Accessed: 2025-06-16},
+  title        = {Why LangGraph?},
+  year         = {2025},
+}
+
+@Misc{LangChain2025a,
+  author       = {{LangChain Inc.}},
+  howpublished = {\url{https://langchain-ai.github.io/langgraph/agents/overview/}},
+  month        = {June},
+  note         = {Online-Dokumentation; abgerufen am 16. Juni 2025},
+  title        = {Agent development with {LangGraph}},
+  year         = {2025},
+}
+
+@Misc{LangChain2025b,
+  author       = {{LangChain Inc.}},
+  howpublished = {\url{https://langchain-ai.github.io/langgraph/concepts/multi_agent/}},
+  month        = {June},
+  note         = {Online-Dokumentation; abgerufen am 16. Juni 2025},
+  title        = {Multi-agent systems},
+  year         = {2025},
+}
+
+@Misc{LangChain2025c,
+  author       = {{LangChain Inc.}},
+  howpublished = {\url{https://langchain-ai.github.io/langgraph/how-tos/multi_agent/#build-a-multi-agent-system}},
+  month        = {June},
+  note         = {Online-Dokumentation; abgerufen am 16. Juni 2025},
+  title        = {Build multi-agent systems},
+  year         = {2025},
+}
+
+@Misc{Hadfield2025,
+  author       = {Jeremy Hadfield and Barry Zhang and Kenneth Lien and Florian Scholz and Jeremy Fox and Daniel Ford},
+  howpublished = {\url{https://www.anthropic.com/engineering/built-multi-agent-research-system}},
+  month        = {June},
+  note         = {Anthropic Engineering Blog; abgerufen am 17. Juni 2025},
+  title        = {How we built our multi-agent research system},
+  year         = {2025},
+  day          = {13},
+}
+
+@Misc{Reimers2019,
+  author        = {Nils Reimers and Iryna Gurevych},
+  title         = {Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks},
+  year          = {2019},
+  archiveprefix = {arXiv},
+  eprint        = {1908.10084},
+  primaryclass  = {cs.CL},
+  url           = {https://arxiv.org/abs/1908.10084},
+}
+
+@Article{Singhal2001,
+  author  = {Singhal, Amit and others},
+  journal = {IEEE Data Eng. Bull.},
+  title   = {Modern information retrieval: A brief overview},
+  year    = {2001},
+  number  = {4},
+  pages   = {35--43},
+  volume  = {24},
+}
+
+@Article{Pan2024,
+  author   = {Pan, James Jie and Wang, Jianguo and Li, Guoliang},
+  journal  = {The VLDB Journal},
+  title    = {Survey of vector database management systems},
+  year     = {2024},
+  issn     = {0949-877X},
+  number   = {5},
+  pages    = {1591--1615},
+  volume   = {33},
+  abstract = {There are now over 20 commercial vector database management systems (VDBMSs), all produced within the past five years. But embedding-based retrieval has been studied for over ten years, and similarity search a staggering half century and more. Driving this shift from algorithms to systems are new data intensive applications, notably large language models, that demand vast stores of unstructured data coupled with reliable, secure, fast, and scalable query processing capability. A variety of new data management techniques now exist for addressing these needs, however there is no comprehensive survey to thoroughly review these techniques and systems. We start by identifying five main obstacles to vector data management, namely the ambiguity of semantic similarity, large size of vectors, high cost of similarity comparison, lack of structural properties that can be used for indexing, and difficulty of efficiently answering “hybrid” queries that jointly search both attributes and vectors. Overcoming these obstacles has led to new approaches to query processing, storage and indexing, and query optimization and execution. For query processing, a variety of similarity scores and query types are now well understood; for storage and indexing, techniques include vector compression, namely quantization, and partitioning techniques based on randomization, learned partitioning, and “navigable” partitioning; for query optimization and execution, we describe new operators for hybrid queries, as well as techniques for plan enumeration, plan selection, distributed query processing, data manipulation queries, and hardware accelerated query execution. These techniques lead to a variety of VDBMSs across a spectrum of design and runtime characteristics, including “native” systems that are specialized for vectors and “extended” systems that incorporate vector capabilities into existing systems. We then discuss benchmarks, and finally outline research challenges and point the direction for future work.},
+  doi      = {10.1007/s00778-024-00864-x},
+  refid    = {Pan2024},
+  url      = {https://doi.org/10.1007/s00778-024-00864-x},
+}
+
+@Misc{Qdrant2025,
+  author       = {{Qdrant Inc.}},
+  howpublished = {\url{https://qdrant.tech/documentation/overview/}},
+  month        = {June},
+  note         = {Online-Dokumentation; abgerufen am 17. Juni 2025},
+  title        = {What is Qdrant?},
+  year         = {2025},
+}
+
+@InBook{VillazonTerrazas2017,
+  author    = {Villazon-Terrazas, Boris and Garcia-Santa, Nuria and Ren, Yuan and Faraotti, Alessandro and Wu, Honghan and Zhao, Yuting and Vetere, Guido and Pan, Jeff Z.},
+  editor    = {Pan, Jeff Z. and Vetere, Guido and Gomez-Perez, Jose Manuel and Wu, Honghan},
+  pages     = {17--55},
+  publisher = {Springer International Publishing},
+  title     = {Knowledge Graph Foundations},
+  year      = {2017},
+  address   = {Cham},
+  isbn      = {978-3-319-45654-6},
+  abstract  = {This chapter presents a high-level overview of the foundations of Knowledge Graphs.},
+  booktitle = {Exploiting Linked Data and Knowledge Graphs in Large Organisations},
+  doi       = {10.1007/978-3-319-45654-6_2},
+  url       = {https://doi.org/10.1007/978-3-319-45654-6_2},
 }
 
 @Comment{jabref-meta: databaseType:bibtex;}
