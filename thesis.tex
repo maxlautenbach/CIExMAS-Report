@@ -48,6 +48,24 @@
   literate={:}{{{\color{orange}:}}}1,
 }
 
+% Definition einer SPARQL‑Sprache
+\lstdefinelanguage{SPARQL}{
+  morekeywords={@prefix,@base,a,SELECT,WHERE},
+  morekeywords=[2]{ex,exp,rdfs},
+  morestring=[b]",
+  morestring=[b]',
+  sensitive=true,
+  basicstyle=\small\ttfamily,
+  keywordstyle=\color{blue},
+  keywordstyle=[2]\color{magenta},
+  commentstyle=\color{gray}\itshape,
+  stringstyle=\color{OliveGreen},
+  columns=fullflexible,
+  breaklines=true,
+  breakatwhitespace=false,
+  literate={:}{{{\color{orange}:}}}1,
+}
+
 % Globales Styling für alle Listings
 \lstset{
   language=Turtle,
@@ -87,6 +105,12 @@
 \begin{acronym}
   \acro{RDF}{Resource Description Framework}
   \acro{URI}{Uniform Resource Identifier}
+  \acro{RDFS}{Resource Description Framework Schema}
+  \acro{OWL}{Web Ontology Language}
+  \acro{SPARQL}{SPARQL Protocol and RDF Query Language}
+  \acro{LM}{Language Model}
+  \acro{LLM}{Large Language Model}
+  \acro{ML}{Machine Learning}
 \end{acronym}
 
 \mainmatter
@@ -98,7 +122,7 @@
 
 \chapter{Background}
 \label{ch:related_work}
-In the following chapter, the necessary theoretical background to understand core concepts of this approach will be described. Therefore, the chapter will start with an explanation of knowledge graphs (section \ref{sec:knowledge_graphs}). Building on that foundation, a section on closed information extraction (section \ref{sec:closed_information_extraction}), which is the problem that is approached in this work, will follow. Afterwards the theoretical background on the multi-agent-system approach will be defined starting with the core language and embedding models (section \ref{sec:large_language_models} and \ref{sec:sentence_embeddings_vector_stores}) over to defining what AI agents and multi-agent-systems are (section \ref{sec:ai_agents} and \ref{sec:multi_agent_systems}), leading to a section on agent design best practises (section \ref{sec:agent_design}).
+In the following chapter, the necessary theoretical background to understand core concepts of this approach will be described. Therefore, the chapter will start with an explanation of knowledge graphs (section \ref{sec:knowledge_graphs}). Building on that foundation, a section on closed information extraction (section \ref{sec:closed_information_extraction}), which is the problem that is approached in this work, will follow. Afterwards the theoretical background on the multi-agent-system approach will be defined starting with the core language and embedding models (section \ref{sec:language_models} and \ref{sec:sentence_embeddings_vector_stores}) over to defining what AI agents and multi-agent-systems are (section \ref{sec:ai_agents} and \ref{sec:multi_agent_systems}), leading to a section on agent design best practises (section \ref{sec:agent_design}).
 \section{Knowledge Graphs}
 \label{sec:knowledge_graphs}
 Knowledge graphs are a concept to store knowledge in a way that the semantic in the knowledge is machine-retrievable \cite{GomezPerez2017}. In order to accomplish this goal, knowledge graphs are directed graphs, whereas the nodes define real world entities and the edges define the relationsship between the entities \cite{Paulheim2016}. To define the domain and give a knowledge graph a set of rules, the types of entities and relations are predefined in what is called an ontology \cite{GomezPerez2017,Paulheim2016}. Following those definition, the ecosystem of knowledge graphs is build from three building blocks: knowledge graph construction, knowledge graph storage, knowledge graph consumption \cite{GomezPerez2017}.
@@ -124,7 +148,7 @@ Turtle is build up of simple triple statements consisting of subject, property a
 _:b1 <http://example.org/property/works_for> <http://example.org/entity/Friedrich_Merz>.
 \end{lstlisting}
 
-In order to simplify the turtle statements, prefixes can be defined. Those prefixes corralate to a namespace, which is a path in the \ac{URI} which multiple resource are stored under. A prefix is defined using \textit{@prefix}, the name of the prefix followed by a colon (i.e. \textit{ex:}) and the namespace itself. In the shown example using prefixes could simplify the turtle statements to the following:
+In order to simplify the turtle statements, prefixes can be defined. Those prefixes corralate to a namespace, which is a path in the \ac{URI} which multiple resource are stored under. A prefix is defined using \textit{@prefix}, the name of the prefix followed by a colon (i.e. \textit{ex:}) and the namespace itself. In the shown example using prefixes could simplify the turtle statements to the following \cite{Tomaszuk2020}:
 
 \begin{lstlisting}[language=Turtle, caption=Example of a Knowledge Graph in Turtle Format, label=lst:turtle_example]
 @prefix ex: <http://example.org/entity/>
@@ -137,23 +161,60 @@ ex:Angela_Merkel exp:greeted_by _:b1.
 _:b1 exp:works_for ex:Friedrich_Merz.
 \end{lstlisting}
 
-\begin{itemize}
-  \item What are Knowledge Graphs
-  \item How are Knowledge Graphs Designed (OWL, Restrictions - Domain \& Ranges, RDF)?
-  \item How are Knowledge Graphs Queried (SPARQL)
-  \item How can Knowledge Graphs be stored and retrieved (Vector Store - Jena)
-  \item What is the Use Case of Knowledge Graphs
-  \item Common Public Knowledge Graphs (Wikidata)
-\end{itemize}
+Besides defining the entities and their relationship, turtle is also used to implement ontologies. In general ontologies can be defined using \ac{RDFS} or \ac{OWL}, which itself is an extension to \ac{RDFS}. The idea behind \ac{RDFS} is to provide a standardised way to define classes and properties for a knowledge graph. In addition, \ac{RDFS} can make the semantic of a knowledge graph more extensive by providing restrictions or indents on a class. One apparent restrictions is the domains and ranges attached on properties. Domains and ranges are type restrictions on the subject (domain) and object (range) of a triple. When there is a property like \textit{exp:member\_of} is defined, the ontology can hold the domain \textit{ex:human} and the range \textit{ex:organisation}, which means the every subject \textit{S} that is member of an object \textit{O} must be of type \textit{ex:human}, whereas the object must be of type \textit{ex:organisation}. As \ac{RDFS} is limited in experessive power, \ac{OWL} was developed as extension providing ideas like symmetric properties like \textit{exp:married\_to}, which when A is married to B, we can imply that B is married to A. \ac{OWL} also provides an extensive set of possible restrictions, which opens the opportunity to design complex restrictions on either classes or properties \cite{VillazonTerrazas2017}.
+
+Following up to the building block of knowledge graph construction, it is necessary to introduce triple stores as the building block of knowledge graph storage. Triple stores are build to save and retrieve identities form a triplex collection, which means that triple stores are connection construction and retrieval. The triplex collection has to comply with the \ac{RDF} standard \cite{Rusher2003}. One triple store implementation is Apache Jena. Jena provides a whole triple store stack, allowing to manipulate and retrieve an \ac{RDF} graph via API or direct I/O modules in Java. In addition, Jena supports all mentioned standard like \ac{RDF}, \ac{RDFS} and \ac{OWL} \cite{Carroll2004}. To support the de-facto standard knowledge graph query language \ac{SPARQL} \cite{VillazonTerrazas2017}, the Apache Jena Toolset implements Jena Fuseki which is working as a \ac{SPARQL} server \cite{Chokshi2022}.
+
+The idea of \ac{SPARQL} is to retrieve data from a \ac{RDF} knowledge graph, but also to manipulate data in it. The language is following the standards of turtle, when it comes to query construction. Three most essential query types are select, ask and insert queries. Select queries are able to retrieve content from the graph. Ask queries are simplified select queries, that can just acknowledge on an existance of the requested query. Insert queries are ones to manipulate the data in the graph \cite{VillazonTerrazas2017}.
+
+In general a \ac{SPARQL} query begins with the query type followed with the \textit{WHERE} keyword and the query definition. In the case of select queries, the query type keyword is followed by variables, which are defined be a leading question mark followed by the variable name (i.e. \textit{?organisation}). As \ac{SPARQL} follows the turtle language also prefixes can be defined. In addition \ac{SPARQL} queries can take filtering and query options like limits or offsets \cite{VillazonTerrazas2017}. To show an example, if you want to search the organisations Angela Merkel is member of, a \ac{SPARQL} query could look like this:
+
+\begin{lstlisting}[language=SPARQL, caption=Example of a SPARQL Query, label=lst:turtle_example]
+  @prefix ex: <http://example.org/entity/>
+  @prefix exp: <http://example.org/property/>
+  
+  SELECT ?organisation WHERE {
+    ex:Angela_Merkel exp:member_of ?organisation
+  }
+  \end{lstlisting}
+
+As all building blocks of a knowledge graphs are declared, the goal is now to introduce one use case of knowledge graphs to show the capabilities but also challenges in leveraging knowledge graphs in real world use cases. A project named HAVAS 18 aimed to monitor start-up activities, tech trends and tech talents leveraging knowledge graphs. This comes by leveraging existing relationships between the mentioned entities on social networks. This could reveal relevant relations and create a better understanding how start-ups, tech trends and tech talents arise and evolve. As social networks can already provide structured relationship data, the data basis of the knowledge graph can be extracted \cite{Monti2017}. On the other side \citep{Monti2017} states, that the main challenges of this project were entity resolution and disambiguation as well as the processing of unstructured data. This already shows up challenges, that this work tries to solve.
+
+In addition to such specific use cases, there are approaches, which try to represent the largest online encyclopoedia Wikipedia into a knowledge graph. Two present approaches are Wikidata and DBpedia. The goal of Wikidata was to establish a knowledge management for factual information in Wikipedia. Leveraging knowledge graph technology the idea was to eliminate redundancies and create multi-language support. Therefore, Wikidata is also a community-based project, where the community can make changes in the graph. In addition, Wikidata is nowadays the factual information knowledge store integrated into Wikipedia \cite{Vrandecic2014}. In addition, DBpedia is another knowledge graph employed to provide data for semantic web applications. Other than in Wikidata, DBpedia use extraction frameworks leveraging syntactical structured constructs from MediaWiki to convert Wikipedia dumps to \ac{RDF}.
+
+As a conclusion, knowledge graphs can provide semantically rich data, by leveraging the graph data structure together with standardised frameworks and languages build around the knowledge graph concept. In addition, knowledge graphs are publically available in immense size and are open to use. Nevertheless, when developing use cases utilising knowledge graphs, the challenges could come down to process unstructured data and detect ambiguated entities.
+
 \section{Closed Information Extraction}
 \label{sec:closed_information_extraction}
-\begin{itemize}
-  \item What is Information Extraction
-  \item What is Closed Information Extraction
-  \item What types of approaches exist
-\end{itemize}
-\section{Large Language Models}
-\label{sec:large_language_models}
+Closed information extraction is the problem area of extracting triples out of an unstructured text, whereas each part of triple must match the underlying knowledge graph \cite{Josifoski2021}. This means that the extracted entities and properties have to match the exact string, that can be mapped into the knowledge graph. This differs from open information extraction, as there the textual information gets convert in free-form triples \cite{Etzioni2008}.
+Another concept in the area of information extraction is relation extraction, which is focussed on identifying the relation between entities, which also includes detecting entities \cite{Zhao2024}. Relation extraction differs from open relation extraction, as the type and structure of relations are already defined \cite{Kamp2023}. All problems are sub-problems of the field of information extraction, which is defined as the general process to extract entities and relations out of a text \cite{Etzioni2008}.
+
+As especially relation extraction and closed information extraction share many similarities, the challenges and solutions are also similar. The first challenge is about to identify and extract entities out of a text. From there on, entities can be already linked to a knowledge graph in the case of closed information extraction. In this case entity extraction necessarily means also entity disambiguation, as there might be entities using the same name in the knowledge graph. Using the identified entities, relations must be detected between them and those relations have to be classified. Afterwards a mapping of those relations into the knowledge graph must be done when processing a closed information extraction task \cite{Josifoski2021,Zhao2024}.
+
+To process those tasks, there are two approaches: A pipeline or a joint-approach. The pipeline approaches work through those tasks step-by-step. In some cases the exact steps are variied as tasks can be splited up or joined. In joint approaches all steps happen at the same time but implicitly. This is an approach to reduce error propagation throughout the single steps in the pipelines by combining them, in order to optimised methods towards the overall target of producing correct triples \cite{Zhao2024,Josifoski2021}.
+
+Whereas the ideas of all subproblems of information extraction remains the same, \citep{Josifoski2021} states, that especially open information extraction techniques are not applicable to closed information extraction. This is grounded in the complexity of closed information extraction, being constraint to a knowledge base. Therefore, closed information extraction requires structured output that is ready to be mapped onto entities and properties in a knowledge graph \cite{Josifoski2021}.
+
+Overall closed information extraction is a very restricted subclass of information extraction where the additional challenge of mapping entities and properties to a knowledge base is added to the remaining challenges. Those challenges are covering entity extraction, disambiguation and linking together with the actual relation extraction and linking. Each of this steps can produce errors, which is why either pipeline approaches are used, where each step is tried to be as error-resistant as possible or joint approaches are used, which can be optimised towards the overall goal.
+
+\section{Language Models}
+\label{sec:language_models}
+A \ac{LM} is a \ac{ML} model, that at its core is able to predict the probabilities of how a text is going to be completed based on the previous text\cite{Radford2019}. Since the original publication by \citep{Vaswani2023} most present \acp{LM} are build out of two components, the tokenizer and the transformel model. The tokenizer transforms parts of a text into a integers. Therefore, the integers are like a index in a vocabulary mapping a character sequence to an integer \cite{Sennrich2016}. In present models like the GPT-models the existing tokenizer is a byte-pair encoding \cite{Radford2019}. This byte-pair encoding works by intialising a vocabulary using single characters. Afterwards frequent character sequences will be merged iteratively, create new tokens. This will be done until a defined maximum number of tokens in the vocabulary is reached \cite{Sennrich2016}. With that explained, a \ac{LM} can be mathematically formulated as a conditional probability $P$ of the token $t_i$ under the condition of all previous tokens:
+\begin{equation}
+  P(t_i|t_1,...,t_{i-1}).
+\end{equation}
+
+The core part of a \ac{LM} is the transformer. Transformers itself are \ac{ML} models that concept of Multi-Head-Attention Layers and Feed-Fordward Layers. Attention is a concept to encode previously tokens ($t_1,...,t_{i-1}$) and their relation to the current token $t_i$ into the encoded representation of the current token. The implementation of this concepts requires an learned embedidng of all tokens and three learnable weight matrices. An embedding is in this case a trained mathematical representation of a token. The weight matrices split up in one weight matrix $W^Q$ for the current token and two weight matrices $W^K, W^V$ for the previous tokens \cite{Vaswani2023}. The idea behind this concept is, that those weight matrices are able to detect relations like adjectives and therefore influence the encoding of a token \cite{Sanderson2024}. For instance, when the text \enquote{... the former german chancelor Angela Merkel ...} is processed by the attention layer, the attention mechanism could encode \enquote{former german} into the token of \enquote{chancelor}. It has to be mentioned, that this is an example and the exact behavior of the attention layer could differ \cite{Sanderson2024}.
+
+Following this idea, \citep{Vaswani2023} proposed the concept of multi-head attention to learn multiple weight matrices and run the matrix multiplication done by the attention mechanism multiple times in parallel. Afterwards the result of all attention heads are concatenated and projected using the Softmax function \cite{Vaswani2023}. Therefore, multi-head attention could also be able to identify various kinds of relationships inside a sentence \cite{Sanderson2024}. In addition to multi-head attention, a position encoding is inserted into the embeddings of the tokens \cite{Vaswani2023}. In addition, each output of the attention respective the feed forward layer gets added to the initial input to this layer and afterwards get normalized. The Transformer is completed by a linear layer mapping the vector representation back on the vocabulary and a softmax layer to get a probability distribution across the vocabulary \cite{Vaswani2023}. Figure \ref{fig:transformer} shows the overall composition of transformers with the encoder component on the left and the decoder component on the right. As following explanations focusses on the already explained components the masked-multi-head-attention and encoder-decoder split will not be covered.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.5\textwidth]{figures/Transformer.png}
+  \caption{Architecture of a Transformer model. \cite{Vaswani2023}}
+  \label{fig:transformer}
+\end{figure}
+
 \begin{itemize}
   \item What are LLMs?
   \item How do they work?
@@ -224,6 +285,16 @@ _:b1 exp:works_for ex:Friedrich_Merz.
 \label{subsec:turtle_to_label}
 \section{Evaluation Setup}
 \label{sec:evaluation_setup}
+\subsection{Dataset}
+\label{sec:dataset}
+\begin{itemize}
+  \item synthIE
+\end{itemize}
+\subsection{Wikidata}
+\label{sec:wikidata}
+\begin{itemize}
+  \item How does Wikidata looks like?
+\end{itemize}
 \begin{itemize}
   \item Langgraph
   \item 2 Datasplits on synthIE Text (Train Val, Test)
