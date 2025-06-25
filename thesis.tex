@@ -103,6 +103,8 @@
 
 \chapter{List of Abbreviations}
 \begin{acronym}
+  \acro{AI}{Artificial Intelligence}
+  \acro{CRM}{Customer Relationship Management}
   \acro{RDF}{Resource Description Framework}
   \acro{URI}{Uniform Resource Identifier}
   \acro{RDFS}{Resource Description Framework Schema}
@@ -127,7 +129,7 @@
 
 \chapter{Background}
 \label{ch:related_work}
-In the following chapter, the necessary theoretical background to understand core concepts of this approach will be described. Therefore, the chapter will start with an explanation of knowledge graphs (section \ref{sec:knowledge_graphs}). Building on that foundation, a section on closed information extraction (section \ref{sec:closed_information_extraction}), which is the problem that is approached in this work, will follow. Afterwards the theoretical background on the multi-agent-system approach will be defined starting with the core language and embedding models (section \ref{sec:language_models} and \ref{sec:sentence_embeddings_vector_stores}) over to defining what AI agents and multi-agent-systems are (section \ref{sec:ai_agents} and \ref{sec:multi_agent_systems}), leading to a section on agent design best practises (section \ref{sec:agent_design}).
+In the following chapter, the necessary theoretical background to understand core concepts of this approach will be described. Therefore, the chapter will start with an explanation of knowledge graphs (section \ref{sec:knowledge_graphs}). Building on that foundation, a section on closed information extraction (section \ref{sec:closed_information_extraction}), which is the problem that is approached in this work, will follow. Afterwards the theoretical background on the multi-agent-system approach will be defined starting with the core language and embedding models (section \ref{sec:language_models} and \ref{sec:sentence_embeddings_vector_stores}) over to defining what \ac{AI} agents and multi-agent-systems are (section \ref{sec:ai_agents} and \ref{sec:multi_agent_systems}), leading to a section on agent design best practises (section \ref{sec:agent_design}).
 \section{Knowledge Graphs}
 \label{sec:knowledge_graphs}
 Knowledge graphs are a concept to store knowledge in a way that the semantic in the knowledge is machine-retrievable \cite{GomezPerez2017}. In order to accomplish this goal, knowledge graphs are directed graphs, whereas the nodes define real world entities and the edges define the relationsship between the entities \cite{Paulheim2016}. To define the domain and give a knowledge graph a set of rules, the types of entities and relations are predefined in what is called an ontology \cite{GomezPerez2017,Paulheim2016}. Following those definition, the ecosystem of knowledge graphs is build from three building blocks: knowledge graph construction, knowledge graph storage, knowledge graph consumption \cite{GomezPerez2017}.
@@ -267,7 +269,23 @@ As already stated Qdrant is an example for a \ac{VDBMS}. It uses the concept of 
 \section{AI Agents}
 \label{sec:ai_agents}
 
-AI Agents are a more narrow concept of a normal Agent. \citet{Dorri2018} defines an Agent as \enquote{(a)n entity which is placed in an environment and senses different parameters that are used to make a decision based on the goal of the entity. The entity performs the necessary action on the environment based on this decision.} \cite[S. 28574]{Dorri2018}
+\ac{AI} agents are a more narrow concept of a normal agent. \citet{Dorri2018} defines an agent as \enquote{(a)n entity which is placed in an environment and senses different parameters that are used to make a decision based on the goal of the entity. The entity performs the necessary action on the environment based on this decision.} \cite[S. 28574]{Dorri2018} The entity in this case is defined as the type of the agent. The enviroment is the place of the agent, which is defined by the accessibility and quality of data, predictability of outcomes, the dynamic of enviroment changes and continuity of the state. Parameters can be defined as the data that the agent gets and the action is the set of actions that the agent can take \cite{Dorri2018}.
+
+Agents do have a decision engine. \ac{AI} agents typically narrow this decision engine nowadays down to \acp{LLM} \cite{Sapkota2025,Park2023}. Furthermore \ac{AI} agents are defined by having a high degree of idependence, while being task-specific and react and adapt to the current state \cite{Sapkota2025,OpenAI2025}. The high degree of independence differs to workflows, were the path how to achieve a goal is well-defined \cite{Anthropic2024}. The idea behind \acp{LLM} that power agents is to generate human-like behavior, as \acp{LLM} have internal representation of human behavior via the training data \cite{Park2023}.
+
+To achieve this goal the agent architecture cosists of agent orchestration, a \ac{LLM} model used for decision making and reasoning and tools \cite{Wiesinger2025,OpenAI2025}. All components are executed by an agent runtime. The orchestration layer is the layer that defines which information an agent gets. This consists of managing memory, providing the prompt templates to the agent and define a message flow, so how the actions that the agent takes are executed \cite{Wiesinger2025}.
+
+According to \citet{OpenAI2025} tools can be defined in three types: Data, Action, Orchestration. Data tools are concentrated on retrieving information from external systems. Therefore, data tools can query databases or search the web. Action tools enable the agent to take actions in external systems. This means, the agent could update or create record in systems like a \ac{CRM}. Orchestration agents, agents that serve themselve as tools. This concept is referred to as multi-agent systems an will be explained in detail in section \ref{sec:multi_agent_systems}. In general, tools are an enabler to AI agent to directly interact with external systems. This interaction allows \ac{AI} agents to act highly idenpendent.
+
+A single \ac{AI} agent is targeted to process a single well defined tasks together with defined tools. Within this task it stays indepent, but a single \ac{AI} agent is not offering a high degree of flexibility, when not using other agents as tools \cite{Sapkota2025}. In this use case \citet{Anthropic2024} proposes that \ac{AI} agents are able to understand complex inputs, can make use of tools in reliable manner and recover from errors. In addition, \ac{AI} agents can engage in reasoning and planning over given tasks \cite{Anthropic2024}.
+
+The ability to reason is especially used in the ReAct agent framework proposed by \citet{Yao2023}. The idea behind the ReAct frame is the synergy between reasoning on perceptions and taking action from there on, as this is a typical learning behavior of humans. In the proposed idea, the \ac{LLM} is mocking this human behavior by being told to reason and act \cite{Yao2023}.
+
+In general the ReAct framework prompts an \ac{LLM} to reason about a task using a defined state. The resulting thought will be written in the state, alongside with all following thought. Besides giving a thought, the \ac{LLM} is prompted to take an action which could either be running a tool, running itself again or ending the process. This action leads to a result which is called observation. After each thought in the state, an action and the following observation is stored. Together this build up a history, that the \ac{LLM} could leverage to memorise it's own thoughts and actions \cite{Yao2023}.
+
+To implement \ac{AI} agents \citet{Anthropic2024} proposes to take a framework like LangGraph. LangGraph is an open-source frame to build agent with the whole agent ecosystem. Therefore, tools, memory and the state can be define either using LangGraph in python or JavaScript. LangGraph offers a high extensibility, to define the agent as individual as needed \cite{LangChain2025}. Alltogether LangGraph is integrated with the LangChain package \cite{LangChain2025a}.
+
+Overall \ac{AI} agents are defined by a model taking independent actions. Therefore, an agent must be orchestrated and has access to various tools. The ReAct framework can implement the ideas and capabilities of \ac{AI} agents so that the \acp{LLM} behave human-like and therefore achieve good results.
 
 \begin{itemize}
   \item What is an Agent
