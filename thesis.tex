@@ -111,6 +111,11 @@
   \acro{LM}{Language Model}
   \acro{LLM}{Large Language Model}
   \acro{ML}{Machine Learning}
+  \acro{GPT}{Generative Pre-trained Transformer}
+  \acro{LLaMA}{Large Language Model Meta AI}
+  \acro{RAG}{Retrieval Augmented Generation}
+  \acro{VDBMS}{Vector Database Management System}
+  \acro{DBMS}{Database Management System}
 \end{acronym}
 
 \mainmatter
@@ -178,7 +183,7 @@ In general a \ac{SPARQL} query begins with the query type followed with the \tex
   }
   \end{lstlisting}
 
-As all building blocks of a knowledge graphs are declared, the goal is now to introduce one use case of knowledge graphs to show the capabilities but also challenges in leveraging knowledge graphs in real world use cases. A project named HAVAS 18 aimed to monitor start-up activities, tech trends and tech talents leveraging knowledge graphs. This comes by leveraging existing relationships between the mentioned entities on social networks. This could reveal relevant relations and create a better understanding how start-ups, tech trends and tech talents arise and evolve. As social networks can already provide structured relationship data, the data basis of the knowledge graph can be extracted \cite{Monti2017}. On the other side \citep{Monti2017} states, that the main challenges of this project were entity resolution and disambiguation as well as the processing of unstructured data. This already shows up challenges, that this work tries to solve.
+As all building blocks of a knowledge graphs are declared, the goal is now to introduce one use case of knowledge graphs to show the capabilities but also challenges in leveraging knowledge graphs in real world use cases. A project named HAVAS 18 aimed to monitor start-up activities, tech trends and tech talents leveraging knowledge graphs. This comes by leveraging existing relationships between the mentioned entities on social networks. This could reveal relevant relations and create a better understanding how start-ups, tech trends and tech talents arise and evolve. As social networks can already provide structured relationship data, the data basis of the knowledge graph can be extracted \cite{Monti2017}. On the other side \citet{Monti2017} states, that the main challenges of this project were entity resolution and disambiguation as well as the processing of unstructured data. This already shows up challenges, that this work tries to solve.
 
 In addition to such specific use cases, there are approaches, which try to represent the largest online encyclopoedia Wikipedia into a knowledge graph. Two present approaches are Wikidata and DBpedia. The goal of Wikidata was to establish a knowledge management for factual information in Wikipedia. Leveraging knowledge graph technology the idea was to eliminate redundancies and create multi-language support. Therefore, Wikidata is also a community-based project, where the community can make changes in the graph. In addition, Wikidata is nowadays the factual information knowledge store integrated into Wikipedia \cite{Vrandecic2014}. In addition, DBpedia is another knowledge graph employed to provide data for semantic web applications. Other than in Wikidata, DBpedia use extraction frameworks leveraging syntactical structured constructs from MediaWiki to convert Wikipedia dumps to \ac{RDF}.
 
@@ -193,20 +198,20 @@ As especially relation extraction and closed information extraction share many s
 
 To process those tasks, there are two approaches: A pipeline or a joint-approach. The pipeline approaches work through those tasks step-by-step. In some cases the exact steps are variied as tasks can be splited up or joined. In joint approaches all steps happen at the same time but implicitly. This is an approach to reduce error propagation throughout the single steps in the pipelines by combining them, in order to optimised methods towards the overall target of producing correct triples \cite{Zhao2024,Josifoski2021}.
 
-Whereas the ideas of all subproblems of information extraction remains the same, \citep{Josifoski2021} states, that especially open information extraction techniques are not applicable to closed information extraction. This is grounded in the complexity of closed information extraction, being constraint to a knowledge base. Therefore, closed information extraction requires structured output that is ready to be mapped onto entities and properties in a knowledge graph \cite{Josifoski2021}.
+Whereas the ideas of all subproblems of information extraction remains the same, \citet{Josifoski2021} states, that especially open information extraction techniques are not applicable to closed information extraction. This is grounded in the complexity of closed information extraction, being constraint to a knowledge base. Therefore, closed information extraction requires structured output that is ready to be mapped onto entities and properties in a knowledge graph \cite{Josifoski2021}.
 
 Overall closed information extraction is a very restricted subclass of information extraction where the additional challenge of mapping entities and properties to a knowledge base is added to the remaining challenges. Those challenges are covering entity extraction, disambiguation and linking together with the actual relation extraction and linking. Each of this steps can produce errors, which is why either pipeline approaches are used, where each step is tried to be as error-resistant as possible or joint approaches are used, which can be optimised towards the overall goal.
 
 \section{Language Models}
 \label{sec:language_models}
-A \ac{LM} is a \ac{ML} model, that at its core is able to predict the probabilities of how a text is going to be completed based on the previous text\cite{Radford2019}. Since the original publication by \citep{Vaswani2023} most present \acp{LM} are build out of two components, the tokenizer and the transformel model. The tokenizer transforms parts of a text into a integers. Therefore, the integers are like a index in a vocabulary mapping a character sequence to an integer \cite{Sennrich2016}. In present models like the GPT-models the existing tokenizer is a byte-pair encoding \cite{Radford2019}. This byte-pair encoding works by intialising a vocabulary using single characters. Afterwards frequent character sequences will be merged iteratively, create new tokens. This will be done until a defined maximum number of tokens in the vocabulary is reached \cite{Sennrich2016}. With that explained, a \ac{LM} can be mathematically formulated as a conditional probability $P$ of the token $t_i$ under the condition of all previous tokens:
+A \ac{LM} is a \ac{ML} model, that at its core is able to predict the probabilities of how a text is going to be completed based on the previous text\cite{Radford2019}. Since the original publication by \citet{Vaswani2023} most present \acp{LM} are build out of two components, the tokenizer and the transformel model. The tokenizer transforms parts of a text into a integers. Therefore, the integers are like a index in a vocabulary mapping a character sequence to an integer \cite{Sennrich2016}. In present models like the GPT-models the existing tokenizer is a byte-pair encoding \cite{Radford2019}. This byte-pair encoding works by intialising a vocabulary using single characters. Afterwards frequent character sequences will be merged iteratively, create new tokens. This will be done until a defined maximum number of tokens in the vocabulary is reached \cite{Sennrich2016}. With that explained, a \ac{LM} can be mathematically formulated as a conditional probability $P$ of the token $t_i$ under the condition of all previous tokens:
 \begin{equation}
   P(t_i|t_1,...,t_{i-1}).
 \end{equation}
 
 The core part of a \ac{LM} is the transformer. Transformers itself are \ac{ML} models that concept of Multi-Head-Attention Layers and Feed-Fordward Layers. Attention is a concept to encode previously tokens ($t_1,...,t_{i-1}$) and their relation to the current token $t_i$ into the encoded representation of the current token. The implementation of this concepts requires an learned embedidng of all tokens and three learnable weight matrices. An embedding is in this case a trained mathematical representation of a token. The weight matrices split up in one weight matrix $W^Q$ for the current token and two weight matrices $W^K, W^V$ for the previous tokens \cite{Vaswani2023}. The idea behind this concept is, that those weight matrices are able to detect relations like adjectives and therefore influence the encoding of a token \cite{Sanderson2024}. For instance, when the text \enquote{... the former german chancelor Angela Merkel ...} is processed by the attention layer, the attention mechanism could encode \enquote{former german} into the token of \enquote{chancelor}. It has to be mentioned, that this is an example and the exact behavior of the attention layer could differ \cite{Sanderson2024}.
 
-Following this idea, \citep{Vaswani2023} proposed the concept of multi-head attention to learn multiple weight matrices and run the matrix multiplication done by the attention mechanism multiple times in parallel. Afterwards the result of all attention heads are concatenated and projected using the Softmax function \cite{Vaswani2023}. Therefore, multi-head attention could also be able to identify various kinds of relationships inside a sentence \cite{Sanderson2024}. In addition to multi-head attention, a position encoding is inserted into the embeddings of the tokens \cite{Vaswani2023}. In addition, each output of the attention respective the feed forward layer gets added to the initial input to this layer and afterwards get normalized. The Transformer is completed by a linear layer mapping the vector representation back on the vocabulary and a softmax layer to get a probability distribution across the vocabulary \cite{Vaswani2023}. Figure \ref{fig:transformer} shows the overall composition of transformers with the encoder component on the left and the decoder component on the right. As following explanations focusses on the already explained components the masked-multi-head-attention and encoder-decoder split will not be covered.
+Following this idea, \citet{Vaswani2023} proposed the concept of multi-head attention to learn multiple weight matrices and run the matrix multiplication done by the attention mechanism multiple times in parallel. Afterwards the result of all attention heads are concatenated and projected using the Softmax function \cite{Vaswani2023}. Therefore, multi-head attention could also be able to identify various kinds of relationships inside a sentence \cite{Sanderson2024}. In addition to multi-head attention, a position encoding is inserted into the embeddings of the tokens \cite{Vaswani2023}. In addition, each output of the attention respective the feed forward layer gets added to the initial input to this layer and afterwards get normalized. The Transformer is completed by a linear layer mapping the vector representation back on the vocabulary and a softmax layer to get a probability distribution across the vocabulary \cite{Vaswani2023}. Figure \ref{fig:transformer} shows the overall composition of transformers with the encoder component on the left and the decoder component on the right. As following explanations focusses on the already explained components the masked-multi-head-attention and encoder-decoder split will not be covered.
 
 \begin{figure}[h]
   \centering
@@ -215,16 +220,55 @@ Following this idea, \citep{Vaswani2023} proposed the concept of multi-head atte
   \label{fig:transformer}
 \end{figure}
 
-\begin{itemize}
-  \item What are LLMs?
-  \item How do they work?
-  \item What capabilities do they have?
-  \item Softmax Temperature and Seeds
-\end{itemize}
-\section{Sentence Embeddings and Vector Stores}
-\label{sec:sentence_embeddings_vector_stores}
+As already stated, a softmax function is used to get a probability distribution across all possible output tokens. Normally the sampling process of the next token is used to be a random process, where each tokens has the assigned weight from the softmax function. In order to increase or decrease randomness, a temperature parameter $T$ is introduced in the softmax function \cite{Peeperkorn2024}. For each output $z_i$ on token $t_i$ for a sequence with length $n$ the softmax function $softmax(\mathbf{z})_i$ with the temperature $T$ will be calculated as \cite{Peeperkorn2024}:
+
+\begin{equation}
+  softmax(\mathbf{z})_i = \frac{exp(\frac{z_i}{T})}{\sum^n_j exp(\frac{z_j}{T})}~~~where~\mathbf{z} \in \mathbb{R}^n.
+\end{equation}
+
+Increasing the temperature $T>1$ would lower high probabilities and increase low probabilities and therefore make the output more novel in theory. A temperatur $T<1$ would amplify high probabilities and make the text generation more predictable. Using a temperature $T=0$ change the generation to greedy sampling, as then only the token with the highest probability is used \cite{Peeperkorn2024}.
+
+Todays top-tier like OpenAIs \ac{GPT} models or Metas \ac{LLaMA} models \acp{LM} do make use of the decoder part of the transformer \cite{Radford2018,Grattafiori2024}. Models especially with large amount of parameters are typically referred to as \acp{LLM}. Those decoder-only models do only have the target to make predictions for the token $t_i$. Those models use unsupervised pre-training, by using a text-corpora and maximizing the probabilities of each subsequent token in this corpora to be predicted. In former models like the original GPT version, after pre-training a task-specific supervised fine-tuning was necessary to get usable results \cite{Radford2018}.
+
+The recent history of \acp{LM} showed, that increasing the corpora size on the pre-training and the parameters number enables the models to be able to process tasks from various domains without further fine-tuning \cite{Radford2018,Radford2019,Brown2020}. With the GPT-3 publication, \citet{Brown2020} showed that their model can leverage in-context learning to increase their performance on specific tasks. Therefore, in the input of the model, what is also called the prompt, examples will be added. For instance, when the \ac{LM} should process translation tasks, it get's in it's prompt examples like \textit{house $\rightarrow$ Haus} or \textit{light bulb $\rightarrow$ Glühbirne}. Including multiple examples is called few-shot prompting, while including one example is called one-shot-prompting and including no example is called zero-shot prompting.
+
+This technique has shown great success especially when using larger models, as they were able to process in-context information more efficient. But also the zero-shot experiments showed superior performance to SOTA models in various tasks, showing the general capabilities of recent \acp{LM} \cite{Brown2020}. To enable this performance, \citet{Brown2020} used the Common Crawl corpora, filtered it and added also other smaller, but high quality corpora to their pre-training dataset. Therefore, the \ac{GPT}-3 pre-training dataset had access on over 500 billion tokens \cite{Brown2020}.
+
+As the Common Crawl corpora follows the idea of providing a copy of the entire internet \cite{CCF2025} and other used corpora also provide prose text combined with the overall training goal of \acp{LM} leads to a superior performance in text generation but not in instruction following \cite{Ouyang2022}. In addition, \citet{Ouyang2022} states the real-world usage of \acp{LM} differ from the given corpora, as most users use instructions. Therefore, \ac{GPT}-3 was finetuned towards two datasets. One dataset uses human-given answers to prompts to fine-tune the model. In addition, human-labeled comparisons between answers of different \ac{GPT}-3 models are used to train a reward models, that is applied using reinforcement learning on the model. At the end of the experiements, the resulting InstructGPT model reached superior performance on human evaluated benchmarks based on the output on held-out prompts from customers. Even the smallest instruction tuned model with 1.3 billion parameters outperformed \ac{GPT}-3 with 175 billion parameters in this evaluation \cite{Ouyang2022}.
+
+In order to choose ideal model for use-cases, on option could be to use benchmarks like MMLU-Pro \cite{Wang2024} or the human-evaluated Chatbot Arena \cite{Chiang2024}. The MMLU-Pro benchmark is testing for multi-task language understanding with the goal to test the various capabilities of LLMs. Therefore, the MMLU-Pro keeps tasks from maths, physics, law, engineering and various other topics \cite{Wang2024}. The Chatbot Arena\footnote{The Chatbot Arena can be accessed under \url{https://lmarena.ai}} is a live benchmark working with human preferences. Therefore, the use gets two answers from two distinct models to the user prompt. Then the human chooses which \ac{LM} performed better. Based on this feedback a win rate and a score can be calculated \cite{Chiang2024}.
+
+In conclusion, \acp{LM} are \ac{ML} models consisting out of multiple multi-head attention and feed-forward network layers with the goal to predict the probability of a following token based on all previous tokens. Therefore, those models are designed as with a large amount of parameters and additional use pre-training based on large size corpora to achieve outperforming results. In the end, those models can be benchmarked using MMLU-Pro or the Chatbot Arena to test various capabilities of them.
+
+\section{Sentence Embeddings}
+\label{sec:sentence_embeddings}
+
+Sentence embeddings in general have the idea to represent a text in a vector \cite{Singhal2001}. Building those vectors, the semantic of the sentence can be encoded in those embeddings, so that a meaningful similarity between the vectors can be calculated \cite{Reimers2019}. Typically this similarity is the cosine of the angle between two vectors, which is named cosine similarity. The property of the cosine function then allows, that the cosine between two vectors is 1.0 when they are total identical and 0.0 if not \cite{Singhal2001}. Such models are critical to enable large-scale semantic similarity comparisons which are useful for various use cases, like retrieving knowledge similar to a user query \cite{Reimers2019,Gao2024}.
+
+One recent model is M3-Embedding, which is trained to support semantic retrieval functions that rely on similarity functions. The overall idea of M3-Embedding is to support multiple languages, multiple retrieval functionalities and multiple input granularities. To achieve this goal M3-Embedding leverage the encoder architecture of transformers like stated in section \ref{sec:language_models} \cite{Chen2024}.
+
+Training-wise, \citet{Chen2024} follows the pre-training approach, while fine-tuning later on high-quality data. The pre-training was done on unlabeled corpora utilising semantic structures like title-body or title-abstract. To support multi-linugua a translation dataset was leveraged. Then labeled corpora in different languages and synthesised corpora consisting of questions generated by \ac{GPT}-3.5 based on multilingual paragraphs were used to fine-tune the embeddings. Overall the M3-Embedding model was trained to detect if a queries matches a text passage from its semantics or not \cite{Chen2024}.
+
+Overall sentence embeddings can be used to map sentence into the vector space, while also encoding semantic into this space. Leveraging vector algebra like the cosine similarity, semantic similarity between two sentence embeddings can be calculate. To achieve SOTA performance embeddings like M3-Embedding make use of the transformer architecture combined with extensive training sets and the pre-training technique.
+
+\section{Retrieval Augmented Generation}
+\label{sec:retrieval_augmented_generation}
+
+As \acp{LM} are trained on large-size snapshots of corpora, they are by default not able to retrieve out-of-scope knowledge from the internal representation. Therefore, \ac{RAG} emerged as a solution to incorporate knowledge from external data sources into the \ac{LM} at runtime. \ac{RAG} in it's simplest form is build out of indexing, retrieval and generation. In the indexing step, the plain text, also called document, will be mapped into the vector space utilising embedding models like the previously named M3-Embeddings \cite{Gao2024}. This embeddings are stored for later retreive in a database that can handle vectors and vector algebra efficient \cite{Gao2024,Pan2024}.
+
+The steps of retrieval and generation are done at runtime, whereas the indexing can run independend. The retrieval steps utilises again the embedding model to map the user query into the vector space. As shown in section \ref{sec:sentence_embeddings}, models like M3-Embeddings are trained on to calculate the similarity between documents and user queries. This enables the retrieval step to run a similarity search on the \ac{VDBMS} and retrieve the most relevant documents based on the user query. After the retrieval those documents can be composed into a prompt template, where additionaly to the user prompt, a system prompt can be defined. Then this prompt is send to the \ac{LM} with the goal to produce a external knowledge aware answer \cite{Gao2024}.
+
+Besides the already explained embeddings the \ac{RAG} depends on a \ac{VDBMS}. Those databases consist like normal \ac{DBMS} out of a query processor and a storage manager. The query processor is optimising the query and processes especially the similarity searches. One example of \ac{VDBMS} is Qdrant. Qdrant uses filtering and vector set size depended execution paths. If a vector set, named collection in Qdrant, keeps many vectors, a brute-force search would be to extensive. Therefore, Qdrant would use pre-filtering mechanism that limit the search results and computations that have to be done. The storage manager manages the physical access and storage of the data \cite{Pan2024}.
+
+As already stated Qdrant is an example for a \ac{VDBMS}. It uses the concept of collection, where vectors are stored that should be retrieved together, for instance to cluster vectors that all belong to one project. Additionally to the vectors, payloads can be used to store metadata alongside with the vectors. Qdrant offers a python client and a Langchain integration, which is useful to be leveraged in vector store projects \cite{Qdrant2025}. Langchain itself is a framework to develop application with \acp{LM} \cite{LangChain2025d}. Through its query optimisations, Qdrant is able to handle large-scale datasets efficient \cite{Qdrant2025,Pan2024}.
+
+\ac{RAG} is one solution to integrate external knowledge bases, that can be updated efficient, into \acp{LM}. Therefore, \ac{RAG} makes use of the ability of embeddings to encode semantic similarity that can be retrieved using cosine similarity. In order to make use of \ac{RAG} the external knowledge bases have to be indexed using embeddings. To support \ac{RAG}, \ac{VDBMS} are utilised for an efficient indexing and retrieval process.
+
 \section{AI Agents}
 \label{sec:ai_agents}
+
+AI Agents are a more narrow concept of a normal Agent. \citet{Dorri2018} defines an Agent as \enquote{(a)n entity which is placed in an environment and senses different parameters that are used to make a decision based on the goal of the entity. The entity performs the necessary action on the environment based on this decision.} \cite[S. 28574]{Dorri2018}
+
 \begin{itemize}
   \item What is an Agent
   \item What is an AI Agent
@@ -304,6 +348,12 @@ Following this idea, \citep{Vaswani2023} proposed the concept of multi-head atte
   \item Models: Llama 3.3 70B (Mainly), Tests with o3-mini, Llama 4 ...
 \end{itemize}
 % Your first main chapter goes here
+\section{Language Models}
+\begin{itemize}
+  \item Llama 3.3 70B
+  \item Gemma 3 27B
+  \item Llama 4 Maverick
+\end{itemize}
 
 \chapter{Evaluation}
 \label{ch:evaluation}
