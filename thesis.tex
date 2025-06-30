@@ -217,7 +217,7 @@ The core part of a \ac{LM} is the transformer. Transformers itself are \ac{ML} m
 
 Following this idea, \citet{Vaswani2023} proposed the concept of multi-head attention to learn multiple weight matrices and run the matrix multiplication done by the attention mechanism multiple times in parallel. Afterwards the result of all attention heads are concatenated and projected using the Softmax function \cite{Vaswani2023}. Therefore, multi-head attention could also be able to identify various kinds of relationships inside a sentence \cite{Sanderson2024}. In addition to multi-head attention, a position encoding is inserted into the embeddings of the tokens \cite{Vaswani2023}. In addition, each output of the attention respective the feed forward layer gets added to the initial input to this layer and afterwards get normalized. The Transformer is completed by a linear layer mapping the vector representation back on the vocabulary and a softmax layer to get a probability distribution across the vocabulary \cite{Vaswani2023}. Figure \ref{fig:transformer} shows the overall composition of transformers with the encoder component on the left and the decoder component on the right. As following explanations focusses on the already explained components the masked-multi-head-attention and encoder-decoder split will not be covered.
 
-\begin{figure}[h]
+\begin{figure}[t]
   \centering
   \includegraphics[width=0.5\textwidth]{figures/Transformer.png}
   \caption{Architecture of a Transformer model. \cite{Vaswani2023}}
@@ -247,7 +247,14 @@ In conclusion, \acp{LM} are \ac{ML} models consisting out of multiple multi-head
 \section{Sentence Embeddings}
 \label{sec:sentence_embeddings}
 
-Sentence embeddings in general have the idea to represent a text in a vector \cite{Singhal2001}. Building those vectors, the semantic of the sentence can be encoded in those embeddings, so that a meaningful similarity between the vectors can be calculated \cite{Reimers2019}. Typically this similarity is the cosine of the angle between two vectors, which is named cosine similarity. The property of the cosine function then allows, that the cosine between two vectors is 1.0 when they are total identical and 0.0 if not \cite{Singhal2001}. Such models are critical to enable large-scale semantic similarity comparisons which are useful for various use cases, like retrieving knowledge similar to a user query \cite{Reimers2019,Gao2024}.
+Sentence embeddings in general have the idea to represent a text in a vector \cite{Singhal2001}. Building those vectors, the semantic of the sentence can be encoded in those embeddings, so that a meaningful similarity between the vectors can be calculated \cite{Reimers2019}. Typically this similarity is the cosine of the angle between two vectors, which is named cosine similarity. The property of the cosine function then allows, that the cosine between two vectors is 1.0 when they are total identical and 0.0 if not \cite{Singhal2001}. An visualisation of this behavior can be found in figure \ref{fig:cosine_similarity}. Such models are critical to enable large-scale semantic similarity comparisons which are useful for various use cases, like retrieving knowledge similar to a user query \cite{Reimers2019,Gao2024}.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.6\textwidth]{figures/cosine_similarity.jpeg}
+  \caption{Visualization of cosine similarity between two vectors showing how the angle between vectors determines their similarity score. \cite{Leys2022}}
+  \label{fig:cosine_similarity}
+\end{figure}
 
 One recent model is M3-Embedding, which is trained to support semantic retrieval functions that rely on similarity functions. The overall idea of M3-Embedding is to support multiple languages, multiple retrieval functionalities and multiple input granularities. To achieve this goal M3-Embedding leverage the encoder architecture of transformers like stated in section \ref{sec:language_models} \cite{Chen2024}.
 
@@ -260,7 +267,14 @@ Overall sentence embeddings can be used to map sentence into the vector space, w
 
 As \acp{LM} are trained on large-size snapshots of corpora, they are by default not able to retrieve out-of-scope knowledge from the internal representation. Therefore, \ac{RAG} emerged as a solution to incorporate knowledge from external data sources into the \ac{LM} at runtime. \ac{RAG} in it's simplest form is build out of indexing, retrieval and generation. In the indexing step, the plain text, also called document, will be mapped into the vector space utilising embedding models like the previously named M3-Embeddings \cite{Gao2024}. This embeddings are stored for later retreive in a database that can handle vectors and vector algebra efficient \cite{Gao2024,Pan2024}.
 
-The steps of retrieval and generation are done at runtime, whereas the indexing can run independend. The retrieval steps utilises again the embedding model to map the user query into the vector space. As shown in section \ref{sec:sentence_embeddings}, models like M3-Embeddings are trained on to calculate the similarity between documents and user queries. This enables the retrieval step to run a similarity search on the \ac{VDBMS} and retrieve the most relevant documents based on the user query. After the retrieval those documents can be composed into a prompt template, where additionaly to the user prompt, a system prompt can be defined. Then this prompt is send to the \ac{LM} with the goal to produce a external knowledge aware answer \cite{Gao2024}.
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.8\textwidth]{figures/RAG.png}
+  \caption{Overview of the Retrieval Augmented Generation (RAG) architecture showing the indexing, retrieval, and generation pipeline. \cite{Gao2024}}
+  \label{fig:rag}
+\end{figure}
+
+In figure \ref{fig:rag} an overview about the steps and the functionality of each step can be found. The steps of retrieval and generation are done at runtime, whereas the indexing can run independend. The retrieval steps utilises again the embedding model to map the user query into the vector space. As shown in section \ref{sec:sentence_embeddings}, models like M3-Embeddings are trained on to calculate the similarity between documents and user queries. This enables the retrieval step to run a similarity search on the \ac{VDBMS} and retrieve the most relevant documents based on the user query. After the retrieval those documents can be composed into a prompt template, where additionaly to the user prompt, a system prompt can be defined. Then this prompt is send to the \ac{LM} with the goal to produce a external knowledge aware answer \cite{Gao2024}.
 
 Besides the already explained embeddings the \ac{RAG} depends on a \ac{VDBMS}. Those databases consist like normal \ac{DBMS} out of a query processor and a storage manager. The query processor is optimising the query and processes especially the similarity searches. One example of \ac{VDBMS} is Qdrant. Qdrant uses filtering and vector set size depended execution paths. If a vector set, named collection in Qdrant, keeps many vectors, a brute-force search would be to extensive. Therefore, Qdrant would use pre-filtering mechanism that limit the search results and computations that have to be done. The storage manager manages the physical access and storage of the data \cite{Pan2024}.
 
@@ -304,7 +318,16 @@ All mentioned points can also be mapped and extended when focussing on \ac{LLM} 
 
 In the case of \ac{LLM}-based \ac{MAS}, each agent is in general required the same building blocks like mentioned in section \ref{sec:ai_agents}. This concept is adapted to \ac{MAS} by extending the state to a shared state \cite{Sapkota2025}. In addition, each agent in a \ac{MAS} needs to have an handoff. This handoff is defined by the agent itself and decides the further flow within agent system. Especially in LangGraph the handoff specifies the destination of the handoff, so the next tool or agent, and the payload, meaning the update of the state or inputs to the next agent or tool. Therefore, the orchestration layer of the \ac{LLM}-based \ac{MAS} gets more complex, what could be handled by frameworks like LangGraph \cite{LangChain2025b}.
 
-The agentic architecture patterns of a \ac{LLM}-based \ac{MAS} follows the classic \ac{MAS} patterns. The leader-follow pattern is defined as supervisor pattern by \citet{LangChain2025b}, alongside with the hierarchical pattern. The supervisor pattern therefore, has on supervisor agents, that manages the communication to other expert agents, which themselve can only communicate with the supervisor agent. In the hierarchical pattern, those expert agent can itself be supervisors to other expert agents \cite{LangChain2025b}.
+The agentic architecture patterns of a \ac{LLM}-based \ac{MAS} follows the classic \ac{MAS} patterns as depicted in figure \ref{fig:mas_architecture}.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.8\textwidth]{figures/Multi-agent architectures.png}
+  \caption{Example multi-agent architecture patterns showing supervisor, hierarchical, network, and custom patterns for LLM-based multi-agent systems (self-created after \cite{LangChain2025b})}
+  \label{fig:mas_architecture}
+\end{figure}
+
+The leader-follow pattern is defined as supervisor pattern by \citet{LangChain2025b}, alongside with the hierarchical pattern. The supervisor pattern therefore, has on supervisor agents, that manages the communication to other expert agents, which themselve can only communicate with the supervisor agent. In the hierarchical pattern, those expert agent can itself be supervisors to other expert agents \cite{LangChain2025b}.
 
 \ac{LLM}-based \ac{MAS} can also be used with decentralised leaderless architecture \cite{OpenAI2025,LangChain2025b}. This concept is extended by \citet{LangChain2025b} to network and custom patterns. The network pattern allows each agent to decide to which agent in the network it should handoff its request. In this pattern each agent controls the flow within the \ac{MAS} \cite{LangChain2025b,OpenAI2025}. The custom pattern could not be perfectly adapted to either leader-follow nor leaderless patterns. In the custom pattern a user can also define workflows for specific agents or let some agents not communicate with specified other agents \cite{LangChain2025b}. The big benefit besides the theoretical more accurate performance of \ac{LLM}-based \ac{MAS}, is the high modularity that is being enabled. In addition, through packages like LangGraph, the communication flow between the agents can be precisely defined alongside with the agents specialisation \cite{LangChain2025b}.
 
@@ -337,6 +360,9 @@ Overall, as \acp{LLM} come with limitation and challenges, it is crucial to desi
 
 \chapter{Related Work}
 \label{ch:related_work_chapter}
+
+Like already outline in section \ref{sec:closed_information_extraction} the area of open and closed information extraction have the research streams of pipeline- and joint-approaches. Both streams relied on a broad variety of solutions ranging from table-filling with tag probability learning over 
+
 \begin{itemize}
   \item What Models or Work do exists in the cIE and MAS Context?
   \item What Dataset do exist in the cIE Context? How are they compared? How are they extracted?
