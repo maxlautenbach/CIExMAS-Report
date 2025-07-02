@@ -316,7 +316,7 @@ Especially leaderless \ac{MAS} bring a high degree of flexibility with them. Fro
 
 All mentioned points can also be mapped and extended when focussing on \ac{LLM} based \ac{MAS}. In general, due to the capabilities of \acp{LLM}, single \ac{AI} agents are already able to take care of complex tasks. But the only way to keep with more complex task is to increase instruction size and the number of tools, which could lead the \ac{AI} agents into failing or looping like already outlined in section \ref{sec:ai_agents} \cite{OpenAI2025}. Therefore, the goal decomposition into various specialised \ac{AI} agents remains also a key enable to solve more complex tasks \cite{Sapkota2025}.
 
-In the case of \ac{LLM}-based \ac{MAS}, each agent is in general required the same building blocks like mentioned in section \ref{sec:ai_agents}. This concept is adapted to \ac{MAS} by extending the state to a shared state \cite{Sapkota2025}. In addition, each agent in a \ac{MAS} needs to have an handoff. This handoff is defined by the agent itself and decides the further flow within agent system. Especially in LangGraph the handoff specifies the destination of the handoff, so the next tool or agent, and the payload, meaning the update of the state or inputs to the next agent or tool. Therefore, the orchestration layer of the \ac{LLM}-based \ac{MAS} gets more complex, what could be handled by frameworks like LangGraph \cite{LangChain2025b}.
+In the case of \ac{LLM}-based \ac{MAS}, each agent is in general required the same building blocks like mentioned in section \ref{sec:ai_agents}. This concept is adapted to \ac{MAS} by extending the state to a shared state \cite{Sapkota2025}. In addition, each agent in a \ac{MAS} needs to have an handoff. This handoff is defined by the agent itself and decides the further flow within agent system. Especially in LangGraph the handoff specifies the destination of the handoff, so the next tool or agent, and the payload, meaning the update of a state or inputs to the next agent or tool. The state itself in LangGraph is a python dictonary with pre-defined fields. Therefore, the orchestration layer of the \ac{LLM}-based \ac{MAS} gets more complex, what could be handled by frameworks like LangGraph \cite{LangChain2025b}.
 
 The agentic architecture patterns of a \ac{LLM}-based \ac{MAS} follows the classic \ac{MAS} patterns as depicted in figure \ref{fig:mas_architecture}.
 
@@ -404,14 +404,45 @@ This work followed an iterative approach in designing various multi-agent system
 
 In addition to the agents, multiple tools arose with the most important tool to fulfill the closed information extraction being the URI retrieval tool (section \ref{subsec:uri_retrieval}), which is designed to match search terms to URIs. To increase the knowledge graph incorporation, the tools of a network traversal search (section \ref{subsec:network_traversal}), a semantic validation (section \ref{subsec:semantic_validation}) and a turtle to label tool (section \ref{subsec:turtle_to_label}) were developed. Meaning that those tools have been developed does not imply that each architecture was connected to each tool.
 
+The agents are designed as \ac{LLM} calls with a prompt template that is field with selected fields from the prompt. In theory, more and more \acp{LLM} in LangChain support structured output, meaning that the output of the \ac{LLM} is mapped automatically to a pre-defined scheme \cite{LangChain2025e}. As this structured output experienced as not supported by all models, this work relies on parsing instructions out of the text generation of the \acp{LLM} directly. This is done by requesting the \ac{LLM} to output specific XML-tags with information of the next agent, the final output, the instruction for the next agent or the tool input.
+
 In addition, it has to be mentioned that all architectures were further advanced in regards of prompts and tools through the process, but especially those that were achieving the best results. As already stated, the process were imperative and so was the tool development, meaning that some tools were only developed for specific architectures. Further details which tools were evaluated for which architectures can be found in section \ref{sec:evaluation_configurations}.
 
 \section{Agent Architectures}
 \label{sec:agent_architectures}
+
+In the following section the various agent architectures will be outlined. This is including the declaration which agents have been used and how the overall flow is desing. In addition the definition of the state and handoff will be shown per architecture.
+
 \subsection{Baseline}
 \label{subsec:baseline}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{figures/Baseline Architecture.png}
+  \caption{Baseline architecture showing the pipeline approach with specialized agents for each step of the closed information extraction process (self created)}
+  \label{fig:baseline_architecture}
+\end{figure}
+
+The baseline architecture remarks the first approach used in this work to approach. This architecture follows the pipeline approach of closed information extraction by implementing two specialised agents for extracting and disambiguating the entities and forming triples. The idea follows the multi-agent priciple of splitting down complex tasks like closed information extraction is perceived \cite{Josifoski2021} into simple managable tasks. In addition, the baseline follows the overall principle of the supervisor pattern, by implementing one agent that defines the flow and communication between the agents. The URI retrieval tool is already included in this stage, in order to map the free-text triples to URIs. An overview of this architecture can be found in \ref{fig:baseline_architecture}.
+
+The backbone of the baseline architecture remains the state. The state is build up of the fields text, messages and instruction. The text is part of each state and keeps the text that is being processed by the agent. The messages field is an array of messages send. Therefore, especially the supervisor agent gets access to the message history to prevent looping and enable targeted reasoning. The instruction can be filled with variable that should be given as an input to either tools or other agents.
+
+In a supervisor architecture like in the baseline the orchestration and routing relies solely on the supervisor agent. In this configuration the supervisor agent is the only agent, which has access to the full state. The supervisor is designed to take additionally care of agent results validation and to formate the final result. This means, that the supervisor is in charge to extract the entities and triples using the specialised agents and then evaluate whether those results are valid or if it has to reiterate with the agents to get better results or to get a entity disambiguation. Therefore, the supervisor agent can leverage the instruction field on the state to pass individual prompt instructions to the agents. With triples formed by the triple extractor, the supervisor agent then has to formulate search terms, that will be search using the URI retrieval tool. With the output the final task of the supervisor is to formulate a valid turtle output. In order to parse the next agents and the final output, the supervisor agent is using xml tags to delimit the parseable outputs.
+
+The entity and relation extraction agent are related on prompt engineering. Therefore, both agents were initially used with a simple prompt asking for entity, respective relation extraction. Further details on the general prompt engineering approach can be found in \ref{sec:iterative_prompt_engineering}. The idea is that over time both agent can tackle the limited task of entity and triple extraction to a very good extend.
+
+All in all the idea can be lead to a flow where first the entities get extracted and then the the triples get formulated. Then the supervisor should get the corresponding URIs and produce a final turtle output. If this straightforward approach fails, for instance because a URI can not be found as the entity or predicate in the triple is incorrect, the supervisor agent can then loop. This shows that in theory this approach can extend the simple workflow by refinements and limit error propogation.
+
 \subsection{Supervisor}
 \label{subsec:supervisor}
+
+\begin{itemize}
+  \item Idea: Split up Supervisor in Single Agents
+  \item Through Process -> Two General Supervisor Architecture with Two States
+  \item First: Gen1 State \& Agents
+  \item Then: Property Extraction
+  \item Last: Gen1v2
+\end{itemize}
 \subsection{ReAct}
 \label{subsec:react}
 \subsection{Network}
@@ -421,6 +452,9 @@ In addition, it has to be mentioned that all architectures were further advanced
 \label{sec:agent_tools}
 \subsection{URI Retrieval}
 \label{subsec:uri_retrieval}
+
+In order to limit the context length, the tool was extended by a LLM call, where the LLM was asked to format the search results and create a primliminary mapping of the search terms to the URIs. Later extended by access to more parts of the state in i.e. Gen1v2.
+
 \subsection{Network Traversal}
 \label{subsec:network_traversal}
 \subsection{Semantic Validation}
@@ -429,6 +463,13 @@ In addition, it has to be mentioned that all architectures were further advanced
 \label{subsec:turtle_to_label}
 \subsection{Message Deletion}
 \label{subsec:message_deletion}
+
+\section{Iterative Prompt Engineering}
+\label{sec:iterative_prompt_engineering}
+\begin{itemize}
+  \item Manual Prompting following Agent Design Guidelines
+  \item Find Edge Cases and add them to Guidelines Section
+\end{itemize}
 
 \chapter{Evaluation}
 \label{ch:evaluation}
@@ -463,7 +504,6 @@ In addition, it has to be mentioned that all architectures were further advanced
 \section{Prompting}
 \label{sec:prompting}
 \begin{itemize}
-  \item Manual Prompting following Agent Design Guidelines
   \item Using Train or Validation Set of synthIE-code or synthIE-text
 \end{itemize}
 \section{Evaluation Metrics}
@@ -484,6 +524,7 @@ In addition, it has to be mentioned that all architectures were further advanced
   \item Entity Extractor
   \item Relation Extractor
   \item URI Retrieval Agent
+  \item Problems with Supervisor Agent, Entity Extractor and co.
 \end{itemize}
 
 \subsection{Modularization of Agent Tasks}
