@@ -396,15 +396,15 @@ The related work shows, that apparent advances in \ac{LLM} reasearch can also ad
 \chapter{Approach}
 \label{ch:approach}
 
-\begin{itemize}
-  \item Novel Approach using MAS for cIE
-  \item Leverage tools among knowledge graph incorporation
-  \item Designed to be general-usable instead of fine-tuned to one dataset to match real-world performance
-  \item Concept after \cite{Brown2020} to just use in-context learning, as also LLMs has advanced (reference on section in experimental setup)
-  \item Iterative Approach based on Agent Design ideas
-  \item That is why four architectures emerged: Baseline, Supervisor, ReAct, Network
-  \item Five tools emerged: URI Search, Network Traversal, Message Deletion, Semantic Validation, Turtle to Label
-\end{itemize}
+This work introduce a novel approach to closed information extraction using multi-agent systems. The overall idea is evaluate both the pipeline and joint approach to closed information extraction conducted by multiple specialised agents. In order to fullfil the task the agents should be able to access and retrieve data from the knowledge graph directly. Therefore the concept of tools should be utilised.
+
+The general design follows to goal to achieve an multi-agent system that can be applied to real-world usage and therefore can handle various type of texts and extract triples out of them. This is why, the approach relies solely on prompt tuning and in-context learning rather than on fine-tuning models. The concept of limiting to in-context learning is based on \citet{Brown2020} achieving outperformance with in-context learning against other domain fine-tuned models. Additionally, recent advances of various \acp{LLM} to outperform prior models by a huge marging or match the performance of prior models while keeping lower parameter sizes \cite{MetaAI2024,Chiang2024} shows increased capabilities and can imply higher in-context learning abilities. The exact advances will be outlined in section \ref{sec:eval_language_models}.
+
+This work followed an iterative approach in designing various multi-agent systems following the agent design best practises shown in section \ref{sec:agent_design}. As of my knowledge, there is no other work proposed using the multi-agent system approach to closed information extraction, which makes the iterative approach crucial. This approach is giving the ability to learn the limitations of the agents and then iterate with those ideas. From the output four core architecture arose. The baseline (section \ref{subsec:baseline}) structure following strictly the closed pipeline idea. The supervisor (section \ref{subsec:supervisor}) architecture splitting up tasks from the baseline. The ReAct architecture (section \ref{subsec:react}) as the opposite direction is simplifying all agents to one, while keeping the tools. The full network system (section \ref{subsec:network}) shows the abilities of having expert agents that are defining the flow through the agent system themselves.
+
+In addition to the agents, multiple tools arose with the most important tool to fulfill the closed information extraction being the URI retrieval tool (section \ref{subsec:uri_retrieval}), which is designed to match search terms to URIs. To increase the knowledge graph incorporation, the tools of a network traversal search (section \ref{subsec:network_traversal}), a semantic validation (section \ref{subsec:semantic_validation}) and a turtle to label tool (section \ref{subsec:turtle_to_label}) were developed. Meaning that those tools have been developed does not imply that each architecture was connected to each tool.
+
+In addition, it has to be mentioned that all architectures were further advanced in regards of prompts and tools through the process, but especially those that were achieving the best results. As already stated, the process were imperative and so was the tool development, meaning that some tools were only developed for specific architectures. Further details which tools were evaluated for which architectures can be found in section \ref{sec:evaluation_configurations}.
 
 \section{Agent Architectures}
 \label{sec:agent_architectures}
@@ -419,16 +419,16 @@ The related work shows, that apparent advances in \ac{LLM} reasearch can also ad
 
 \section{Agent Tools}
 \label{sec:agent_tools}
-\subsection{URI Search}
-\label{subsec:uri_search}
+\subsection{URI Retrieval}
+\label{subsec:uri_retrieval}
 \subsection{Network Traversal}
 \label{subsec:network_traversal}
-\subsection{Message Deletion}
-\label{subsec:message_deletion}
 \subsection{Semantic Validation}
 \label{subsec:semantic_validation}
 \subsection{Turtle to Label}
 \label{subsec:turtle_to_label}
+\subsection{Message Deletion}
+\label{subsec:message_deletion}
 
 \chapter{Evaluation}
 \label{ch:evaluation}
@@ -454,12 +454,14 @@ The related work shows, that apparent advances in \ac{LLM} reasearch can also ad
 \end{itemize}
 % Your first main chapter goes here
 \section{Language Models}
+\label{sec:eval_language_models}
 \begin{itemize}
   \item Llama 3.3 70B
   \item Gemma 3 27B
   \item Llama 4 Maverick
 \end{itemize}
 \section{Prompting}
+\label{sec:prompting}
 \begin{itemize}
   \item Manual Prompting following Agent Design Guidelines
   \item Using Train or Validation Set of synthIE-code or synthIE-text
