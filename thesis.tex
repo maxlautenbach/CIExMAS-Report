@@ -120,6 +120,8 @@
   \acro{GPT}{Generative Pre-trained Transformer}
   \acro{LLaMA}{Large Language Model Meta AI}
   \acro{LM}{Language Model}
+  \acro{SSA}{Splitted Supervisor Architecture}
+  \acro{SSSA}{Simplified Splitted Supervisor Architecture}
 \end{acronym}
 
 \mainmatter
@@ -413,7 +415,7 @@ In addition, it has to be mentioned that all architectures were further advanced
 
 In the following section the various agent architectures will be outlined. This is including the declaration which agents have been used and how the overall flow is desing. In addition the definition of the state and handoff will be shown per architecture.
 
-\subsection{Baseline}
+\subsection{Baseline Architecture}
 \label{subsec:baseline}
 
 \begin{figure}[h]
@@ -425,7 +427,7 @@ In the following section the various agent architectures will be outlined. This 
 
 The baseline architecture remarks the first approach used in this work to approach. This architecture follows the pipeline approach of closed information extraction by implementing two specialised agents for extracting and disambiguating the entities and forming triples. The idea follows the multi-agent priciple of splitting down complex tasks like closed information extraction is perceived \cite{Josifoski2021} into simple managable tasks. In addition, the baseline follows the overall principle of the supervisor pattern, by implementing one agent that defines the flow and communication between the agents. The URI retrieval tool is already included in this stage, in order to map the free-text triples to URIs. An overview of this architecture can be found in \ref{fig:baseline_architecture}.
 
-The backbone of the baseline architecture remains the state. The state is build up of the fields text, messages and instruction. The text is part of each state and keeps the text that is being processed by the agent. The messages field is an array of messages send. Therefore, especially the supervisor agent gets access to the message history to prevent looping and enable targeted reasoning. The instruction can be filled with variable that should be given as an input to either tools or other agents.
+The backbone of the baseline architecture remains the state. The state is build up of the fields text, messages and instruction. The text is part of each state and keeps the text that is being processed by the agent. The messages field is an array of messages send. Therefore, especially the supervisor agent gets access to the message history to prevent looping and enable targeted reasoning. The instruction can be filled with variable that should be given as an input to either a tool or other agents.
 
 In a supervisor architecture like in the baseline the orchestration and routing relies solely on the supervisor agent. In this configuration the supervisor agent is the only agent, which has access to the full state. The supervisor is designed to take additionally care of agent results validation and to formate the final result. This means, that the supervisor is in charge to extract the entities and triples using the specialised agents and then evaluate whether those results are valid or if it has to reiterate with the agents to get better results or to get a entity disambiguation. Therefore, the supervisor agent can leverage the instruction field on the state to pass individual prompt instructions to the agents. With triples formed by the triple extractor, the supervisor agent then has to formulate search terms, that will be search using the URI retrieval tool. With the output the final task of the supervisor is to formulate a valid turtle output. In order to parse the next agents and the final output, the supervisor agent is using xml tags to delimit the parseable outputs.
 
@@ -433,25 +435,92 @@ The entity and relation extraction agent are related on prompt engineering. Ther
 
 All in all the idea can be lead to a flow where first the entities get extracted and then the the triples get formulated. Then the supervisor should get the corresponding URIs and produce a final turtle output. If this straightforward approach fails, for instance because a URI can not be found as the entity or predicate in the triple is incorrect, the supervisor agent can then loop. This shows that in theory this approach can extend the simple workflow by refinements and limit error propogation.
 
-\subsection{Supervisor}
+\subsection{Splitted Supervisor Architecture}
 \label{subsec:supervisor}
 
-\begin{itemize}
-  \item Idea: Split up Supervisor in Single Agents
-  \item Through Process -> Two General Supervisor Architecture with Two States
-  \item First: Gen1 State \& Agents
-  \item Then: Property Extraction
-  \item Last: Gen1v2
-\end{itemize}
-\subsection{ReAct}
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{figures/Splitted Supervisor Architecture.png}
+  \caption{Splitted supervisor architecture showing the decomposition of the supervisor agent into specialized sub-agents for better task management (self created)}
+  \label{fig:splitted_supervisor_architecture}
+\end{figure}
+
+As in the baseline archiecture, the supervisor agents has the task to plan the task, route the task to right agent or tool with the correct instruction and then evaluate the observations from the agent and the URI retrieval tool following up with a refinement of the plan or the output of a turtle string. This task is a rather complex one, especially if the idea remains to iterate over the closed information extraction task. The \ac{SSA} is a step in the iterative agent system design process, to adapt towards \acp{LLM} which are not able to process as many tasks at the same time alongside with an increasing prompt and context size. Therefore, the supervisor agent is split up into a planner, agent instructor, result checker and result formatter agents. In addition the specialised agents (Entity and Triple Extractor) were completed by an property extractor. As the property extractor was added during the iterative process, an exact evaluation of the introduction of this agent can be found in section \ref{subsec:error_message_incorporation}. An overview of the architecture can be found in figure \ref{fig:splitted_supervisor_architecture}.
+
+The state is redefined in the \ac{SSA}, according to provide more overview to the supervision agents (planner, agent instructor and result checker). This means in addition to the text and the instruction, a call trace, a results and a comment field was implemented in the state. The call trace is used by the agent instructor to save which specialised agent or tool was called with which input. The results field is than the counter part where every result of the specialised agents and the URI retrieval are saved. At last, all comments made by the supervision agents are written into the comments field. Doing so, the actual closed information extraction results can be seperated from the overhead communication made by the supervison agents within the state. Furthermore, this can also separate the information within the prompt with idea to give the agents are pre-structured overview of the flow within the multi-agent system.
+
+The planner agent is the central point within the \ac{SSA}. It generates an initial plan and decides whether to how to proceed with the plan or finish the flow by handing over to the result formatter. If the next step of the plan should be executed, the agent instructor refines this action into parseable agent id with the matching instruction. The idea behind is, that the planner can fully concentrate on planning, while the agent instructor can parse ideas into actions. Using a result formatter agent follows this idea and is added up by the complexity of providing a valid turtle output for the selected datasets. In addition, the result formatter is used to put all pieces of information like URI retrievals and extracted triple together.
+
+The result checker agent follows the idea of a real supervisor. It has the task to look onto whether the specialised agents are producing correct results. In addition, the result checker agent should give the planner ideas how to refine the overall processing plan and what information are missing. Therefore, the result checker agent should induce iterating over the closed information extraction task.
+
+The entity extractor and relation extractor agents are designed like in the baseline architecture, but are changed in the point in which field they save their outputs to. The property extractor agent follows the overall plan of the practises designed in section \ref{sec:agent_design}. This means, that the relation extractor is taken apart the task to identify the properties within text. The URI retrieval tool is similar to the one in the baseline archiecture, but as the agents, so does the URI retrieval tool save its output to the results field of the \ac{SSA} state.
+
+Overall the \ac{SSA} is an extensive interpretation of splitting up complex tasks. Therefore, it follows an custom architecture pattern similar to the original supervisor pattern. In addition, the state is changed in order to provide more overview for the added overhead of more agents.
+
+\subsection{Simplified Splitted Supervisor Architecture}
+\label{subsec:simplified_splitted_supervisor}
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{figures/Simplified Splitted Supervisor Architecture.png}
+  \caption{Simplified splitted supervisor architecture showing a streamlined version of the supervisor decomposition with optimized agent interactions (self created)}
+  \label{fig:simplified_splitted_supervisor_architecture}
+\end{figure}
+
+The \ac{SSSA} is following the general idea of the \ac{SSA}, but uses a simplified supervisor splitting. Based on the assumption that a single supervisor can handle all supervison task, but struggles with putting together the triples and URIs to valid turtle strings and using an unstructured state as context. Therefore, all specialised agents remain the same as in the \ac{SSA} and result checker and agent instructor are merged into the planner agent similar to the supervisor agent of the baseline archiecture. Additionally, the mapping of results of the agents is adapted to an updated and more structured state. An overview of the the architecture can be found in figure \ref{fig:simplified_splitted_supervisor_architecture}.
+
+A core change in comparison to the \ac{SSA} is the overall structure of the state. In order to sleeken the state, the \ac{SSSA} state just keeps the core of the result of the specialised agents. This means, that the state has now field for entities, properties, triples and URI mapping instead of a single results field. Those fields will be filled by the specialised agents and the URI retrieval.
+
+As this state change deletes the full output of specialised agents and of the URI retrieval, a field agent response is added that exposes the full output of the speicalised agent, but also tools to the planner to detect, if the agent are processing the tasks given correct. In order to prevent looping, the message field in the state remains the same, but is now the output history of the planner agent.
+
+Overall the \ac{SSSA} is designed for less resource consumption and more efficient context use. The architecture is mainly designed towards context limits, that can apply, while keeping the idea of iterating over the process. In addition, it is another approach to split up the supervisor agent and therefore remains an architecture following the custom multi-agent system pattern.
+
+
+\subsection{ReAct Architecture}
 \label{subsec:react}
-\subsection{Network}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{figures/ReAct Architecture.png}
+  \caption{ReAct architecture showing the single-agent approach with reasoning and action capabilities for closed information extraction (self created)}
+  \label{fig:react_architecture}
+\end{figure}
+
+\begin{itemize}
+  \item Idea: Test simplest solution for cost and time efficiency and Reduce Steps to save context size
+  \item Simpler Optimisation (Main Agent has to work better with the tools)
+  \item State
+  \item Tools needed to accomplish task (URI Retrieval)
+  \item Additional Tools as of good performance
+\end{itemize}
+
+\subsection{Network Architecture}
 \label{subsec:network}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{figures/Network Architecture.png}
+  \caption{Network architecture showing the fully connected multi-agent system with dynamic routing and reasoning capabilities (self created)}
+  \label{fig:network_architecture}
+\end{figure}
+
+\begin{itemize}
+  \item Idea: Leverage Ideas and Capabilities of ReAct Agent, but combined with validation capabilities from Gen1. Leads to build less specialised but fully connected agents. Leverage each agent in fact of routing and reasoning.
+  \item State
+  \item Agents used: Extractor -> like in ReAct Agent, URI Retrieval,
+  \item Tools
+\end{itemize}
 
 \section{Agent Tools}
 \label{sec:agent_tools}
 \subsection{URI Retrieval}
 \label{subsec:uri_retrieval}
+
+\begin{itemize}
+  \item VectorDB, multiple collections (Label, Description, Sample (Properties Only))
+  \item Search Modes (No Mode -> Searching for all on Label, Select for Collection, Filter for Entity/Property)
+  \item Latest: Entity, Property, Sample
+  \item LLM Incorporation in baseline
+\end{itemize}
 
 In order to limit the context length, the tool was extended by a LLM call, where the LLM was asked to format the search results and create a primliminary mapping of the search terms to the URIs. Later extended by access to more parts of the state in i.e. Gen1v2.
 
@@ -469,6 +538,13 @@ In order to limit the context length, the tool was extended by a LLM call, where
 \begin{itemize}
   \item Manual Prompting following Agent Design Guidelines
   \item Find Edge Cases and add them to Guidelines Section
+\end{itemize}
+
+\section{Error Incorporation}
+\label{sec:error_incorportion}
+\begin{itemize}
+  \item Validation of Turtle output
+  \item Check Agent Flow with Error Loops -> Prevent Agent System from throwing any error and aborting the whole execution
 \end{itemize}
 
 \chapter{Evaluation}
