@@ -244,6 +244,10 @@ As the Common Crawl corpora follows the idea of providing a copy of the entire i
 
 In order to choose ideal model for use-cases, on option could be to use benchmarks like MMLU-Pro \cite{Wang2024} or the human-evaluated Chatbot Arena \cite{Chiang2024}. The MMLU-Pro benchmark is testing for multi-task language understanding with the goal to test the various capabilities of LLMs. Therefore, the MMLU-Pro keeps tasks from maths, physics, law, engineering and various other topics \cite{Wang2024}. The Chatbot Arena\footnote{The Chatbot Arena can be accessed under \url{https://lmarena.ai}} is a live benchmark working with human preferences. Therefore, the use gets two answers from two distinct models to the user prompt. Then the human chooses which \ac{LM} performed better. Based on this feedback a win rate and a score can be calculated \cite{Chiang2024}.
 
+The \acp{LLM} breakthrough performances on such benchmarks rely also on their high complexity. Models like GPT-3 are using 175B parameters make the use of multiple high-performance GPUs necessary \cite{Brown2020,Frantar2023}. There can be seen two methods how to utilise \acp{LLM} within a limited performance set up. First is to use smaller models with less parameters. This shows consequences in the abilities of the models \cite{Brown2020,Grattafiori2024}. Recent research shows that especially newer models can achieve prior state-of-the-art performance with less parameters \cite{Meta2024}.
+
+Another way to use \acp{LLM} that fit into the limited configurations, but utilising large parameter models while handling a tradeoff with performance is quantisation. In general, quantisation methods lower the number of bits used per parameter. As naive quantisation leads to higher accuracy drops, methods like GPTQ or AWQ are developed. Both methods implement variants to lower the error, by either handling and lower the error in the quantisation process or by preserving salient weights. Both approaches show around 3x faster performance while producing high quality results compared to the standard 16-bit accuracy \cite{Frantar2023,Lin2024}.
+
 In conclusion, \acp{LM} are \ac{ML} models consisting out of multiple multi-head attention and feed-forward network layers with the goal to predict the probability of a following token based on all previous tokens. Therefore, those models are designed as with a large amount of parameters and additional use pre-training based on large size corpora to achieve outperforming results. In the end, those models can be benchmarked using MMLU-Pro or the Chatbot Arena to test various capabilities of them.
 
 \section{Sentence Embeddings}
@@ -472,7 +476,7 @@ A core change in comparison to the \ac{SSA} is the overall structure of the stat
 
 As this state change deletes the full output of specialised agents and of the URI retrieval, a field agent response is added that exposes the full output of the speicalised agent, but also tools to the planner to detect, if the agent are processing the tasks given correct. In order to prevent looping, the message field in the state remains the same, but is now the output history of the planner agent.
 
-Overall the \ac{SSSA} is designed for less resource consumption and more efficient context use. The architecture is mainly designed towards context limits, that can apply, while keeping the idea of iterating over the process. In addition, it is another approach to split up the supervisor agent and therefore remains an architecture following the custom multi-agent system pattern.
+Overall the \ac{SSSA} is designed for less resource consumption and more efficient context use. The architecture is mainly designed towards context limits, that can apply, while keeping the idea of iterating over the process. In addition, it is another approach to split up the supervisor agent and therefore it remains an architecture following the custom multi-agent system pattern.
 
 
 \subsection{ReAct Architecture}
@@ -485,13 +489,13 @@ Overall the \ac{SSSA} is designed for less resource consumption and more efficie
   \label{fig:react_architecture}
 \end{figure}
 
-\begin{itemize}
-  \item Idea: Test simplest solution for cost and time efficiency and Reduce Steps to save context size
-  \item Simpler Optimisation (Main Agent has to work better with the tools)
-  \item State
-  \item Tools needed to accomplish task (URI Retrieval)
-  \item Additional Tools as of good performance
-\end{itemize}
+All previously shown solution rely on multi-agent system, as of the assumption of high complexity wihtin the task of closed information extraction. The ReAct architecture is targetting an opposite direction. The idea is to show, how capable a single-agent system with reasoning capabilities can be, as simplicity often showed empirical success within the work. In addition, the ReAct architecture can solely concentrate of incorporating with tools other than incorporating with agents which increases the possiblity for failures. Like already state in section \ref{sec:related_approaches} a joint-optimisation has the advantage of a single-optimisation point with no error propogation. The ReAct architecture follows this joint-optimisation. Another conceptual advantage is that the agent calls are reduced, which results in lower cost and lower inference latency.
+
+The state is also made simpler than in the \ac{SSA} and \ac{SSSA}. As the agent calls get reduces, so does the context. Therefore, the baseline state shown in section \ref{subsec:baseline} is used as well. The tools are writing their outputs into the messages field.
+
+As the agent is limited in its availablity to handle the task to the full extend, it is initially given URI retrieval tool. As the ReAct architecture showed a good optimisation capability further tools were developed for it. First, there were tools to incorporate and communicate with the knowledge graph, namely the network traversal, semantic validation and turtle to label tool. Second, to give the agent the ability to manage the context, a message deletion tool was implemented. A overview of the tools used in the ReAct architecture can be found in figure \ref{fig:react_architecture}. As outlined, there were multiple iterative steps within the development of this architecture. All of them will be review in section \ref{sec:evaluation_configurations}.
+
+The ReAct architecture is not a multi-agent system, but it remains one step to contrast highly complex systems in order to develop an understanding of the \ac{LLM} used for the closed information extraction. As of its cost efficiency it remains a good point to start to develop more tools and to test which of them are providing a leap over the previous configuration. Therefore, the ReAct architecture is a logical iterative step to a target architecture.
 
 \subsection{Network Architecture}
 \label{subsec:network}
@@ -503,12 +507,21 @@ Overall the \ac{SSSA} is designed for less resource consumption and more efficie
   \label{fig:network_architecture}
 \end{figure}
 
-\begin{itemize}
-  \item Idea: Leverage Ideas and Capabilities of ReAct Agent, but combined with validation capabilities from Gen1. Leads to build less specialised but fully connected agents. Leverage each agent in fact of routing and reasoning.
-  \item State
-  \item Agents used: Extractor -> like in ReAct Agent, URI Retrieval,
-  \item Tools
-\end{itemize}
+The network architecture following the idea of the network pattern outline in section \ref{sec:multi_agent_systems} is the result of the experience made with all previous architectures but also with all different configurations of tools and states. Therefore, the idea is to leverage the reasoning and validation capabilities build up within the \ac{SSA} and \ac{SSSA} and combine it with a direct triple extraction approach like shown in the ReAct architecture. In addition, the network architecture spreads the decisions about the flow on all used agents. The resulting architecture figure can be found in figure \ref{fig:network_architecture}.
+
+The state of the network architecture is a extension of the idea within the state of the \ac{SSSA}. The idea is again to save intermediate results in a context efficient way. Therefore, the fields triples and uri mapping are again part of the state. The URI mapping contains in this architecture the label of the entity or predicate alongside with the URI and the label and description stored in Wikidata.
+
+In addition, a call trace is introduced again to prevent looping and enable logical reasoning. To provide a good overview, the last agent or tool call is stored alongside the response in the fields \texttt{last\_call} and \texttt{last\_response}. In addition, the \texttt{agent\_instruction} field is introduced to persist the instruction given to an agent by a previous agent, while not being dropped within a tool call. The input to any tool is persisted in a \texttt{tool\_call} field. A \texttt{message} field is also introduced, but unlike in other architectures, in the network architecture it is used to output the final result, which is based on interoperability considerations.
+
+This architecture is also thought to minimize context length by not having any field in the state that builds up content increasingly except for the call trace. Therefore, the agents have to decide on the next steps utilising the previous call trace and the current results. This increases the reliability requirements for each agent and could potentially be a point where heavy prompt engineering must be used.
+
+Agent-wise the network architecture uses three agents, which all have access to the full-state, while the tools are using solely the tool input given by the agents. This is done, because each agent needs to have the full overview to take better decisions on the overall agentic flow. All inquiries start at the extractor agent, which follows the idea of the main agent in the ReAct architecture, but splits the URI mapping, triple validation and turtle output part from it. The extractor agent has write access to the triples as the only agent in the architecture.
+
+The URI mapping is done by the URI mapping and refinement agent. It is thought to be the central place where the URI mapping gets generated or changed on request. Therefore, it is the only agent with write access to the URI mapping. The agent is also bound to the triples extracted by the extractor agent. Tool-wise the URI mapping and refinement agent has access to the URI retrieval tool.
+
+The validation and output agent has the task to prevent halucination of the agents and also validate triples based on semantic features which are used in the knowledge graph. Therefore, the agent is asked in its prompt to do a semantic validation followed by a turtle to label conversion to check the results. Both steps are based on tools that are connected to the validation and output agent. The validation and output agent is also the point to refine and polish the results, if they fall through a validation. Then the agent is able to call either the extractor or the URI mapping and refinement agent again, in regards where it assumes the error can be solved.
+
+The network architecture is a results of the experience gathered throughout prior work. Therefore, it already misses out on unpromising tools or uses a highly tweaked state. In the end, the network architecture remains a multi-agent system in its core idea, while keeping the overhead and context length minimal.
 
 \section{Agent Tools}
 \label{sec:agent_tools}
