@@ -525,26 +525,69 @@ The network architecture is a results of the experience gathered throughout prio
 
 \section{Agent Tools}
 \label{sec:agent_tools}
+
+The agents in the various architectures are the core of the solution to the closed information extraction. As \acp{LLM} are limited in their knowledge and also can show hallucination like shown in section \ref{sec:language_models}, the tools are necessary to limit both caveats and on the other side improve the performance. Therefore, two general types of tools are used in this work. First, the knowledge graph incorporation tools, which are URI retrieval (section \ref{subsec:uri_retrieval}), network traversal (section \ref{subsec:network_traversal}), semantic validation (section \ref{subsec:semantic_validation}) and turtle to label (section \ref{subsec:turtle_to_label}). Second, the tools to orchestrate the agent system. In this work, just the message deletion tool (section \ref{subsec:message_deletion}) is proposed.
+
 \subsection{URI Retrieval}
 \label{subsec:uri_retrieval}
 
-\begin{itemize}
-  \item VectorDB, multiple collections (Label, Description, Sample (Properties Only))
-  \item Search Modes (No Mode -> Searching for all on Label, Select for Collection, Filter for Entity/Property)
-  \item Latest: Entity, Property, Sample
-  \item LLM Incorporation in baseline
-\end{itemize}
+The URI retrieval tools remains a central tool in solving a closed information extraction task. Various \ac{LLM}-based agents can achieve a extraction of free-form triples, but the challenge of closed information extraction remains in the correct mapping to the underlying knowledge graph. Therefore, this URI mapping ability is given to the agents by the URI retrieval tool, which is able to incorporate with the knowledge graph.
 
-In order to limit the context length, the tool was extended by a LLM call, where the LLM was asked to format the search results and create a primliminary mapping of the search terms to the URIs. Later extended by access to more parts of the state in i.e. Gen1v2.
+The general idea of the URI retrieval tool is to get individual search terms of the agent and then search for it using embeddings and their cosine similarity. The instructions are ideated to be variied throught the iterations. Therefore, the agents can re-search for entities or properties that were not found by using the simple free-form text.
+
+In order to provide embeddings of the underlying knowledge graph it is needed to pipeline the generation of a search index. The pipeline is executed against the Wikidata knowledge graph, as this is the only knowledge graph used in the benchmarks evaluated in this work. In the final implementation three search indices exist. Those indexes keep embeddings for either the \texttt{rdfs:label} or \texttt{rdfs:description} of an entity in Wikidata. The third search index is saving triple examples for the use of a specific properties out of Wikidata. The idea is, that the sentence embeddings can embed semantic features of subject and object, which later can be retrieved by the agents.
+
+The pipeline works in three steps. The first step is loading a dataset split like the test-split on synthIE with a limited number of documents to be loaded. The second step is to get the label and description for all entities and properties inside the data loaded. In addition, the example triples for the properties will be retrieved for the properties if existing in Wikidata. In a third step all parts will be embedded and saved into the corresponding search index. In order to provide label and description as well as a distinction between entity and property, those data will be stored as metadata in the search index.
+
+In order to provide access to the various collections, the URI retrieval tool required search modes in the instructions. This means, that the agent can decide whether it wants to similarity search its search term agains all labels, description or examples of an entity or property. In addition, as the URI retrieval tool can access the type of a stored point in the search index, the instruction does get another filter mode, where the agent can decide if it searchs solely for entities or properties. In the last implementation a mixture of search and filter modes is used. In this case the agent can decide whether it search for entities or properties by its label or it searches for properties by an sentence. The trajectory of the work resulting in this limitation can be found in section \ref{sec:evaluation_configurations}.
+
+The URI retrieval tool itself parses the instruction and the search mode, respective filter mode per search term. Afterwards, it execute a cosine similarity search using the embedding of the search term on the selected search index. The search result includes the most similar results with their rdfs:label, rdfs:description and their URI.
+
+In cases with agent architectures that are prone to have a problem with context bloating, this can show problem when many search terms are used. In order to take care of this, the URI retrieval tool gets an additional \ac{LLM} call, that should evaluate if one search result matches by looking on the given output. Afterwards it returns a simplified URI mapping, with a reason why a mapping has been choosen, but without the full information about other results and information about descriptions of the search results. This is especially used in the baseline architecture, the \ac{SSA} and the \ac{SSSA}.
+
+All in all the URI retrieval tool is ideated to give the agent the maximum flexibility in searching matching results. Therefore, it indexes the relevant parts of Wikidata within a search index, which later can be retrieved by the agents, which in general follows a retrieval augmented generation idea. As the URI retrieval tool is the tool where much accuracy can get lost, it is the most changed tool throughout the work, which can be seen in section \ref{sec:evaluation_configurations}.
 
 \subsection{Network Traversal}
 \label{subsec:network_traversal}
+
+The network traversal tool is the next step in knowledge graph incorporation. The idea targets the problem of agents choosing super or sub-properties of a searched property. This problem could arise especially, when the sentence does not include the exact label of the searched property. The network traversal tool should give the agents the ability to get insights in the knowledge graph property hierarchy by executing SPARQL queries on the knowledge graph.
+
+In Wikidata the property \textit{subproperty of} is used to show this relation. The SPARQL query then searches for all direct super- and subproperties of a targeted property. In addition the SPARQL query is enhanced by a label query, searching for the corresponding labels of the found properties. Then the network traversal tool creates an output consisting of the label and example triple, if one exists for the found property.
+
+Some properties can have a vast amount of super- and subproperties. This can lead to a unsorted output, where \acp{LLM} can struggle selecting the relevant property from the output. That is why, in later implementations the network traversal tool checked the possible properties for property constraints. In Wikidata there are subject and object type constraints, that can be accessed behind qualifiers.
+
+Qualifiers in wikidata is a triple consisting of a predicate and an attribute \cite{Wikidata2025}. For the subject and object type constraint, the property named property type constraint is used. This property has either the property subject type constraint or the property value type constraint for the object. The attribute is than the actual URI of the type that the original property is constrained to.
+
+Using this knowledge the SPARQL query used in the network traversal tool could output whether a properties subject and object type constrained have been matched or not. This is also done by using one level of superclasses above the type of the particular subject or object in the corresponding triple. This is limited due to the exploration about infinite looping by not restricting, when accessing Wikidata directly like done in this implementation.
+
+Utilising the output of the network traversal tool, the agents are enabled to detect to narrow or to wide property extractions. This gives a better insight in knowledge incorporation for the agents and can make the results more correct. Nevertheless, the network traversal tool can produce a high amount of results, which can be adding overhead to the agents, as they have to decide if any of the resulting properties is fitting better into the extracted triple, while resisting properties that might match the property constraints more, but could be either to narrow or to wide.
+
 \subsection{Semantic Validation}
 \label{subsec:semantic_validation}
+
+As \acp{LLM} can show hallucination and additionally do not have the build-in the ability to double check their results, the semantic validation was ideated as solution. The overall idea is like in the network traversal tool, to check for type restrictions on each property of each resulting triple. The semantic validation tool uses a pre-filtered Wikidata class hierarchy, which is loop-free and therefore enables to search across the full hierarchy.
+
+The semantic validation tool gets as input a ready turtle string, which gets checked and afterwards splitted into triples and per triple in subject, property and object. Then the in subsection \ref{subsec:network_traversal} explained qualifiers are utilised to check for subject and object type restrictions. In addition, the semantic validation tools also detects, whether there is a subject or object type restriction at all. In the end it outputs the results per triples back to the agent.
+
+Therefore, the semantic validation tool is rather simple, but remains powerful in creating valid results. With the semantic validation tool the agents can detect whether a property could be meant for another type of relations, when the descriptions and examples in the URI retrieval tool could not bring this recognition. This enhances the knowledge incorporation that other solution do not make use of and is intended to give agents the starting point for iteration.
+
 \subsection{Turtle to Label}
 \label{subsec:turtle_to_label}
+
+The agents have shown multiple points, where wrong URI were used because of copy failures or internal knowledge incorporation. As Wikidata is one of the biggest knowledge graphs, it can be assumed that it was part of the training data used for \acp{LLM}. As wikidata uses the same namespace to define entities and properties and especially relations to other properties, labels or descriptions, but uses a different namespace for the actual property in the used triples, and Wikidata knowledge can be present in the \ac{LLM}, it is crucial to check if the output was generated in the correct namespace. Especially as other tools leverage SPARQL queries on property hierarchies, the output in CIExMAS is limited to the Wikidata entity namespace, which can lead to mismatches.
+
+The turtle to label tool therefore tries to leverage the final turtle output string to collect labels for each part of each triple. This is done by using a simple SPARQL Query asking for the value behind the rdfs:label of every part. This query fails, when the resulting properties are in the wrong namespace. In addition, the \ac{LLM} can hallucinate the URIs completely, which is shown by the turtle to label tool as it outputs the free-form triples again, but also checks whether a URI exists or not. The output also contains a corresponding message, when a URI exits but it has no english label.
+
+The turtle to label tools is overall another tool to incorporate with the knowledge graph directly. The ability for the agents to check if any agents before createc hallucinated results, is crucial to decrease later errors in the final result, while also limiting hallucination. Together with the semantic validation, the turtle to label tool can increase the precision of the final results.
+
 \subsection{Message Deletion}
 \label{subsec:message_deletion}
+
+In multiple chapters was the topic of context bloating a topic that should be miminised by the design of agent, state and tools. Another approach is to give the agents an ability to manage the context themselves. Therefore, the message deletion tool was implemented.
+
+The message deletion tool can enable the agents to delete messages in the state by their id. This is especially important, as this tools was developed for the ReAct architecture. As this architecture has a single message field, where all output of the main agent and the tools is saved and tools like the network traversal tool or the URI retrieval tool tend to produce a high amount of output, the message field can bloat the context quickly. On the other side, the agents sometimes just reuse content and have the ability to summarise content. Therefore, the agents could also be able to delete single message out of the messages field and generate a sleeker summary of the core knowledge gained through the deleted messages.
+
+Alongside with the ability to edit fields in the state like the triples field in the \ac{SSSA} or network architecture, the message deletion tool enables the agent to self-manage the state and context. This gives the opportunity of not getting any context length errors. Nevertheless, this adds complexity to the agents, as they have to create summaries but also decide which message are not useful anymore. The corresponding results can be found in section \ref{sec:evaluation_configurations}.
 
 \section{Iterative Prompt Engineering}
 \label{sec:iterative_prompt_engineering}
