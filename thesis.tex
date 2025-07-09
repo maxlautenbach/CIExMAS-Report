@@ -591,10 +591,16 @@ Alongside with the ability to edit fields in the state like the triples field in
 
 \section{Iterative Prompt Engineering}
 \label{sec:iterative_prompt_engineering}
-\begin{itemize}
-  \item Manual Prompting following Agent Design Guidelines
-  \item Find Edge Cases and add them to Guidelines Section
-\end{itemize}
+
+As outlined in the sections \ref{sec:ai_agents} and \ref{sec:multi_agent_systems} \acp{LLM} are prompt sensitive. Therefore, finding the correct prompt remains complex and challenging. As this work focusses primarily on developing various architecture of multi-agent system and proof that knowledge graph incorporation can lead to better results, the prompt engineering was done manual in the iterative process.
+
+Overall the prompting followed the ideas from section \ref{sec:agent_design}. This means, that overall the prompts are written and evolved, so that a human can handle the task. In addition, the prompt uses examples to drive in-context learning. In the iterative process those examples either have been examples for tool instructions or examples from the dataset used for tasks like entity extraction. In the last case the original text was given with the expected entities from the dataset. The idea is to give the dataset an example what kind triples are expected in the use case.
+
+Another technique that was used is guided \ac{CoT}. Therefore, the agents got the instruction to follow a predefined prompted \ac{CoT}. In addition to this technique most of the prompts were build out of a role introduction, the tools with descriptions if the agent could decide of the agentic flow, guidelines, examples and the state inputs. The guidelines were especially used to prevent edge cases and problems that were experienced. In contrast, the role instruction stayed similar to the start of prompting in general.
+
+Like outlined in section \ref{sec:agent_design} the tool description are crucial to enable the agents to make use of them. In CIExMAS the tools will be incorporated through the prompt directly. This means, that like outlined, there is a section where the tools will be described. Each tool is described by its ID, its name and a description. The description is also the place, where instruction definitions were done. Especially with tools like the URI retrieval, this is important to enable the agents with the correct instruction, like using the correct search and filter modes.
+
+Overall the prompt engineering in CIExMAS remains a manual and iterative process. The prompting is heavily adapted to best practises shown by other researchers. This includes the design of human-readable prompts, that are structured, well defined and include examples for the use of tools or for solving the tasks.
 
 \section{Error Incorporation}
 \label{sec:error_incorportion}
@@ -740,6 +746,12 @@ Alongside with the ability to edit fields in the state like the triples field in
 \section{Discussion}
 \label{sec:discussion}
 
+\begin{itemize}
+  \item Hallucination of URIs
+  \item Dataset inquiries (synthIE examples for in-context learning)
+  \item Manual Prompt Engineering
+  \item Small SOTA Models
+\end{itemize}
 
 \chapter{Conclusion and Outlook}
 \label{ch:conclusion_outlook}
