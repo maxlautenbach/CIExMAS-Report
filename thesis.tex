@@ -602,12 +602,18 @@ Like outlined in section \ref{sec:agent_design} the tool description are crucial
 
 Overall the prompt engineering in CIExMAS remains a manual and iterative process. The prompting is heavily adapted to best practises shown by other researchers. This includes the design of human-readable prompts, that are structured, well defined and include examples for the use of tools or for solving the tasks.
 
-\section{Error Incorporation}
+\section{Error Handling}
 \label{sec:error_incorportion}
-\begin{itemize}
-  \item Validation of Turtle output
-  \item Check Agent Flow with Error Loops -> Prevent Agent System from throwing any error and aborting the whole execution
-\end{itemize}
+
+As \acp{LLM} are designed to generate unstructured outputs in form of texts, problem can arise when specific output tags or a specific form of output is expected. Therefore, a solution can be, that the reasoning and looping abilities of agent system can be used to incorporate error message into the agent flow. Leveraging this idea, agents can correct wrong behavior, especially when the error message are clear and understandable.
+
+Therefore, in the iterative process of creating CIExMAS, more and more agents and tools are made error prone. This is done by using simple try except blocks, while the except block generates a specific message, for the problem. Those try except blocks are mainly done when tag parsing is done from the output of an agent. Like described in the agent architecture sections before, this is especially the case when an agent gives instructions and decides on the agentic flow. There are mainly one goto and one instruction or input tag that has to be read out. At every point, the agents can fail to include one of those, which is why there are try and except blocks around the parsing section detecting, which tags might be missing.
+
+In addition, the agents can produce inputs to tools, which can not be interpreted. That is why also tools get the try and except handlers for parsing inputs. Like for the agent output parsing, the instruction parsing also gives dedicated error message to the error.
+
+Another problem of the agents are incorrect outputs. Like already shown in section \ref{subsec:semantic_validation} and \ref{subsec:turtle_to_label} the agent systems used in CIExMAS have multiple tools to reduce hallucination and incorrect outputs. Nevertheless, the final turtle string has also to be syntactical valid, meaning for instance that when prefixes are used, they have to be defined. To tackle this, in the final implementation, the outputs will be checked against a turtle parser, which produces errors, when the output is syntactical incorrect. This error can also be incorporated back into the agent system and then be processed.
+
+With this measures, various errors from parsing issues to syntactical issues can be detected and processed. In addition, the error message incorporation also adds error handling, which enables the agent system to not stop when an error occurs, expect for external errors like context overflow or GPU memory problems. Together, the error handling in the whole system can enable better results and can enable to get a valid result for all datapoints.
 
 \chapter{Evaluation}
 \label{ch:evaluation}
