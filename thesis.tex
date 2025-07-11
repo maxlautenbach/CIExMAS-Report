@@ -678,6 +678,17 @@ Overall the usage of a vector store is necessary to solve the task of closed inf
 
 \subsection{Language Models}
 \label{subsec:eval_language_models}
+
+The choice of a language model is a very complex task in regards of a multi-agent system. For such a task, the \ac{LLM} has to be able to follow prompts, plan, reason about tasks, but also have to extract triples and know how knowledge graphs triples are typically build. In addition, from the kick-off of the CIExMAS project until the end multiple models have been published. Those models were also not tested before on the related approaches to CIExMAS, which lets the evaluation start at the foundation.
+
+An additional limitation is the system used to benchmark as well as the providers used to develop the system. The benchmarks were all executed on 2x Nvidia A100 with 48GB VRAM, which had to run the \ac{LLM} and the embedding model. Therefore, the \ac{LLM} parameter limit was experienced at circa 70 billion parameters for a 4-bit quantised \ac{LLM}. In addition, the extensive development and evaluation was limited to open source models, as of the traceability of CIExMAS and to offer more flexibility in model use. Additionally, the evaluation could be done on local servers instead of using credits at AI vendors for the token instense benchmarking.
+
+In the course of the work, Llama 3.3 70B showed the best performance in the outlined capabilities, especially in executing a multi-agent system and following instructions. That is why all benchmarks of CIExMAS except for the model variation were done on a 4-bit AWQ model of Llama 3.3 70B named \texttt{kosbu/Llama-3.3-70B-Instruct-AWQ}. The high performance also matches with the benchmarks executed by \citet{Meta2024}, which showed a similar performance to GPT-4o or Claude 3.5-Sonnet, which were state-of-the-art models back at the time, but needed more parameters and are no open sourced. The Llama 3 Series furthermore is build like the GPT models, but could leverage a large scale of high quality data, which reduced the parameter size down to 405 billion parameters in Llama 3 and 70 billion parameters in Llama 3.3, while keeping the performance up \cite{Grattafiori2024,Meta2024}.
+
+More recently Google released a new open source model called Gemma3 which got ranked one of the best models on the human-evaluated LMSys Chatbot Arena \cite{Chiang2024}, while maintaining a low number of 27 billion parameters \cite{Team2025}. Nevertheless it showed slightly lower scores than Llama 3.3 70B in for instance the MMLU-Pro benchmark. Furthermore, the Gemma3 model showed shortcomings in instruction following and executing a logic agent flow.
+
+In addition, newer model architectures like Mixture-of-Experts or reasoning models became present with the rise of Deepseek-R1 or the Meta Llama 4 models \cite{DeepSeekAI2025,MetaAI2025}.
+
 \begin{itemize}
   \item Llama 3.3 70B
   \item Gemma 3 27B
