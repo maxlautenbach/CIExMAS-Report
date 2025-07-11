@@ -618,12 +618,12 @@ With this measures, various errors from parsing issues to syntactical issues can
 \chapter{Evaluation}
 \label{ch:evaluation}
 
-This chapter is about the overall evaluation of the effectiveness of multi-agent system in doing closed information extraction.  The overall setup including the used datasets and Wikidata incorporation, the used language models and used frameworks will be explained in section \ref{sec:evaluation_setup}. Furthermore, the calculation of the evaluation metrics which are used for the comparison later will be outlined in section \ref{sec:evaluation_metrics}. The results within this evaluation will be done in section \ref{sec:evaluation_configurations} leading by an overview comparison of the best CIExMAS configuration to the approaches synthIE \cite{Josifoski2023} and GenIE \cite{Josifoski2021} on the a split of the synthIE dataset \cite{Josifoski2023}. This will be followed by the single interation steps and their results. In section \ref{sec:discussion} all results will be concluded and interpreted.
+This chapter is about the overall evaluation of the effectiveness of multi-agent system in doing closed information extraction. In general, the multi-agent system was build using python. The overall setup of it including the used datasets and Wikidata incorporation, the used language models and used frameworks will be explained in section \ref{sec:evaluation_setup}. Furthermore, the calculation of the evaluation metrics which are used for the comparison later will be outlined in section \ref{sec:evaluation_metrics}. The results within this evaluation will be done in section \ref{sec:evaluation_configurations} leading by an overview comparison of the best CIExMAS configuration to the approaches synthIE \cite{Josifoski2023} and GenIE \cite{Josifoski2021} on the a split of the synthIE dataset \cite{Josifoski2023}. This will be followed by the single interation steps and their results. In section \ref{sec:discussion} all results will be concluded and interpreted.
 
 \section{Evaluation Setup}
 \label{sec:evaluation_setup}
 
-The evaluation setup consists out of three essential parts. First, is the subsection \ref{sec:dataset} about the dataset used for the evaluation and espeically which split of it is used. Additionally, the subsection contains details about where external information are stored for the information. Afterwards the language models and providers will be outlined in subsection \ref{subsec:eval_language_models}. The evaluation setup will be concluded by section \ref{sec:evaluation_setup} about the concrete agentic framework used.
+The evaluation setup consists out of three essential parts. First, is the subsection \ref{sec:dataset} about the dataset used for the evaluation and espeically which split of it is used. Additionally, the subsection contains details about where external information are stored for the information. Afterwards the language models and providers will be outlined in subsection \ref{subsec:eval_language_models}. The evaluation setup will be concluded by section \ref{sec:evaluation_setup} about the concrete agentic framework used. In addition, huge parts of the work is traced using the open-source application LangFuse \footnote{available under \url{https://langfuse.com}}.
 
 \subsection{Dataset and Comparison Models}
 \label{sec:dataset}
@@ -666,16 +666,16 @@ Overall the first 50-sample sorted synthIE-text dataset serves as benchmark for 
 
 Like outlined in various sections about knowledge graph incorporation tool in section \ref{sec:agent_tools} it is necessary to provide the agent system direct access to Wikidata as underlying knowledge graph. To provide faster latency this is done by a system consisting of Qdrant as vector database, Redis as key-value storage and Apache Jena Fuseki as local SPARQL endpoint. All of this is hosted on a virtual private server, which provide lower latency than using the SPARQL endpoint of Wikidata directly. Nevertheless, a direct access to the Wikidata SPARQL endpoint is used in the network traversal and turtle to label tool to get the restrictions directly.
 
+The URI retrieval tool, like already outlined in the corresponding subsection \ref{subsec:uri_retrieval}, needs a search index to produce relevant mappings. In this evaluation each search index is one collection in the hosted Qdrant vector storage. It has to be mentioned, that using some kind of database that supports similarity search was necessary to support the outlined approach.
 
+In order to fill the Qdrant collections, the relevant data was pre-collected for all development and benchmarking datasets and their corresponding samples. This means that also when developing and benchmarking on synthIE dataset, the benchmarking parts of REBEL, meaning entities and properties are indexed in all collections of Wikidata. This is based on the goal to make CIExMAS real-world ready, where it would have to decide out of the whole underlying knowledge graph, while keeping the collections manageable. On the otherside, this enabled a simple dataset switch in either development or benchmarking.
 
-\begin{itemize}
-  \item synthIE
-  \item How does Wikidata looks like?
-  \item Langgraph
-  \item 2 Datasplits on synthIE Text (Train Val, Test)
-  \item 2 Datasplits on synthIE Code (Train , Test) (optional)
-  \item Results on 5/50 Examples
-\end{itemize}
+As already stated, the semantic validation needed a loop-free hierarchy graph of the entities and properties of Wikidata. To provide them across various machines, a instance of Apache Jena Fuseki was hosted with a class- and a property-hierarchy. As those graphs were also smaller, this gave another performance boost over calling the SPARQL-endpoint of Wikidata directly.
+
+The key-value store Redis is used for faster data processing pipelines and debugging. This means, that the redis primarily stores, which data from Wikidata have already been stored into the Qdrant database. Alongside it also stores the label, the description and the type of element saved from Wikidata, so that also the displaying the labels is faster. Displaying labels faster also saves time, when for instance benchmark runs have to be evaluated in detail and each URI must be transformed into a human-readable label.
+
+Overall the usage of a vector store is necessary to solve the task of closed information extraction with the CIExMAS approach. Furthermore, things like a triple store and a key-value store can help to make information available across multiple machines and decrease latency. Combined this enables the overhead of preparing and executing of the agent system to be low.
+
 \subsection{Language Models}
 \label{subsec:eval_language_models}
 \begin{itemize}
@@ -697,6 +697,7 @@ Like outlined in various sections about knowledge graph incorporation tool in se
   \item Definition Positive/Negative Triple \cite{Josifoski2021}
   \item F1-Score, Precision, Recall
   \item With Parents, With Related
+  \item How evaluations are stored
 \end{itemize}
 
 \section{Evaluation Overview}
