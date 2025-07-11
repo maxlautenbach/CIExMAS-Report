@@ -617,39 +617,80 @@ With this measures, various errors from parsing issues to syntactical issues can
 
 \chapter{Evaluation}
 \label{ch:evaluation}
+
+This chapter is about the overall evaluation of the effectiveness of multi-agent system in doing closed information extraction.  The overall setup including the used datasets and Wikidata incorporation, the used language models and used frameworks will be explained in section \ref{sec:evaluation_setup}. Furthermore, the calculation of the evaluation metrics which are used for the comparison later will be outlined in section \ref{sec:evaluation_metrics}. The results within this evaluation will be done in section \ref{sec:evaluation_configurations} leading by an overview comparison of the best CIExMAS configuration to the approaches synthIE \cite{Josifoski2023} and GenIE \cite{Josifoski2021} on the a split of the synthIE dataset \cite{Josifoski2023}. This will be followed by the single interation steps and their results. In section \ref{sec:discussion} all results will be concluded and interpreted.
+
 \section{Evaluation Setup}
 \label{sec:evaluation_setup}
-\subsection{Dataset}
+
+The evaluation setup consists out of three essential parts. First, is the subsection \ref{sec:dataset} about the dataset used for the evaluation and espeically which split of it is used. Additionally, the subsection contains details about where external information are stored for the information. Afterwards the language models and providers will be outlined in subsection \ref{subsec:eval_language_models}. The evaluation setup will be concluded by section \ref{sec:evaluation_setup} about the concrete agentic framework used.
+
+\subsection{Dataset and Comparison Models}
 \label{sec:dataset}
+
+The evaluation is based on the datasets synthIE and REBEL. Both datasets, which are described in section \ref{sec:related_datasets}, contain triples, that are extracted out of a given text. Each extracted triples contains unique identifiers from Wikidata for each part of the triple, which make them ideal for closed information extraction. Each identifier could be resolved within the entity namespace \texttt{https://www.wikidata.org/entity/}.
+
+Both datasets follow a similar structure. Both datasets are stored in json lines, which is a line separated format of objects consisting of entities, relations and triples. Each entity and relation, which can also be named as property, is further split down into a surfaceform and uri, which is a unique identifier. The surfaceform is exactly how the entities and relations are written in the given text. The uri field is the local part of the Wikidata Qname. A Qname itself has a prefix, which is the namespace in the case of Wikidata, and a local part which is the unique identifier \cite{ASF2010}. This means that the uri field is for instance Q120 with the surfaceform \enquote{June}. The full entity \enquote{June} can only be detected in the namespace of \texttt{https://www.wikidata.org/entity/}. The triples contain of a subject, object and predicate, which itself are build up like entities and relations.
+
+As already outlined in section \ref{sec:related_datasets} there are two datasets of synthIE, which are synthIE-code and synthIE-text. Both datasets differ in the GPT-3.5 model used for the text generation. As the text model showed better performances, the evaluation is strictly done on synthIE-text.
+
+Nevertheless, all evaluation configurations until section \ref{subsec:knowledge_graph_integration} were developed on synthIE-code, as of the larger amount of training data could have provided are more extensive development set in order to detect as much edge cases as possible. For development reasons, the train-split of synthIE-code was used and sorted, so that the document with id one is the first in the jsonlines file.
+
+As of upcoming limitations due to dataset quality and the experience of developing on at most ten examples, the latest developments were done on the validation-split of synthIE-text, which is also sorted and includes the same underlying triples but different text. The validation split is used, as synthIE-text does not offer a train split. In the end, this offers a higher quality of text and might produce more solvable edge cases, than triples that are hard to find in the text.
+
+The evaluation was done for all comparison models and evaluation configrations of CIExMAS on the first 50 documents within the sorted test split of the synthIE-text datasplit. The number was choosen based on limitation in computing capacities, especially for agent call intense architectures like \ac{SSA} or \ac{SSSA}. Again synthIE-text was choosen, as it was perceived by \citet{Josifoski2023} to produce improved results in comparison with synthIE-code without changing the training dataset, which implies a higher dataset quality. In addition, the experiments have shown a more detectable result of triples.
+
+To illustrate the distinction between \texttt{synthIE-code} and \texttt{synthIE-text}, the first document of both datasets is shown in the following example. In the \texttt{synthIE-code} version, the sentence reads: “\emph{‘Groovin’ Blue’ is an album by Curtis Amy, released on Pacific Jazz Records.}” In contrast, the \texttt{synthIE-text} version presents a variation: “\emph{Groovin’ Blue was released on Pacific Jazz Records and performed by Curtis Amy.}” While both versions encode the same structured triplets, which can be found in table \ref{tab:triple-example}, the textual surface varies. The synthIE-text version already gives a hint on the exact property, which in the case of synthIE-code is harder to find.
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{l l l}
+    \toprule
+    \textbf{Subject} & \textbf{Property} & \textbf{Object}        \\
+    \midrule
+    Groovin\_Blue    & record label      & Pacific\_Jazz\_Records \\
+    Groovin\_Blue    & performer         & Curtis\_Amy            \\
+    \bottomrule
+  \end{tabular}
+  \caption{Surfaceform Triplets - DocID: 0 - synthIE Code \& Text}
+  \label{tab:triple-example}
+\end{table}
+
+In addition, to the synthIE dataset, benchmarking on the best CIExMAS models were done on the REBEL dataset. Like in the synthIE evaluation, the first 50 samples in the sorted test-split were used. Like already outline, CIExMAS focussed mainly on synthIE as foundation for developing the agents, which can conclude in worse results on REBEL.
+
+Both datasets were evaluated on various different models before. Espeically for the synthIE dataset, the solutions of \citet{Josifoski2023} synthIE- and GenIE were used as they were used pre-trained under \url{https://github.com/epfl-dlab/SynthIE}. For the synthIE solution all three versions synthIE-base, synthIE-base-sc and synthIE-large were evaluated. Like the CIExMAS solution, those solutions were also evaluated against the same samples of synthIE-text. For REBEL, no comparison models were evaluated, as the clear focus of CIExMAS is on synthIE, as of the higher dataset quality.
+
+Overall the first 50-sample sorted synthIE-text dataset serves as benchmark for CIExMAS and comparison models. In addition, the dataset can also show which evaluation configuration changes had which impact on the overall performance. Other datasets like REBEL were tested, but not extensive.
+
+\subsection{Knowledge Graph Access}
+
+Like outlined in various sections about knowledge graph incorporation tool in section \ref{sec:agent_tools} it is necessary to provide the agent system direct access to Wikidata as underlying knowledge graph. To provide faster latency this is done by a system consisting of Qdrant as vector database, Redis as key-value storage and Apache Jena Fuseki as local SPARQL endpoint. All of this is hosted on a virtual private server, which provide lower latency than using the SPARQL endpoint of Wikidata directly. Nevertheless, a direct access to the Wikidata SPARQL endpoint is used in the network traversal and turtle to label tool to get the restrictions directly.
+
+
+
 \begin{itemize}
   \item synthIE
-\end{itemize}
-\subsection{Wikidata}
-\label{sec:wikidata}
-\begin{itemize}
   \item How does Wikidata looks like?
-\end{itemize}
-\begin{itemize}
   \item Langgraph
   \item 2 Datasplits on synthIE Text (Train Val, Test)
   \item 2 Datasplits on synthIE Code (Train , Test) (optional)
   \item Results on 5/50 Examples
-  \item Cerebras, SambaNova Cloud, vLLM on 2x A100
-  \item Models: Llama 3.3 70B (Mainly), Tests with o3-mini, Llama 4 ...
 \end{itemize}
-% Your first main chapter goes here
-\section{Language Models}
-\label{sec:eval_language_models}
+\subsection{Language Models}
+\label{subsec:eval_language_models}
 \begin{itemize}
   \item Llama 3.3 70B
   \item Gemma 3 27B
   \item Llama 4 Maverick
+  \item Cerebras, SambaNova Cloud, vLLM on 2x A100
+  \item Models: Llama 3.3 70B (Mainly), Tests with o3-mini, Llama 4 ...
 \end{itemize}
-\section{Prompting}
-\label{sec:prompting}
+\subsection{Agentic Framework}
+\label{subsec:agentic_framework}
 \begin{itemize}
-  \item Using Train or Validation Set of synthIE-code or synthIE-text
+  \item Langgraph
 \end{itemize}
+
 \section{Evaluation Metrics}
 \label{sec:evaluation_metrics}
 \begin{itemize}
@@ -658,6 +699,8 @@ With this measures, various errors from parsing issues to syntactical issues can
   \item With Parents, With Related
 \end{itemize}
 
+\section{Evaluation Overview}
+\label{sec:evaluation_overview}
 
 \section{Evaluation Configurations}
 \label{sec:evaluation_configurations}
