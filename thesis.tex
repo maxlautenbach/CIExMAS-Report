@@ -687,15 +687,12 @@ In the course of the work, Llama 3.3 70B showed the best performance in the outl
 
 More recently Google released a new open source model called Gemma3 which got ranked one of the best models on the human-evaluated LMSys Chatbot Arena \cite{Chiang2024}, while maintaining a low number of 27 billion parameters \cite{Team2025}. Nevertheless it showed slightly lower scores than Llama 3.3 70B in for instance the MMLU-Pro benchmark. Furthermore, the Gemma3 model showed shortcomings in instruction following and executing a logic agent flow.
 
-In addition, newer model architectures like Mixture-of-Experts or reasoning models became present with the rise of Deepseek-R1 or the Meta Llama 4 models \cite{DeepSeekAI2025,MetaAI2025}.
+In addition, newer model architectures like Mixture-of-Experts or reasoning models became present with the rise of Deepseek-R1 or the Meta Llama 4 models \cite{DeepSeekAI2025,MetaAI2025}. Those models have also shown high benchmarking results, while keeping the parameters lower then top-end state-of-the-art models. Those models partly have shown higher performances, but as the reasoning capability keeps looping over the LLM and produces a higher need for tokens as well as higher needs on resources, those models were not used for development due to hardware and time limitations.
 
-\begin{itemize}
-  \item Llama 3.3 70B
-  \item Gemma 3 27B
-  \item Llama 4 Maverick
-  \item Cerebras, SambaNova Cloud, vLLM on 2x A100
-  \item Models: Llama 3.3 70B (Mainly), Tests with o3-mini, Llama 4 ...
-\end{itemize}
+Nevertheless both Gemma3 and Meta Llama 4 are used to test different models with the best evaluation configuration of CIExMAS. Therefore, the whole configuration stayed the same. This can lead to expositions of the prompt senstivity of the other models, which can show underperformance in comparison to a perfectly adapted prompt. In order to use Gemma3 on the given setup, a 4-bit GPTQ-quantised version named \texttt{ISTA-DASLab/gemma-3-27b-it-GPTQ-4b-128g} was used. As the best version at the time is Llama 4 Maverick and this model requires over 96GB of VRAM, that the two available Nvidia A100 GPUs offer, the evaluation on Llama 4 Maverick was done on SambaNova Cloud, which is a provider for LLM inference.
+
+All in all, Llama 3.3 70B remained the ideal model for fast development using SambaNova Cloud and the unquantised Llama 3.3 70B model, while the main evaluation was done on the quantised model. This model already provided a great leap over the previous used \ac{LM} of \citet{Josifoski2023}. Therefore, the model advance are included in CIExMAS. To test even more recent advances, other models were also included in the evaluation.
+
 \subsection{Agentic Framework}
 \label{subsec:agentic_framework}
 \begin{itemize}
