@@ -30,7 +30,7 @@
 % example enviroments (add more as needed)
 \newtheorem{definition}{Definition} \newtheorem{proposition}{Proposition}
 
-% Definition einer Turtle‑Sprache
+% Definition einer Turtle-Sprache
 \lstdefinelanguage{Turtle}{
   morekeywords={@prefix,@base,a},
   morekeywords=[2]{ex,exp,rdfs},
@@ -48,7 +48,7 @@
   literate={:}{{{\color{orange}:}}}1,
 }
 
-% Definition einer SPARQL‑Sprache
+% Definition einer SPARQL-Sprache
 \lstdefinelanguage{SPARQL}{
   morekeywords={@prefix,@base,a,SELECT,WHERE},
   morekeywords=[2]{ex,exp,rdfs},
@@ -681,7 +681,7 @@ Overall the usage of a vector store is necessary to solve the task of closed inf
 
 The choice of a language model is a very complex task in regards of a multi-agent system. For such a task, the \ac{LLM} has to be able to follow prompts, plan, reason about tasks, but also have to extract triples and know how knowledge graphs triples are typically build. In addition, from the kick-off of the CIExMAS project until the end multiple models have been published. Those models were also not tested before on the related approaches to CIExMAS, which lets the evaluation start at the foundation.
 
-An additional limitation is the system used to benchmark as well as the providers used to develop the system. The benchmarks were all executed on 2x Nvidia A100 with 48GB VRAM, which had to run the \ac{LLM} and the embedding model. Therefore, the \ac{LLM} parameter limit was experienced at circa 70 billion parameters for a 4-bit quantised \ac{LLM}. In addition, the extensive development and evaluation was limited to open source models, as of the traceability of CIExMAS and to offer more flexibility in model use. Additionally, the evaluation could be done on local servers instead of using credits at AI vendors for the token instense benchmarking.
+An additional limitation is the system used to benchmark as well as the providers used to develop the system. The benchmarks were all executed on 2x Nvidia A100 with 48GB VRAM, which had to run the \ac{LLM} using vLLM \footnote{available under \url{https://docs.vllm.ai/en/latest/}} and the embedding model using Ollama \footnote{available under \url{https://ollama.com}}. Therefore, the \ac{LLM} parameter limit was experienced at circa 70 billion parameters for a 4-bit quantised \ac{LLM}. In addition, the extensive development and evaluation was limited to open source models, as of the traceability of CIExMAS and to offer more flexibility in model use. Additionally, the evaluation could be done on local servers instead of using credits at AI vendors for the token instense benchmarking.
 
 In the course of the work, Llama 3.3 70B showed the best performance in the outlined capabilities, especially in executing a multi-agent system and following instructions. That is why all benchmarks of CIExMAS except for the model variation were done on a 4-bit AWQ model of Llama 3.3 70B named \texttt{kosbu/Llama-3.3-70B-Instruct-AWQ}. The high performance also matches with the benchmarks executed by \citet{Meta2024}, which showed a similar performance to GPT-4o or Claude 3.5-Sonnet, which were state-of-the-art models back at the time, but needed more parameters and are no open sourced. The Llama 3 Series furthermore is build like the GPT models, but could leverage a large scale of high quality data, which reduced the parameter size down to 405 billion parameters in Llama 3 and 70 billion parameters in Llama 3.3, while keeping the performance up \cite{Grattafiori2024,Meta2024}.
 
@@ -695,18 +695,70 @@ All in all, Llama 3.3 70B remained the ideal model for fast development using Sa
 
 \subsection{Agentic Framework}
 \label{subsec:agentic_framework}
-\begin{itemize}
-  \item Langgraph
-\end{itemize}
+In order to evaluate any agentic system, an agentic framework is needed. As the \ac{LM} and the embedding model run on vLLM and Ollama, while the \acp{LLM} in development are called from cloud providers, the agentic framework is also required to support those requirements. In addition it needed to support custom states like outlined in chapter \ref{ch:approach}.
+A package that supported those requirements and had the flexibility to be extended was LangGraph like already stated in section \ref{sec:multi_agent_systems}. As LangGraph implements mainly flow features, but in the form used does not interact with the \acp{LLM} directly, the \ac{LLM} and embedding model access were again flexible. The decision was taken on LangChain, as LangGraph and LangChain were integrated into each other. Therefore, the monitoring using Langfuse can be done seemlessly on the agent overview level. This gives the outlined capability of agent tracibility outlined in section \ref{sec:agent_design}. Another advantage of LangChain is the wide availability of adapters to various LLM providers. In addition, all frameworks are also open-sourced projects and have big communities what was supporting the creation of CIExMAS.
+In the end, many agentic and \ac{LLM}-frameworks in general could be used. Nevertheless, the combination out of LangChain, LangGraph and Langfuse was taken due to their match in requirements and wide-spread usage in the community. With those tools, the best practises of agent design are enabled for the implementation of CIExMAS.
 
 \section{Evaluation Metrics}
 \label{sec:evaluation_metrics}
-\begin{itemize}
-  \item Definition Positive/Negative Triple \cite{Josifoski2021}
-  \item F1-Score, Precision, Recall
-  \item With Parents, With Related
-  \item How evaluations are stored
-\end{itemize}
+The evaluation metrics are crucial to make CIExMAS comparable to other models, but also to identify optimisation potentials in CIExMAS. The evaluation is therefore based on evaluation metrics proposed by \citet{Josifoski2021}, which are meant to define true and false positive triples. Derived from defining positive and negative matches, typical score like F1-score, precision or recall can be defined. In addition to \citet{Josifoski2021} we propose a definition of close matches.
+
+To define close matches, it is important to outline the definition of a match proposed by \citet{Josifoski2021}. Therefore, the set of predicted and actual triples are compared per document. A predicted triple is a match, when there is a triple in the set of actual triples per document, where each part of the triple matches by its \ac{URI}. Derived from this, there can be a number of matching triples, so called true positive triples be derived. All remaining triples are false positive triples. All unmatched triples of the actual triple set are then false negative triples.
+
+In addition to the main category triples proposed by \citet{Josifoski2021}, four additional categories for direct matches were derived: Subject, Property, Object and Entity. This has the background of showing where a configuration lacks off capability. In addition, it shows which configuration can handle each part the best and then offers a insight to derive prompts to other configurations. Entities in this case is a set of all subject and objects in a document, where the place in the triple does not matter. The metric is calculated in the same way for those addition categories like for the triples.
+
+To offer insights in how close the predictions are towards the expected results, soft matches are addition proposed for the property. Those soft matches also includes triples that use a super-property of the expected property as true positive. This matches are defined as parental soft matches. When a predicted property is either a super- or sub-property of the expected property, the match is defined as related soft match. Both soft match categories can be applied to either the predicate and the triple category.
+
+Those soft matches are implemented by using a greedy search, whether a triple matches a triple from the gold standard and vice a versa to detect to correct number of true and false positive as well as false negative triples. This opens the error of creating f1-scores, precision and recalls over one, as multiple triples of the predicted set could match to one triple in the gold standard. That is why the recall is calculated as number of gold standard triples or properties that were detected devided by the total number of gold standard triples, while the precision was done the same but on prediction side. This follows also the common definition of precision and recall precisely.
+
+The pre-liminary evaluation metrics of true positive, false positive and false negative triples, subjects, properties, objects and entities as well as the related soft matches are calculated for each document. In addition with the resulting turtle string they are saved into a excel sheet, which later on can be processed to F1-scores, precisions and recalls. As the scores are evaluated document-wise, an overall macro or micro average can be used for all three scores. In the following evaluation macro-scores are used, when the averaging method is not further defined, as the macro average gives each document equal weight regardless of the amount of triples in each document.
+
+To illustrate how the evaluation metrics are computed, we consider a concise toy scenario with three triples about Angela Merkel.  Two sets are contrasted below: the triples predicted by CIExMAS and the manually curated gold standard.  Because the example is deliberately minimal, every intermediate step—from strict matching to soft matching—can be verified by hand.
+
+\begin{table}[ht]
+  \centering
+  \label{tab:merkel_triples}
+  \begin{tabular}{p{0.46\textwidth}p{0.46\textwidth}}
+    \toprule
+    \textbf{Predicted triple} & \textbf{Actual triple}                                      \\ \midrule
+    Angela~Merkel ; \textit{profession} ; Politician
+                              & Angela~Merkel ; \textit{profession} ; Politician            \\[0.2em]
+    Angela~Merkel ; \textit{is~member~of} ; CDU
+                              & Angela~Merkel ; \textit{is~member~of~political~party} ; CDU \\[0.2em]
+    Angela~Merkel ; \textit{hobby} ; Tennis
+                              & Angela~Merkel ; \textit{lives~in} ; Berlin                  \\
+    \bottomrule
+  \end{tabular}
+  \caption{Predicted versus actual triples for Angela~Merkel.}
+\end{table}
+
+In this ontology the predicate \textit{is~member~of~political~party} is a declared sub-property of the more general predicate \textit{is~member~of}.  Consequently, when CIExMAS predicts \textit{is~member~of} while the reference solution specifies the specialised variant, the pair is counted as both a \emph{parental soft match} (because the prediction is a direct super-property) and a \emph{related soft match} (because “related” embraces any super- or sub-property relationship).  Such soft matching awards partial credit whenever predicted and gold predicates are ontologically linked, even if their URIs differ.
+
+\begin{table}[ht]
+  \centering
+  \label{tab:merkel_metrics}
+  \begin{tabular}{lrrrrrr}
+    \toprule
+    Category               & TP & FP & FN & Precision & Recall & $F_1$ \\ \midrule
+    Triples                & 1  & 2  & 2  & 0.33      & 0.33   & 0.33  \\
+    Triples -- Parental    & 2  & 1  & 1  & 0.67      & 0.67   & 0.67  \\
+    Triples -- Related     & 2  & 1  & 1  & 0.67      & 0.67   & 0.67  \\
+    Subjects               & 1  & 0  & 0  & 1.00      & 1.00   & 1.00  \\
+    Properties             & 1  & 2  & 2  & 0.33      & 0.33   & 0.33  \\
+    Properties -- Parental & 2  & 1  & 1  & 0.67      & 0.67   & 0.67  \\
+    Properties -- Related  & 2  & 1  & 1  & 0.67      & 0.67   & 0.67  \\
+    Objects                & 2  & 1  & 1  & 0.67      & 0.67   & 0.67  \\
+    Entities               & 3  & 1  & 1  & 0.75      & 0.75   & 0.75  \\
+    \bottomrule
+  \end{tabular}
+  \caption{Per--category evaluation metrics for the example in Table~\ref{tab:merkel_triples}.  “Parental” and “Related” rows count soft matches where the predicted predicate is, respectively, a super-property or any super/sub-property of the expected predicate.}
+\end{table}
+
+The strict comparison in Table~\ref{tab:merkel_metrics} yields one fully correct triple, perfect subject recognition, and largely accurate object selection, while property alignment remains the principal source of error.  Allowing parental and related soft matches mitigates this deficiency by recognising the semantic proximity between \textit{is~member~of} and \textit{is~member~of~political~party}.  For example, in the object category two true positives, one false positive, and one false negative produce a precision and recall of $\tfrac{2}{3}$, resulting in $F_1\approx0.67$.  The same arithmetic is applied uniformly across all other categories.
+
+Because these metrics are computed on a document-by-document basis, macro averages give each document equal weight, thereby yielding an interpretable, document-equitable overall score.  Evaluating at multiple granularities—triples, subjects, predicates, objects, and undifferentiated entities—while incorporating soft matches ultimately offers a robust foundation for diagnosing and improving CIExMAS.
+
+
 
 \section{Evaluation Overview}
 \label{sec:evaluation_overview}
