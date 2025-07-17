@@ -640,7 +640,7 @@ As of upcoming limitations due to dataset quality and the experience of developi
 
 The evaluation was done for all comparison models and evaluation configrations of CIExMAS on the first 50 documents within the sorted test split of the synthIE-text datasplit. The number was choosen based on limitation in computing capacities, especially for agent call intense architectures like \ac{SSA} or \ac{SSSA}. Again synthIE-text was choosen, as it was perceived by \citet{Josifoski2023} to produce improved results in comparison with synthIE-code without changing the training dataset, which implies a higher dataset quality. In addition, the experiments have shown a more detectable result of triples.
 
-To illustrate the distinction between \texttt{synthIE-code} and \texttt{synthIE-text}, the first document of both datasets is shown in the following example. In the \texttt{synthIE-code} version, the sentence reads: “\emph{‘Groovin’ Blue’ is an album by Curtis Amy, released on Pacific Jazz Records.}” In contrast, the \texttt{synthIE-text} version presents a variation: “\emph{Groovin’ Blue was released on Pacific Jazz Records and performed by Curtis Amy.}” While both versions encode the same structured triplets, which can be found in table \ref{tab:triple-example}, the textual surface varies. The synthIE-text version already gives a hint on the exact property, which in the case of synthIE-code is harder to find.
+To illustrate the distinction between \texttt{synthIE-code} and \texttt{synthIE-text}, the first document of both datasets is shown in the following example. In the \texttt{synthIE-code} version, the sentence reads: "\emph{'Groovin' Blue' is an album by Curtis Amy, released on Pacific Jazz Records.}" In contrast, the \texttt{synthIE-text} version presents a variation: "\emph{Groovin' Blue was released on Pacific Jazz Records and performed by Curtis Amy.}" While both versions encode the same structured triplets, which can be found in table \ref{tab:triple-example}, the textual surface varies. The synthIE-text version already gives a hint on the exact property, which in the case of synthIE-code is harder to find.
 
 \begin{table}[h]
   \centering
@@ -762,6 +762,28 @@ Because these metrics are computed on a document-by-document basis, macro averag
 
 \section{Evaluation Overview}
 \label{sec:evaluation_overview}
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{l|rrrrr}
+    \toprule
+    \textbf{Model}         & \multicolumn{5}{c}{\textit{\textbf{Triples}}}                                                                     \\
+                           & Precision                                     & Recall         & F1             & Parental F1    & Related F1     \\
+    \midrule
+    synthIE$_{T5-large}$   & \textbf{0.835}                                & \textbf{0.832} & \textbf{0.831} & \textbf{0.841} & \textbf{0.858} \\
+    synthIE$_{T5-base-SC}$ & 0.789                                         & 0.798          & 0.789          & 0.819          & 0.833          \\
+    synthIE$_{T5-base}$    & 0.784                                         & 0.769          & 0.775          & 0.812          & 0.826          \\
+    GenIE$_{T5-base}$      & 0.527                                         & 0.344          & 0.391          & 0.406          & 0.419          \\
+    GenIE$_{T5-base-SC}$   & 0.527                                         & 0.320          & 0.372          & 0.391          & 0.404          \\
+    \midrule
+    \textbf{CIExMAS}       & 0.728                                         & 0.635          & 0.665          & 0.728          & 0.728          \\
+    \bottomrule
+  \end{tabular}
+  \caption{Performance comparison of CIExMAS against state-of-the-art models on the synthIE dataset.}
+  \label{tab:evaluation_overview}
+\end{table}
+
+The best CIExMAS configuration tested on the outlined 50-sample synthIE-text dataset, was found using the network architecture outlined in section \ref{subsec:network}. The exact configuration can be found in section \ref{subsec:full_network_agent_architecture}. The configuration scored 62.4\% F1 better than the best GenIE solution of \citet{Josifoski2021} and reached near performance to the synthIE models with the largest performance gap being 25\% of F1 increase.
 
 \section{Evaluation Configurations}
 \label{sec:evaluation_configurations}
