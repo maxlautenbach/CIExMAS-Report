@@ -834,7 +834,13 @@ In the end the most sophisticated approaches including a high knowledge graph in
 \subsection{Initial Baseline Setup}
 \label{subsec:initial_baseline_setup}
 
+As a starting point, the baseline architecture was designed like described in section \ref{subsec:baseline}. The initial baseline is a simple version of this architecture. This means that, the prompts were rather simple, especially for the extraction agents. In addition, the output of the URI detection tool was returned directly to the supervisor agent.
 
+In general, this configuration showed a static pattern of executing first entity and relation extraction, than using the URI tool for mapping and afterwards producing an output. Therefore, in the traces no iteration over the triples can be found. As this configuration relates to a very early version, the target was to output solely QNames instead of full URIs. As this baseline was then tested again within the current agent system framework of CIExMAS, the QNames were parsed to turtle strings. The evaluation logs have shown, that sometimes instead of QNames, URIs were outputed. As this was not indented, it is considered as error.
+
+Nevertheless, the initial baseline could score near GenIE scores in remarks of the F1-score, even surpassing the recall of both GenIE models. When assumed that the result were achieved on 80\% of the data, and those results scale to the rest of the data, the baseline had the potential to score an F1 of 0.402. Achieving this score, the baseline would have surpassed both GenIE models.
+
+In this early state, the supervisor agent already showed flaws, what led to the prompt architecture used.
 
 \begin{itemize}
   \item Supervisor Agent
