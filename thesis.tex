@@ -387,7 +387,7 @@ Earlier implementations prior to the emergence of \acp{LLM} showed already super
 
 \citet{Josifoski2021} introduced the idea of GenIE, which is adapting the idea of REBEL towards closed information extraction. This especially meant that the decoding in the BART \ac{LM} was constrained towards the underlying knowledge base, which is Wikidata \cite{Josifoski2021}. Therefore, \citet{Josifoski2021} used an output linearization by introducing special tokens to delimit subject, predicate and object. In addition, \cite{Josifoski2021} introduced a constrained beam search, that limits which tokens can be generated towards Wikidata. This idea on how to secure valid triple generation, outperformed the state-of-the-art pipeline consisting of named entity recognition, entity disambiguation, relation classification and triplet classification when released \cite{Josifoski2021}.
 
-Using the idea of GenIE and the quality of the synthIE dataset, \citet{Josifoski2023} introduced the synthIE model. The synthIE model follows the architecture of GenIE, but replaces BERT by Flan-T5 \ac{LM} due to a higher availablity of usable pre-training configurations. The results showed, that the best synthIE model trained on the train split of synthIE dataset could surpass the REBEL-trained GenIE model by a gap of over 0.8 macro-F1 using the synthIE-text dataset. This outlined the high correlation between the training and benchmarking dataset quality and the overall quality on the model \cite{Josifoski2023}.
+Using the idea of GenIE and the quality of the synthIE dataset, \citet{Josifoski2023} introduced the synthIE model. The synthIE model follows the architecture of GenIE, but replaces BERT by Flan-T5 \ac{LM} due to a higher availablity of usable pre-training configurations. The results showed, that the best synthIE model trained on the train split of synthIE dataset could surpass the REBEL-trained GenIE model, which was also using Flan-T5 in this comparison, by a gap of over 0.8 macro-F1 using the synthIE-text dataset. This outlined the high correlation between the training and benchmarking dataset quality and the overall quality on the model \cite{Josifoski2023}.
 
 Proceeding on to ideas of leveraging foundation models that then can be either fine-tuned or prompt engineered, \citet{Xue2024} presented a pipeline approach with fine-tuned \acp{LLM} for Relation Extraction, Subject Identification and Triplet Fact Extraction, while \citet{Chen2024} presented a prompt tuning approach for joint optimisation. The approach of \citet{Xue2024} was evaluated on the document-relation extraction dataset Re-DocRED showing a 10\% increase in F1-score compared to state-of-the-art models. Furthermore, it was shown that non fine-tuned models like the base ChatGPT model were outperformed by a large gap \cite{Xue2024}.
 
@@ -404,7 +404,7 @@ The related work shows, that apparent advances in \ac{LLM} reasearch can also ad
 
 This work introduce a novel approach to closed information extraction using multi-agent systems. The overall idea is evaluate both the pipeline and joint approach to closed information extraction conducted by multiple specialised agents. In order to fullfil the task the agents should be able to access and retrieve data from the knowledge graph directly. Therefore the concept of tools should be utilised.
 
-The general design follows to goal to achieve an multi-agent system that can be applied to real-world usage and therefore can handle various type of texts and extract triples out of them. This is why, the approach relies solely on prompt tuning and in-context learning rather than on fine-tuning models. The concept of limiting to in-context learning is based on \citet{Brown2020} achieving outperformance with in-context learning against other domain fine-tuned models. Additionally, recent advances of various \acp{LLM} to outperform prior models by a huge marging or match the performance of prior models while keeping lower parameter sizes \cite{MetaAI2024,Chiang2024} shows increased capabilities and can imply higher in-context learning abilities. The exact advances will be outlined in section \ref{sec:eval_language_models}.
+The general design follows to goal to achieve an multi-agent system that can be applied to real-world usage and therefore can handle various type of texts and extract triples out of them. This is why, the approach relies solely on prompt tuning and in-context learning rather than on fine-tuning models. The concept of limiting to in-context learning is based on \citet{Brown2020} achieving outperformance with in-context learning against other domain fine-tuned models. Additionally, recent advances of various \acp{LLM} to outperform prior models by a huge marging or match the performance of prior models while keeping lower parameter sizes \cite{MetaAI2025,Chiang2024} shows increased capabilities and can imply higher in-context learning abilities. The exact advances will be outlined in section \ref{sec:eval_language_models}.
 
 This work followed an iterative approach in designing various multi-agent systems following the agent design best practises shown in section \ref{sec:agent_design}. As of my knowledge, there is no other work proposed using the multi-agent system approach to closed information extraction, which makes the iterative approach crucial. This approach is giving the ability to learn the limitations of the agents and then iterate with those ideas. From the output four core architecture arose. The baseline (section \ref{subsec:baseline}) structure following strictly the closed pipeline idea. The supervisor (section \ref{subsec:supervisor}) architecture splitting up tasks from the baseline. The ReAct architecture (section \ref{subsec:react}) as the opposite direction is simplifying all agents to one, while keeping the tools. The full network system (section \ref{subsec:network}) shows the abilities of having expert agents that are defining the flow through the agent system themselves.
 
@@ -658,7 +658,7 @@ To illustrate the distinction between \texttt{synthIE-code} and \texttt{synthIE-
 
 In addition, to the synthIE dataset, benchmarking on the best CIExMAS models were done on the REBEL dataset. Like in the synthIE evaluation, the first 50 samples in the sorted test-split were used. Like already outline, CIExMAS focussed mainly on synthIE as foundation for developing the agents, which can conclude in worse results on REBEL.
 
-Both datasets were evaluated on various different models before. Espeically for the synthIE dataset, the solutions of \citet{Josifoski2023} synthIE- and GenIE were used as they were used pre-trained under \url{https://github.com/epfl-dlab/SynthIE}. For the synthIE solution all three versions synthIE-base, synthIE-base-sc and synthIE-large were evaluated. Like the CIExMAS solution, those solutions were also evaluated against the same samples of synthIE-text. For REBEL, no comparison models were evaluated, as the clear focus of CIExMAS is on synthIE, as of the higher dataset quality.
+Both datasets were evaluated on various different models before. Espeically for the synthIE dataset, the solutions of \citet{Josifoski2023} synthIE- and GenIE were used as they were used pre-trained under \url{https://github.com/epfl-dlab/SynthIE}. For the synthIE solution all three versions synthIE$_{T5-base}$, synthIE$_{T5-base-SC}$ and synthIE$_{T5-large}$ were evaluated. For the GenIE solution the version GenIE$_{T5-base}$ and GenIE$_{T5-base-SC}$ were tested. The abbreviation \textit{SC} stands for subject-collapsed, which means, that those variants outputs subject grouped triples. All models are using the Flan-T5 \ac{LM}. Like the CIExMAS solution, those solutions were also evaluated against the same samples of synthIE-text. For REBEL, no comparison models were evaluated, as the clear focus of CIExMAS is on synthIE, as of the higher dataset quality.
 
 Overall the first 50-sample sorted synthIE-text dataset serves as benchmark for CIExMAS and comparison models. In addition, the dataset can also show which evaluation configuration changes had which impact on the overall performance. Other datasets like REBEL were tested, but not extensive.
 
@@ -732,7 +732,7 @@ To illustrate how the evaluation metrics are computed, we consider a concise toy
   \caption{Predicted versus actual triples for Angela~Merkel.}
 \end{table}
 
-In this ontology the predicate \textit{is~member~of~political~party} is a declared sub-property of the more general predicate \textit{is~member~of}.  Consequently, when CIExMAS predicts \textit{is~member~of} while the reference solution specifies the specialised variant, the pair is counted as both a \emph{parental soft match} (because the prediction is a direct super-property) and a \emph{related soft match} (because “related” embraces any super- or sub-property relationship).  Such soft matching awards partial credit whenever predicted and gold predicates are ontologically linked, even if their URIs differ.
+In this ontology the predicate \textit{is~member~of~political~party} is a declared sub-property of the more general predicate \textit{is~member~of}.  Consequently, when CIExMAS predicts \textit{is~member~of} while the reference solution specifies the specialised variant, the pair is counted as both a \emph{parental soft match} (because the prediction is a direct super-property) and a \emph{related soft match} (because "related" embraces any super- or sub-property relationship).  Such soft matching awards partial credit whenever predicted and gold predicates are ontologically linked, even if their URIs differ.
 
 \begin{table}[ht]
   \centering
@@ -751,7 +751,7 @@ In this ontology the predicate \textit{is~member~of~political~party} is a declar
     Entities               & 3  & 1  & 1  & 0.75      & 0.75   & 0.75  \\
     \bottomrule
   \end{tabular}
-  \caption{Per--category evaluation metrics for the example in Table~\ref{tab:merkel_triples}.  “Parental” and “Related” rows count soft matches where the predicted predicate is, respectively, a super-property or any super/sub-property of the expected predicate.}
+  \caption{Per--category evaluation metrics for the example in Table~\ref{tab:merkel_triples}.  "Parental" and "Related" rows count soft matches where the predicted predicate is, respectively, a super-property or any super/sub-property of the expected predicate.}
 \end{table}
 
 The strict comparison in Table~\ref{tab:merkel_metrics} yields one fully correct triple, perfect subject recognition, and largely accurate object selection, while property alignment remains the principal source of error.  Allowing parental and related soft matches mitigates this deficiency by recognising the semantic proximity between \textit{is~member~of} and \textit{is~member~of~political~party}.  For example, in the object category two true positives, one false positive, and one false negative produce a precision and recall of $\tfrac{2}{3}$, resulting in $F_1\approx0.67$.  The same arithmetic is applied uniformly across all other categories.
@@ -783,12 +783,59 @@ Because these metrics are computed on a document-by-document basis, macro averag
   \label{tab:evaluation_overview}
 \end{table}
 
-The best CIExMAS configuration tested on the outlined 50-sample synthIE-text dataset, was found using the network architecture outlined in section \ref{subsec:network}. The exact configuration can be found in section \ref{subsec:full_network_agent_architecture}. The configuration scored 62.4\% F1 better than the best GenIE solution of \citet{Josifoski2021} and reached near performance to the synthIE models with the largest performance gap being 25\% of F1 increase.
+The best CIExMAS configuration tested on the outlined 50-sample synthIE-text dataset, was found using the network architecture outlined in section \ref{subsec:network}. The exact configuration can be found in section \ref{subsec:full_network_agent_architecture}. The configuration scored 62\% F1 better than the best GenIE solution of \citet{Josifoski2021} and reached near performance to the synthIE models with the largest performance gap being 25\% of F1 increase. All models were evaluated on the same dataset samples.
+
+In total the evaluation overview in table \ref{tab:evaluation_overview} shows, that there is a gap between non synthIE fine-tuned models and synthIE fine-tuned models like all synthIE models are. Nevertheless the subject collapsed models do not show significant better performance on the used dataset. The synthIE T5-base models are 16\% better than the CIExMAS architecture, while the T5-large model is again 7\% better than the T5-base models.
+
+The comparsion highlights the different streghts and weaknesses of the approaches. First of all, the precision gap between CIExMAS and synthIE models is 8\% at minimum. This means that many triples that are generated by CIExMAS also are apparent in the gold standard. Nevertheless, CIExMAS misses out on Recall by synthIE$_{T5-large}$ performing about 31\% pointing out how CIExMAS detects not all triples expected in the gold standard. In addition, the gap between precision and recall is persistent in all models but the synthIE$_{T5-base-SC}$, but especially high in non synthIE fine-tuned models.
+
+What also can be shown, is that the CIExMAS approach scored approximately 10\% more soft matches than typical matches. In comparison the best synthIE$_{T5-large}$ model scored a parental F1 of 0.841 and related F1 0.858, which means an increase of 1\%, respective 3\%. This implies a closing gap between the CIExMAS and the synthIE$_{T5-large}$ model, meaning that the synthIE model being just 15\% better, respective 18\% better in related F1. The gap to the synthIE$_{T5-base}$ models remain similar, but are also closing, while the gaps to the GenIE models can be seen increased with the soft match evaluation.
+
+In addition, to the triples category the other four categories consisting of subject, property, object and entity can be found in the appendix. Nevertheless, the highlights will be explained in this paragraph. The CIExMAS approach shows state-of-the-art performance when detect subjects and object, which implies also a high score in predicting entities in triples. The precision in those categories is the best, while the F1-score are close. This differentiates CIExMAS clearly from the performance of GenIE, whereas the GenIE precision scores are similar, but the recalls are lower on all categories leading to worse F1-scores overall.
+
+The additional evaluation also shows a lack of performance in predicting properties. This means that the F1-score of synthIE$_{T5-large}$ in the category properties is 24\% higher than the best CIExMAS approach. Overall the properties category shows the lowest scores across all aproaches when compared with the other non triple categories. The triple categroies combines the correct subject, property and object extraction and shows the lowest scores overall.
+
+Overall CIExMAS shows a near state-of-the-art performance in processing the closed information extraction task. It performance 62\% better than GenIE, where synthIE models perform 25\% better than CIExMAS. The main performance difference can be seen within the recall of expected triples, which is also a problem of the non synthIE finetuned GenIE model.
 
 \section{Evaluation Configurations}
 \label{sec:evaluation_configurations}
+
+The evaluation configuration section is intended to outline the various steps in the iterative process of developing CIExMAS. Therefore, this particular section will present an overview over the results. The the separate sections about the configurations will present the changes in detail, while also a reason about why particular steps were taken is presented.
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{p{5cm}|rrrrrr}
+    \toprule
+    \textbf{Configuration}      & \multicolumn{6}{c}{\textit{\textbf{Triples}}}                                             \\
+                                & Prec.                                         & Rec.  & F1    & Par. F1 & Rel. F1 & Err.  \\
+    \midrule
+    Initial Baseline            & 0.294                                         & 0.380 & 0.322 & 0.358   & 0.358   & 0.200 \\
+    Task Modularization                                                                                                     \\(SSA) & 0.160 & 0.207 & 0.173 & 0.204 & 0.212 & 0.180 \\
+    Error Incorp. (SSA)                                                                                                     \\ + PredEx & 0.200 & 0.213 & 0.198 & 0.225 & 0.241 & 0.100 \\
+    Error Incorp. (SSA)         & 0.224                                         & 0.265 & 0.224 & 0.271   & 0.286   & 0.160 \\
+    Error Incorp.                                                                                                           \\(Baseline) & 0.300 & 0.354 & 0.319 & 0.375 & 0.383 & 0.000 \\
+    Agent System Simplification & 0.293                                         & 0.333 & 0.287 & 0.323   & 0.333   & 0.040 \\
+    One Agent Architecture      & 0.343                                         & 0.296 & 0.312 & 0.385   & 0.395   & 0.120 \\
+    URI Retrieval (SSSA)        & 0.325                                         & 0.305 & 0.308 & 0.337   & 0.337   & 0.060 \\
+    URI Retrieval                                                                                                           \\(One Agent) & 0.350 & 0.285 & 0.305 & 0.354 & 0.364 & 0.000 \\
+    Knowledge Graph                                                                                                         \\Integration & 0.331 & 0.277 & 0.292 & 0.357 & 0.357 & 0.220 \\
+    \textbf{Network Architecture}                                                                                           \\\textbf{(Gen2)} & \textbf{0.728} & \textbf{0.635} & \textbf{0.665} & \textbf{0.728} & \textbf{0.728} & \textbf{0.000} \\
+    Advanced Adapt.                                                                                                         \\(One Agent) & 0.667 & 0.484 & 0.545 & 0.584 & 0.584 & 0.020 \\
+    Advanced Adapt.                                                                                                         \\(Baseline) & 0.538 & 0.578 & 0.552 & 0.619 & 0.627 & 0.000 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Performance comparison of CIExMAS development iterations on the synthIE dataset.}
+  \label{tab:evaluation_iterations}
+\end{table}
+
+The comparison in table \ref{tab:evaluation_iterations} shows the metrics already shown in previous chapters, but an additional error rate. This indicates how many runs over a sample produced an error and therefore, was included as zero scores in the macro averages. First and foremost, it can be seen, that the iterative process, was not producing a clear trajectory of producing better results. Especially the initial baseline implementation was the best tested method until the network approach, when concentrating an the F1-score. This means, that a rather simple architecture with a rather simple implementation.
+In the end the most sophisticated approaches including a high knowledge graph integration and result validation mechanics could also outperform the initial baseline by a margin of at least 71\% increase in F1. The best solution could be found, when combining this sophisticated approach with a network architecture like outlined in section \ref{subsec:network}. This solution outperformed the best adapted baseline by another 20\%. Only with those improvements, a CIExMAS approach could surpass the F1-score of GenIE$_{T5-base-SC}$, which was 0.372. In the follwoing chapters, references to the appendix will be taken, espeically when differences for the different categories are highlighted. The decision was taken due to better readability.
+
 \subsection{Initial Baseline Setup}
 \label{subsec:initial_baseline_setup}
+
+
+
 \begin{itemize}
   \item Supervisor Agent
   \item Entity Extractor
@@ -820,7 +867,7 @@ The best CIExMAS configuration tested on the outlined 50-sample synthIE-text dat
   \item Baseline extended with URI Response Summary
 \end{itemize}
 
-\subsection{Task Simplification and State Refinement}
+\subsection{Agent System Simplification}
 \label{subsec:task_simplification_state_refinement}
 \begin{itemize}
   \item Simplification of agent state representations (e.g., Gen1 → Gen1v2)
@@ -849,7 +896,7 @@ The best CIExMAS configuration tested on the outlined 50-sample synthIE-text dat
         \end{itemize}
 \end{itemize}
 
-\subsection{Full Network Agent Architecture}
+\subsection{Network Agent Architecture}
 \label{subsec:full_network_agent_architecture}
 \begin{itemize}
   \item Combination of insights from Baseline, Gen1, and One-Agent approaches
@@ -861,7 +908,7 @@ The best CIExMAS configuration tested on the outlined 50-sample synthIE-text dat
   \item Turtle to Label conversion
 \end{itemize}
 
-\subsection{Performance Increases of Gen2 to One Agent and Baseline Architecture}
+\subsection{Integration of Tool Improvements to One Agent and Baseline Architecture}
 \label{subsec:performance_increases_gen2}
 \begin{itemize}
   \item One Agent
@@ -877,6 +924,13 @@ The best CIExMAS configuration tested on the outlined 50-sample synthIE-text dat
 
 \section{Discussion}
 \label{sec:discussion}
+
+\paragraph{Interpretation}
+\begin{itemize}
+  \item Recall lower than Precision in non fine-tuned models -> Finetuning can give sense of what kind of triples are expected. To some extend done by using FSP, but especially apparent in GenIE models.
+  \item QName Extraction in Initial Baseline not 100\% comparable
+  \item Implications on LLM, when hallucination prevention and validation mechanics has to be used.
+\end{itemize}
 
 \begin{itemize}
   \item Hallucination of URIs
@@ -896,7 +950,196 @@ The best CIExMAS configuration tested on the outlined 50-sample synthIE-text dat
 \chapter{Additional Material}
 \label{ch:additional_material}
 
-% Your additional material goes here
+\section{Evaluation Results by Category}
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{l|rrr}
+    \toprule
+    \textbf{Model}         & \multicolumn{3}{c}{\textit{\textbf{Subjects}}}                                   \\
+                           & Precision                                      & Recall         & F1             \\
+    \midrule
+    SynthIE$_{T5-large}$   & 0.927                                          & 0.943          & 0.929          \\
+    SynthIE$_{T5-base-SC}$ & \textbf{0.930}                                 & \textbf{0.945} & \textbf{0.934} \\
+    SynthIE$_{T5-base}$    & 0.923                                          & 0.938          & 0.926          \\
+    GenIE$_{T5-base}$      & 0.710                                          & 0.742          & 0.689          \\
+    GenIE$_{T5-base-SC}$   & 0.691                                          & 0.698          & 0.665          \\
+    \midrule
+    \textbf{CIExMAS}       & \textbf{0.930}                                 & 0.915          & 0.907          \\
+    \bottomrule
+  \end{tabular}
+  \caption{Subject recognition performance comparison of CIExMAS against state-of-the-art models on the synthIE dataset.}
+  \label{tab:evaluation_subjects}
+\end{table}
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{l|rrrrr}
+    \toprule
+    \textbf{Model}         & \multicolumn{5}{c}{\textit{\textbf{Properties}}}                                                                     \\
+                           & Precision                                        & Recall         & F1             & Parental F1    & Related F1     \\
+    \midrule
+    SynthIE$_{T5-large}$   & \textbf{0.882}                                   & \textbf{0.890} & \textbf{0.882} & \textbf{0.894} & \textbf{0.912} \\
+    SynthIE$_{T5-base-SC}$ & 0.850                                            & 0.868          & 0.854          & 0.885          & 0.907          \\
+    SynthIE$_{T5-base}$    & 0.853                                            & 0.848          & 0.849          & 0.888          & 0.905          \\
+    GenIE$_{T5-base}$      & 0.646                                            & 0.395          & 0.459          & 0.501          & 0.527          \\
+    GenIE$_{T5-base-SC}$   & 0.625                                            & 0.357          & 0.424          & 0.455          & 0.478          \\
+    \midrule
+    \textbf{CIExMAS}       & 0.784                                            & 0.672          & 0.710          & 0.782          & 0.790          \\
+    \bottomrule
+  \end{tabular}
+  \caption{Property recognition performance comparison of CIExMAS against state-of-the-art models on the synthIE dataset.}
+  \label{tab:evaluation_properties}
+\end{table}
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{l|rrr}
+    \toprule
+    \textbf{Model}         & \multicolumn{3}{c}{\textit{\textbf{Objects}}}                                   \\
+                           & Precision                                     & Recall         & F1             \\
+    \midrule
+    SynthIE$_{T5-large}$   & 0.926                                         & \textbf{0.930} & \textbf{0.921} \\
+    SynthIE$_{T5-base-SC}$ & 0.891                                         & 0.915          & 0.895          \\
+    SynthIE$_{T5-base}$    & 0.912                                         & 0.915          & 0.909          \\
+    GenIE$_{T5-base}$      & 0.858                                         & 0.484          & 0.583          \\
+    GenIE$_{T5-base-SC}$   & 0.845                                         & 0.449          & 0.551          \\
+    \midrule
+    \textbf{CIExMAS}       & \textbf{0.960}                                & 0.823          & 0.867          \\
+    \bottomrule
+  \end{tabular}
+  \caption{Object recognition performance comparison of CIExMAS against state-of-the-art models on the synthIE dataset.}
+  \label{tab:evaluation_objects}
+\end{table}
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{l|rrr}
+    \toprule
+    \textbf{Model}         & \multicolumn{3}{c}{\textit{\textbf{Entities}}}                                   \\
+                           & Precision                                      & Recall         & F1             \\
+    \midrule
+    SynthIE$_{T5-large}$   & 0.936                                          & \textbf{0.937} & \textbf{0.933} \\
+    SynthIE$_{T5-base-SC}$ & 0.915                                          & 0.929          & 0.918          \\
+    SynthIE$_{T5-base}$    & 0.931                                          & 0.929          & 0.928          \\
+    GenIE$_{T5-base}$      & 0.932                                          & 0.606          & 0.712          \\
+    GenIE$_{T5-base-SC}$   & 0.937                                          & 0.587          & 0.696          \\
+    \midrule
+    \textbf{CIExMAS}       & \textbf{0.966}                                 & 0.876          & 0.907          \\
+    \bottomrule
+  \end{tabular}
+  \caption{Entity recognition performance comparison of CIExMAS against state-of-the-art models on the synthIE dataset.}
+  \label{tab:evaluation_entities}
+\end{table}
+
+\newpage
+
+\clearpage
+\section{Detailed Performance Analysis by Category}
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{p{6cm}|rrrr}
+    \toprule
+    \textbf{Configuration}               & \multicolumn{4}{c}{\textit{\textbf{Subjects}}}                                                    \\
+                                         & Prec.                                          & Rec.           & F1             & Err.           \\
+    \midrule
+    Initial Baseline                     & 0.601                                          & 0.768          & 0.646          & 0.200          \\
+    Task Modularization (SSA)            & 0.481                                          & 0.698          & 0.534          & 0.180          \\
+    Error Incorp. (SSA) + PredEx         & 0.663                                          & 0.810          & 0.687          & 0.100          \\
+    Error Incorp. (SSA)                  & 0.613                                          & 0.755          & 0.640          & 0.160          \\
+    Error Incorp. (Baseline)             & 0.756                                          & 0.848          & 0.749          & 0.000          \\
+    Agent System Simplification          & 0.702                                          & 0.843          & 0.719          & 0.040          \\
+    One Agent Architecture               & 0.813                                          & 0.738          & 0.751          & 0.120          \\
+    URI Retrieval (SSSA)                 & 0.800                                          & 0.818          & 0.777          & 0.060          \\
+    URI Retrieval (One Agent)            & 0.910                                          & 0.848          & 0.848          & 0.000          \\
+    Knowledge Graph Integration          & 0.693                                          & 0.720          & 0.690          & 0.220          \\
+    \textbf{Network Architecture (Gen2)} & \textbf{0.930}                                 & \textbf{0.915} & \textbf{0.907} & \textbf{0.000} \\
+    Advanced Adapt. (One Agent)          & 0.870                                          & 0.833          & 0.837          & 0.020          \\
+    Advanced Adapt. (Baseline)           & 0.800                                          & 0.948          & 0.840          & 0.000          \\
+    \bottomrule
+  \end{tabular}
+  \caption{Subject recognition performance across CIExMAS development iterations.}
+  \label{tab:evaluation_subjects_iterations}
+\end{table}
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{p{4cm}|rrrrrr}
+    \toprule
+    \textbf{Configuration}               & \multicolumn{6}{c}{\textit{\textbf{Properties}}}                                                                                      \\
+                                         & Prec.                                            & Rec.           & F1             & Par. F1        & Rel. F1        & Err.           \\
+    \midrule
+    Initial Baseline                     & 0.351                                            & 0.393          & 0.363          & 0.442          & 0.450          & 0.200          \\
+    Task Modularization (SSA)            & 0.231                                            & 0.275          & 0.234          & 0.302          & 0.309          & 0.180          \\
+    Error Incorp. (SSA) + PredEx         & 0.270                                            & 0.266          & 0.252          & 0.307          & 0.331          & 0.100          \\
+    Error Incorp. (SSA)                  & 0.325                                            & 0.315          & 0.294          & 0.378          & 0.394          & 0.160          \\
+    Error Incorp. (Baseline)             & 0.413                                            & 0.424          & 0.408          & 0.503          & 0.517          & 0.000          \\
+    Agent System Simplification          & 0.399                                            & 0.389          & 0.365          & 0.449          & 0.465          & 0.040          \\
+    One Agent Architecture               & 0.418                                            & 0.351          & 0.374          & 0.455          & 0.470          & 0.120          \\
+    URI Retrieval (SSSA)                 & 0.396                                            & 0.334          & 0.355          & 0.438          & 0.442          & 0.060          \\
+    URI Retrieval (One Agent)            & 0.485                                            & 0.367          & 0.400          & 0.480          & 0.496          & 0.000          \\
+    Knowledge Graph Integration          & 0.445                                            & 0.352          & 0.376          & 0.465          & 0.469          & 0.220          \\
+    \textbf{Network Architecture (Gen2)} & \textbf{0.784}                                   & \textbf{0.672} & \textbf{0.710} & \textbf{0.782} & \textbf{0.790} & \textbf{0.000} \\
+    Advanced Adapt. (One Agent)          & 0.746                                            & 0.548          & 0.616          & 0.676          & 0.683          & 0.020          \\
+    Advanced Adapt. (Baseline)           & 0.645                                            & 0.640          & 0.631          & 0.724          & 0.735          & 0.000          \\
+    \bottomrule
+  \end{tabular}
+  \caption{Property recognition performance across CIExMAS development iterations.}
+  \label{tab:evaluation_properties_iterations}
+\end{table}
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{p{6cm}|rrrr}
+    \toprule
+    \textbf{Configuration}               & \multicolumn{4}{c}{\textit{\textbf{Objects}}}                                                    \\
+                                         & Prec.                                         & Rec.           & F1             & Err.           \\
+    \midrule
+    Initial Baseline                     & 0.625                                         & 0.745          & 0.665          & 0.200          \\
+    Task Modularization (SSA)            & 0.454                                         & 0.556          & 0.477          & 0.180          \\
+    Error Incorp. (SSA) + PredEx         & 0.692                                         & 0.689          & 0.664          & 0.100          \\
+    Error Incorp. (SSA)                  & 0.621                                         & 0.636          & 0.598          & 0.160          \\
+    Error Incorp. (Baseline)             & 0.804                                         & 0.798          & 0.779          & 0.000          \\
+    Agent System Simplification          & 0.722                                         & 0.723          & 0.691          & 0.040          \\
+    One Agent Architecture               & 0.793                                         & 0.664          & 0.708          & 0.120          \\
+    URI Retrieval (SSSA)                 & 0.789                                         & 0.750          & 0.746          & 0.060          \\
+    URI Retrieval (One Agent)            & 0.848                                         & 0.665          & 0.719          & 0.000          \\
+    Knowledge Graph Integration          & 0.681                                         & 0.600          & 0.618          & 0.220          \\
+    \textbf{Network Architecture (Gen2)} & \textbf{0.960}                                & \textbf{0.823} & \textbf{0.867} & \textbf{0.000} \\
+    Advanced Adapt. (One Agent)          & 0.862                                         & 0.637          & 0.714          & 0.020          \\
+    Advanced Adapt. (Baseline)           & 0.906                                         & 0.949          & 0.918          & 0.000          \\
+    \bottomrule
+  \end{tabular}
+  \caption{Object recognition performance across CIExMAS development iterations.}
+  \label{tab:evaluation_objects_iterations}
+\end{table}
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{p{6cm}|rrrr}
+    \toprule
+    \textbf{Configuration}               & \multicolumn{4}{c}{\textit{\textbf{Entities}}}                                                    \\
+                                         & Prec.                                          & Rec.           & F1             & Err.           \\
+    \midrule
+    Initial Baseline                     & 0.695                                          & 0.767          & 0.724          & 0.200          \\
+    Task Modularization (SSA)            & 0.600                                          & 0.653          & 0.615          & 0.180          \\
+    Error Incorp. (SSA) + PredEx         & 0.782                                          & 0.745          & 0.752          & 0.100          \\
+    Error Incorp. (SSA)                  & 0.737                                          & 0.703          & 0.704          & 0.160          \\
+    Error Incorp. (Baseline)             & 0.914                                          & 0.880          & 0.885          & 0.000          \\
+    Agent System Simplification          & 0.807                                          & 0.798          & 0.785          & 0.040          \\
+    One Agent Architecture               & 0.835                                          & 0.747          & 0.781          & 0.120          \\
+    URI Retrieval (SSSA)                 & 0.868                                          & 0.810          & 0.829          & 0.060          \\
+    URI Retrieval (One Agent)            & 0.935                                          & 0.792          & 0.840          & 0.000          \\
+    Knowledge Graph Integration          & 0.714                                          & 0.656          & 0.670          & 0.220          \\
+    \textbf{Network Architecture (Gen2)} & \textbf{0.966}                                 & \textbf{0.876} & \textbf{0.907} & \textbf{0.000} \\
+    Advanced Adapt. (One Agent)          & 0.895                                          & 0.718          & 0.785          & 0.020          \\
+    Advanced Adapt. (Baseline)           & 0.963                                          & 0.970          & 0.964          & 0.000          \\
+    \bottomrule
+  \end{tabular}
+  \caption{Entity recognition performance across CIExMAS development iterations.}
+  \label{tab:evaluation_entities_iterations}
+\end{table}
 
 \backmatter
 \chapter{Ehrenwörtliche Erklärung}
