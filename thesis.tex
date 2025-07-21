@@ -838,20 +838,27 @@ As a starting point, the baseline architecture was designed like described in se
 
 In general, this configuration showed a static pattern of executing first entity and relation extraction, than using the URI tool for mapping and afterwards producing an output. Therefore, in the traces no iteration over the triples can be found. As this configuration relates to a very early version, the target was to output solely QNames instead of full URIs. As this baseline was then tested again within the current agent system framework of CIExMAS, the QNames were parsed to turtle strings. The evaluation logs have shown, that sometimes instead of QNames, URIs were outputed. As this was not indented, it is considered as error.
 
-Nevertheless, the initial baseline could score near GenIE scores in remarks of the F1-score, even surpassing the recall of both GenIE models. When assumed that the result were achieved on 80\% of the data, and those results scale to the rest of the data, the baseline had the potential to score an F1 of 0.402. Achieving this score, the baseline would have surpassed both GenIE models.
+In this early state, the supervisor agent already showed flaws, what led to the prompt architecture build out of role description and guidelines used. Those flaws were about the supervisor acting without the extraction agents and especially without the URI Mapping Tool. As Wikidata is likely to be apparent, the used \ac{LLM} is expected to know the format of Wikidata URIs as well as the mapping from URIs to entity by the training dataset. The supervisor agent showed the behavior to extract the triples and map them with the internal knowledge. This led to errors, as the URIs were hallucinated to some extend.
 
-In this early state, the supervisor agent already showed flaws, what led to the prompt architecture used.
+In addition, the supervisor agent was prone to miss out necessary outputs. For example in some case no goto tag was provided to decide which agent to call next, which led to a NoneType error, as the tag was not found. Therefore, the supervisor needed strict rules to work correctly in this early baseline. Based on this behavior, the prompt design with role description and guidelines like outlined in section \ref{sec:iterative_prompt_engineering} was used for further development. The guidelines than instructed the supervisor, to delegate the tasks instead of solving themselve and follow the guidelines.
 
-\begin{itemize}
-  \item Supervisor Agent
-  \item Entity Extractor
-  \item Relation Extractor
-  \item URI Retrieval Agent
-  \item Problems with Supervisor Agent, Entity Extractor and co.
-\end{itemize}
+In addition, the extractors also got the same prompt design with edge cases included. For the entity extractor this was about composite entities like \textit{2022 Winter Olympics}, which was expected by the dataset to be split up into \textit{[2022, 2022 Winter Olympics, Winter Olympics]}. In addition, both extractors needed to be prompted about the expected result. This means, that synthIE expected not directly visible results, especially in synthIE-code were the initial baseline was designed on. To provide an example, the composite word \textit{Corfe Castle railway station} was expected to lead to a triple \textit{(Corfe Castle railway station; named after; Corfe Castle)}.
 
-\subsection{Modularization of Agent Tasks}
+Nevertheless, the initial baseline with the outlined tweaks could score near GenIE scores in remarks of the F1-score, even surpassing the recall of both GenIE models. When assumed that the result were achieved on 80\% of the data, and those results scale to the rest of the data, the baseline had the potential to score an F1 of 0.402. Achieving this score, the baseline would have surpassed both GenIE models.
+
+The baseline showed shortcomings in the area of subjects and objects, with an F1 of 0.646, respective 0.665 with higher recall than precision. The main shortcoming like in every other configuration can be found in the detection of properties, which limited the overall F1-score. Espeically, as the initial baseline missed out on hard matches, leaving the parental F1 on properties 22\% higher than the hard matched F1.
+
+Compared to the configuration, the initial baseline already showed the potential of agentic systems. With scores around comparison models, with similar prequisites not being finetuned on synthIE, compared with the flaws detected in the baseline opened the trajectory for further developments. The baseline architecture also was further developed, as it already showed this great potential.
+
+\subsection{Modularization of Supervisor Agent Tasks}
 \label{subsec:modularization_agent_tasks}
+
+The supervisor agent showed major flaws in the initial baseline setup, which could not even fully resolved by prompt engineering. In traces of the initial baseline, it can be found that the initial baseline followed mainly a workflow pattern. That is the reason why the supervisor agent was up to modularization in the \ac{SSA}.
+
+In addition, to splitting up the supervisor agent into planner, agent instructor, result checker and result formatter, the URI mapping got a \ac{LLM}-based summary of the results. This changes made the whole processing more explicit and accessible. Each step could be instructed exactly for what it was meant for. In addition, the planning got more attention, as it was done explicitly in the \ac{SSA}, with the planner agent instructed to make adaption as needed.
+
+The overall evaluation on triples F1 shows an enormous decrease of performance using the initial version of the \ac{SSA}.
+
 \begin{itemize}
   \item Decomposition of the Supervisor Agent into:
         \begin{itemize}
@@ -940,6 +947,7 @@ In this early state, the supervisor agent already showed flaws, what led to the 
 
 \begin{itemize}
   \item Hallucination of URIs
+  \item Wikidata Incorporation in Dataset
   \item Dataset inquiries (synthIE examples for in-context learning)
   \item Manual Prompt Engineering
   \item Small SOTA Models
