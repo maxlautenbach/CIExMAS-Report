@@ -811,7 +811,7 @@ The evaluation configuration section is intended to outline the various steps in
     \midrule
     Initial Baseline            & 0.294                                         & 0.380 & 0.322 & 0.358   & 0.358   & 0.200 \\
     Task Modularization                                                                                                     \\(SSA) & 0.160 & 0.207 & 0.173 & 0.204 & 0.212 & 0.180 \\
-    Error Incorp. (SSA)                                                                                                     \\ + PredEx & 0.200 & 0.213 & 0.198 & 0.225 & 0.241 & 0.100 \\
+    Error Incorp. (SSA)                                                                                                     \\ + PropEx & 0.200 & 0.213 & 0.198 & 0.225 & 0.241 & 0.100 \\
     Error Incorp. (SSA)         & 0.224                                         & 0.265 & 0.224 & 0.271   & 0.286   & 0.160 \\
     Error Incorp.                                                                                                           \\(Baseline) & 0.300 & 0.354 & 0.319 & 0.375 & 0.383 & 0.000 \\
     Agent System Simplification & 0.293                                         & 0.333 & 0.287 & 0.323   & 0.333   & 0.040 \\
@@ -836,7 +836,7 @@ In the end the most sophisticated approaches including a high knowledge graph in
 
 As a starting point, the baseline architecture was designed like described in section \ref{subsec:baseline}. The initial baseline is a simple version of this architecture. This means that, the prompts were rather simple, especially for the extraction agents. In addition, the output of the URI detection tool was returned directly to the supervisor agent.
 
-In general, this configuration showed a static pattern of executing first entity and relation extraction, than using the URI tool for mapping and afterwards producing an output. Therefore, in the traces no iteration over the triples can be found. As this configuration relates to a very early version, the target was to output solely QNames instead of full URIs. As this baseline was then tested again within the current agent system framework of CIExMAS, the QNames were parsed to turtle strings. The evaluation logs have shown, that sometimes instead of QNames, URIs were outputed. As this was not indented, it is considered as error.
+In general, this configuration\footnote{The snapshot of this configuration can be found under: \url{https://github.com/maxlautenbach/CIExMAS/blob/b75556c727e208f048e00caa327778d80cfc9934/baseline.ipynb}} showed a static pattern of executing first entity and relation extraction, than using the URI tool for mapping and afterwards producing an output. Therefore, in the traces no iteration over the triples can be found. As this configuration relates to a very early version, the target was to output solely QNames instead of full URIs. As this baseline was then tested again within the current agent system framework of CIExMAS, the QNames were parsed to turtle strings. The evaluation logs have shown, that sometimes instead of QNames, URIs were outputed. As this was not indented, it is considered as error.
 
 In this early state, the supervisor agent already showed flaws, what led to the prompt architecture build out of role description and guidelines used. Those flaws were about the supervisor acting without the extraction agents and especially without the URI Mapping Tool. As Wikidata is likely to be apparent, the used \ac{LLM} is expected to know the format of Wikidata URIs as well as the mapping from URIs to entity by the training dataset. The supervisor agent showed the behavior to extract the triples and map them with the internal knowledge. This led to errors, as the URIs were hallucinated to some extend.
 
@@ -853,26 +853,35 @@ Compared to the configuration, the initial baseline already showed the potential
 \subsection{Modularization of Supervisor Agent Tasks}
 \label{subsec:modularization_agent_tasks}
 
-The supervisor agent showed major flaws in the initial baseline setup, which could not even fully resolved by prompt engineering. In traces of the initial baseline, it can be found that the initial baseline followed mainly a workflow pattern. That is the reason why the supervisor agent was up to modularization in the \ac{SSA}.
+The supervisor agent showed major flaws in the initial baseline setup, which could not even fully resolved by prompt engineering. In traces of the initial baseline, it can be found that the initial baseline followed mainly a workflow pattern. That is the reason why the supervisor agent was up to modularization in the \ac{SSA} \footnote{The snapshot of this configuration can be found under: \url{https://github.com/maxlautenbach/CIExMAS/tree/ad061f1fd93d8e22ca9046769580e46e8ff2365d}}.
 
-In addition, to splitting up the supervisor agent into planner, agent instructor, result checker and result formatter, the URI mapping got a \ac{LLM}-based summary of the results. This changes made the whole processing more explicit and accessible. Each step could be instructed exactly for what it was meant for. In addition, the planning got more attention, as it was done explicitly in the \ac{SSA}, with the planner agent instructed to make adaption as needed.
+In addition, to splitting up the supervisor agent into planner, agent instructor, result checker and result formatter, the URI mapping got a \ac{LLM}-based summary of the results. This changes made the whole processing more explicit and accessible. Each step could be instructed exactly for what it was meant for. In addition, the planning got more attention, as it was done explicitly in the \ac{SSA}, with the planner agent instructed to make adaption as needed. In contrast to the initial baseline, the \ac{SSA} switched to turtle string outputs, to match the real-world adaption ability of CIExMAS. This requirement is also used on all coming configurations.
 
-The overall evaluation on triples F1 shows an enormous decrease of performance using the initial version of the \ac{SSA}.
+In order to give the agentic system the ability to decide on the search terms and especially on how to search for URI, two search modes were introduced. The first mode was the label mode, which executed the similarity search against the rdfs:label of entities and properties. The second mode was the description mode, which was intend for the agentic system to describe the entity or property and get the correct answer.
 
-\begin{itemize}
-  \item Decomposition of the Supervisor Agent into:
-        \begin{itemize}
-          \item Planner
-          \item Agent Instructor
-          \item Result Checker
-          \item Result Formatter
-        \end{itemize}
+The overall evaluation on triples F1 shows an enormous decrease of performance using the initial version of the \ac{SSA}. The \ac{SSA} in this first implementation just reaches 53\% of the initial baseline performance, scoring an F1 of 0.173. Those errors were mainly context length errors. On the other side, the error rate is slightly lower with 18\% of failed executions, which would provide a better starting point for a higher score.
 
-  \item Introduction of URI-Search Filters (On Label OR Description)
-\end{itemize}
+The idea of splitting up the supervisor agent led directly to more iterations over the closed information extraction task. For instance, the result checker agent once outputted: \enquote{To further improve the extraction, consider calling the Entity Extraction Agent again with specific instructions to disambiguate the entity "2020" and extract its type, as it was not successfully mapped to a URI. Additionally, review the extracted relations and alternative predicates to ensure the most accurate and contextually appropriate relations are used in the final triples.} This behavior was extinct when considering the supervisor agent of the initial baseline. Besides the result checker agent did its task it was intended for, some iterations show, that it was iterating over the same entities over and over again without providing any additional value.
 
-\subsection{Error Message Incorporation}
+In addition, the plan to give the agentic system access to multiple search modes was not used appropriate. To provide an examples, the agent instructor used the search terms: \enquote{Miacatlán[LABEL], Morelos[LABEL], is located in[DESCR], part of[DESCR]}. It is apparent, that the description mode was primarily used for properties while the label mode was primarily used for entities.
+
+For the remaining evaluation categories, this \ac{SSA} configuration showed lacks in every of them. The biggest gap was experienced in detected properties, while the smallest gap is at detected entities in general. In addition, the \ac{SSA} snapshot has also a high gap between soft matches and hard matches, especially for properties, with the related F1 being 32\% higher.
+
+The first implementation of the \ac{SSA} shows additional flaws and highlights the idea of error propagation, while iterating more logically over the closed information extraction task. Adding the complexity also creates new limitations in the are of context lengths, while not performing better than the baseline solution. In the end, the \ac{SSA} revealed the needs for improvements to match and outperform even the baseline solution.
+
+\subsection{Error Message Incorporation & Agent Engineering}
 \label{subsec:error_message_incorporation}
+
+Both the initial baseline configuration as well as the initial implementation of the \ac{SSA} show substantial potential based on their error rates. In addition, several tweaks are needed to increase the performance of the \ac{SSA} based on the previous configuration. This led to implementation of better feedback mechanisms as well as a new agent with the property extractor (short: PropEx) for the \ac{SSA}\footnote{The snapshot of this configuration can be found under: \url{https://github.com/maxlautenbach/CIExMAS/tree/38c72a951ad513bb980b40f432b1958b796d7e4b}}. In addition, the idea of using error incorporation as well as using a URI mapping summary were implemented in the baseline architecture.
+
+As already outlined, looping and errors were issues in the first \ac{SSA} implementation. This loops occured mainly because of missing instructions, where an agent was called without the ability to give any response or give an indecisive response. Besides the error of context overflow, missing goto tags were also a problem that count towards the error rate.
+
+As a solution, error messages were provided and incorporated in the agent flow from this configuration onwards. First of all missing goto tags, led to loops on the same agent, which was especially apparent on the planner and agent instructor agent. In general, the idea was to loop about the agent that has to decide on the further agent flow and to instruct it to provide any goto tag. In addition, the instructions were checked from there on, so that empty instructions, were detected on agent or tool level, where the response was an instruction back to the issuing agent to provide any input to the agent or tool. The error of the context overflow was look on from a prompt design side, but not from the side of let the agents change the context on their own.
+
+Besides implementing this adaption just to the \ac{SSA}, the error incorporation was also implememted for the baseline architecture. In addition, the idea of summaries of the URI mapping showed a logical behavior in the \ac{SSA}, why it was also used in this and coming configuration for the baseline architecture. As outlined in the initial baseline section, the initial implementation was asked to output QNames. Like in the \ac{SSA}, the baseline afterwards was asked to output turtle strings as well.
+
+Another adaption to the \ac{SSA} was the property extractor agent. As the \ac{SSA} showed shortcomings on the property extraction side, like the baseline architecture also did before, the idea was to implement another agent gathering properties from the text. This agent followed the same prompt structure as the entity or triple extractor.
+
 \begin{itemize}
   \item Integration of error messages
   \item Improved state monitoring and feedback
@@ -1060,7 +1069,7 @@ The overall evaluation on triples F1 shows an enormous decrease of performance u
     \midrule
     Initial Baseline                     & 0.601                                          & 0.768          & 0.646          & 0.200          \\
     Task Modularization (SSA)            & 0.481                                          & 0.698          & 0.534          & 0.180          \\
-    Error Incorp. (SSA) + PredEx         & 0.663                                          & 0.810          & 0.687          & 0.100          \\
+    Error Incorp. (SSA) + PropEx         & 0.663                                          & 0.810          & 0.687          & 0.100          \\
     Error Incorp. (SSA)                  & 0.613                                          & 0.755          & 0.640          & 0.160          \\
     Error Incorp. (Baseline)             & 0.756                                          & 0.848          & 0.749          & 0.000          \\
     Agent System Simplification          & 0.702                                          & 0.843          & 0.719          & 0.040          \\
@@ -1086,7 +1095,7 @@ The overall evaluation on triples F1 shows an enormous decrease of performance u
     \midrule
     Initial Baseline                     & 0.351                                            & 0.393          & 0.363          & 0.442          & 0.450          & 0.200          \\
     Task Modularization (SSA)            & 0.231                                            & 0.275          & 0.234          & 0.302          & 0.309          & 0.180          \\
-    Error Incorp. (SSA) + PredEx         & 0.270                                            & 0.266          & 0.252          & 0.307          & 0.331          & 0.100          \\
+    Error Incorp. (SSA) + PropEx         & 0.270                                            & 0.266          & 0.252          & 0.307          & 0.331          & 0.100          \\
     Error Incorp. (SSA)                  & 0.325                                            & 0.315          & 0.294          & 0.378          & 0.394          & 0.160          \\
     Error Incorp. (Baseline)             & 0.413                                            & 0.424          & 0.408          & 0.503          & 0.517          & 0.000          \\
     Agent System Simplification          & 0.399                                            & 0.389          & 0.365          & 0.449          & 0.465          & 0.040          \\
@@ -1112,7 +1121,7 @@ The overall evaluation on triples F1 shows an enormous decrease of performance u
     \midrule
     Initial Baseline                     & 0.625                                         & 0.745          & 0.665          & 0.200          \\
     Task Modularization (SSA)            & 0.454                                         & 0.556          & 0.477          & 0.180          \\
-    Error Incorp. (SSA) + PredEx         & 0.692                                         & 0.689          & 0.664          & 0.100          \\
+    Error Incorp. (SSA) + PropEx         & 0.692                                         & 0.689          & 0.664          & 0.100          \\
     Error Incorp. (SSA)                  & 0.621                                         & 0.636          & 0.598          & 0.160          \\
     Error Incorp. (Baseline)             & 0.804                                         & 0.798          & 0.779          & 0.000          \\
     Agent System Simplification          & 0.722                                         & 0.723          & 0.691          & 0.040          \\
@@ -1138,7 +1147,7 @@ The overall evaluation on triples F1 shows an enormous decrease of performance u
     \midrule
     Initial Baseline                     & 0.695                                          & 0.767          & 0.724          & 0.200          \\
     Task Modularization (SSA)            & 0.600                                          & 0.653          & 0.615          & 0.180          \\
-    Error Incorp. (SSA) + PredEx         & 0.782                                          & 0.745          & 0.752          & 0.100          \\
+    Error Incorp. (SSA) + PropEx         & 0.782                                          & 0.745          & 0.752          & 0.100          \\
     Error Incorp. (SSA)                  & 0.737                                          & 0.703          & 0.704          & 0.160          \\
     Error Incorp. (Baseline)             & 0.914                                          & 0.880          & 0.885          & 0.000          \\
     Agent System Simplification          & 0.807                                          & 0.798          & 0.785          & 0.040          \\
