@@ -869,7 +869,7 @@ For the remaining evaluation categories, this \ac{SSA} configuration showed lack
 
 The first implementation of the \ac{SSA} shows additional flaws and highlights the idea of error propagation, while iterating more logically over the closed information extraction task. Adding the complexity also creates new limitations in the are of context lengths, while not performing better than the baseline solution. In the end, the \ac{SSA} revealed the needs for improvements to match and outperform even the baseline solution.
 
-\subsection{Error Message Incorporation & Agent Engineering}
+\subsection{Error Message Incorporation and Agent Engineering}
 \label{subsec:error_message_incorporation}
 
 Both the initial baseline configuration as well as the initial implementation of the \ac{SSA} show substantial potential based on their error rates. In addition, several tweaks are needed to increase the performance of the \ac{SSA} based on the previous configuration. This led to implementation of better feedback mechanisms as well as a new agent with the property extractor (short: PropEx) for the \ac{SSA}\footnote{The snapshot of this configuration can be found under: \url{https://github.com/maxlautenbach/CIExMAS/tree/38c72a951ad513bb980b40f432b1958b796d7e4b}}. In addition, the idea of using error incorporation as well as using a URI mapping summary were implemented in the baseline architecture.
@@ -878,19 +878,36 @@ As already outlined, looping and errors were issues in the first \ac{SSA} implem
 
 As a solution, error messages were provided and incorporated in the agent flow from this configuration onwards. First of all missing goto tags, led to loops on the same agent, which was especially apparent on the planner and agent instructor agent. In general, the idea was to loop about the agent that has to decide on the further agent flow and to instruct it to provide any goto tag. In addition, the instructions were checked from there on, so that empty instructions, were detected on agent or tool level, where the response was an instruction back to the issuing agent to provide any input to the agent or tool. The error of the context overflow was look on from a prompt design side, but not from the side of let the agents change the context on their own.
 
-Besides implementing this adaption just to the \ac{SSA}, the error incorporation was also implememted for the baseline architecture. In addition, the idea of summaries of the URI mapping showed a logical behavior in the \ac{SSA}, why it was also used in this and coming configuration for the baseline architecture. As outlined in the initial baseline section, the initial implementation was asked to output QNames. Like in the \ac{SSA}, the baseline afterwards was asked to output turtle strings as well.
-
 Another adaption to the \ac{SSA} was the property extractor agent. As the \ac{SSA} showed shortcomings on the property extraction side, like the baseline architecture also did before, the idea was to implement another agent gathering properties from the text. This agent followed the same prompt structure as the entity or triple extractor.
 
-\begin{itemize}
-  \item Integration of error messages
-  \item Improved state monitoring and feedback
-  \item Predicate Extractor in Gen1
-  \item Baseline extended with URI Response Summary
-\end{itemize}
+Besides implementing this adaption of error message incorporation to the \ac{SSA}, the error incorporation was also implememted for the baseline architecture. In addition, the idea of summaries of the URI mapping showed a logical behavior in the \ac{SSA}, why it was also used in this and coming configuration for the baseline architecture. As outlined in the initial baseline section, the initial implementation was asked to output QNames. Like in the \ac{SSA}, the baseline afterwards was asked to output turtle strings as well.
+
+Those configurations could lower the error rates and surpass the performance of the first implementation of the task modularization of the \ac{SSA}. Therefore, the updated \ac{SSA} reached a triple F1 of 0.224, while the updated baseline reached a F1 of 0.319. Both results are lower than the initial baseline. The addition of the property extractor does add performance in comparison to the previous implementation of the \ac{SSA} by reaching 0.198 F1, but is surpassed by the architecture without property extractor.
+
+The baseline architecture combined with shows no errors, while at the same time not performing better than the initial baseline. Same goes for the \ac{SSA} with the property extractor, which shows a 10\% error rate, but the value is lower than the \ac{SSA} without the added agent. It has to mentioned, that for all configurations the prompts were adapted, to provide the additional functionality properly.
+
+Besides the loss in triple extraction performance, all configurations could increase their F1-scores in extracting subject, objects and entities. Especially the \ac{SSA} with the property extraction could surpass the initial baseline in subject and entity extraction, while matching the object extraction F1. The main problem of the \ac{SSA} is the extraction of properties, which is amplified by using the property extraction. The updated baseline could outperform the initial baseline and also the GenIE models in all categories, but it misses out on forming the correct triples.
+
+Therefore, the errors were now on the pure extraction side. A simple example is the text \enquote{Daniel Johannsen is a tenor.}, which should be extracted to \textit{(Daniel Johannsen; voice type; Tenor)}. The updated baseline extracted the property occupation instead, missing out on the context that tenor is not a job.
+
+All in all the error message incorporation showed the expected function. It limited the error rate and the traces also showed less looping. Nevertheless, the results remain limited because of the limited sense for the proper use of properties.
 
 \subsection{Agent System Simplification}
 \label{subsec:task_simplification_state_refinement}
+
+As the main issues of the \ac{SSA} stays the error of context length errors. Combined with the experience of a looping between the result checker, planner and agent instructor agent, the \ac{SSSA} was implemented\footnote{The snapshot of this configuration can be found under: \url{https://github.com/maxlautenbach/CIExMAS/tree/91e14e7561e2ed6ba85e944f8063aca813d173e6}}. The main idea was state simplification, which meant to split up the state in more granular but simple parts.
+
+Like already outlined in section \ref{subsec:simplified_splitted_supervisor}, the tasks of planning, instruction and result checking were reassembled in one planner agent, while the result formatter stayed as it was. In addition, manual prompt engineering was engaged to make the \ac{SSSA} work. Furthermore, the new more granular state had to be parsed out of the responses of the \ac{LLM}.
+
+Providing are more simpler state, while also adding a minor part of complexity showed improvements over the \ac{SSA}. First of all, the \ac{SSSA} showed less token usage, due to the fact of using less agents. Nevertheless the central planner also showed parts of the behavior previously encoded in the result checker. For instance, the planner agent mentioned \enquote{
+  The triple extraction agent has successfully formed additional triples from the extracted entities and predicates, but we should verify if the entities and predicates are correctly extracted and if the triples are accurate.} and instructed the entity extractor \enquote{Re-examine the text to extract entities, focusing on locations such as villages, districts, and counties, and verify the accuracy of the previously extracted entities.}. This example showed, that also the \ac{SSSA} showed the capability of iterating over the triples.
+
+In general the \ac{SSSA} achieved a triple F1 of 0.287, which is about 11\% lower than the F1 of the initial baseline. All while lower the context window errors to 4\%, which gives the ability to achieve potential higher scores. In theory, the updated \ac{SSA} with 16\% error rate, could have potentially scored a F1 of 0.266, while the \ac{SSSA} could potential have scored 0.299, when the non-error execution scale propotionaly to the error samples. This shows, that the \ac{SSSA} performance is slightly better than the \ac{SSA} performance.
+
+Overall the \ac{SSSA} showed a overperformance in all evaluation categories against the \ac{SSA} and the initial baseline. Nevertheless, the traces reveal a problem of the \ac{SSSA}. This is the iteration, which produces many triples, as the planner agents tries to get every triple out of the sentence. This leads to less precision and recall, as the triples that were outputed sometimes were unrelated to the original sentence. To provide an example the \ac{SSSA} configuration extracted \textit{(Cetacea; located in the administrative territory; Quebec)} out of the sentence \enquote{The MURAL Festival is a celebration of street art, held in June each year.}.
+
+In the end, the \ac{SSSA} is a adaption of the \ac{SSA} in order to keep the idea of iterating over the triples. The shorter context showed a lower error rate and therefore also a higher triple F1 score. In addition, the \ac{SSSA} is another improvement on the extraction of subject, properties, objects and entities. Nevertheless, the complexity of the idea of iterating over triples also produces hallucinated triples that will lower all performance metrics.
+
 \begin{itemize}
   \item Simplification of agent state representations (e.g., Gen1 → Gen1v2)
 \end{itemize}
@@ -958,8 +975,11 @@ Another adaption to the \ac{SSA} was the property extractor agent. As the \ac{SS
   \item Hallucination of URIs
   \item Wikidata Incorporation in Dataset
   \item Dataset inquiries (synthIE examples for in-context learning)
+  \item synthIE code for development
   \item Manual Prompt Engineering
   \item Small SOTA Models
+  \item Different Prompts per Config
+  \item Usage of Property Extraction Agent in SSSA Questionable, but give it a chance
 \end{itemize}
 
 \chapter{Conclusion and Outlook}
