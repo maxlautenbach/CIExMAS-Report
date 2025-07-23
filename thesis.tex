@@ -815,12 +815,12 @@ The evaluation configuration section is intended to outline the various steps in
     Error Incorp. (SSA)         & 0.224                                         & 0.265 & 0.224 & 0.271   & 0.286   & 0.160 \\
     Error Incorp.                                                                                                           \\(Baseline) & 0.300 & 0.354 & 0.319 & 0.375 & 0.383 & 0.000 \\
     Agent System Simplification & 0.293                                         & 0.333 & 0.287 & 0.323   & 0.333   & 0.040 \\
-    One Agent Architecture      & 0.343                                         & 0.296 & 0.312 & 0.385   & 0.395   & 0.120 \\
+    ReAct Architecture          & 0.343                                         & 0.296 & 0.312 & 0.385   & 0.395   & 0.120 \\
     URI Retrieval (SSSA)        & 0.325                                         & 0.305 & 0.308 & 0.337   & 0.337   & 0.060 \\
-    URI Retrieval                                                                                                           \\(One Agent) & 0.350 & 0.285 & 0.305 & 0.354 & 0.364 & 0.000 \\
+    URI Retrieval                                                                                                           \\(ReAct) & 0.350 & 0.285 & 0.305 & 0.354 & 0.364 & 0.000 \\
     Knowledge Graph                                                                                                         \\Integration & 0.331 & 0.277 & 0.292 & 0.357 & 0.357 & 0.220 \\
     \textbf{Network Architecture}                                                                                           \\\textbf{(Gen2)} & \textbf{0.728} & \textbf{0.635} & \textbf{0.665} & \textbf{0.728} & \textbf{0.728} & \textbf{0.000} \\
-    Advanced Adapt.                                                                                                         \\(One Agent) & 0.667 & 0.484 & 0.545 & 0.584 & 0.584 & 0.020 \\
+    Advanced Adapt.                                                                                                         \\(ReAct) & 0.667 & 0.484 & 0.545 & 0.584 & 0.584 & 0.020 \\
     Advanced Adapt.                                                                                                         \\(Baseline) & 0.538 & 0.578 & 0.552 & 0.619 & 0.627 & 0.000 \\
     \bottomrule
   \end{tabular}
@@ -908,35 +908,74 @@ Overall the \ac{SSSA} showed a overperformance in all evaluation categories agai
 
 In the end, the \ac{SSSA} is a adaption of the \ac{SSA} in order to keep the idea of iterating over the triples. The shorter context showed a lower error rate and therefore also a higher triple F1 score. In addition, the \ac{SSSA} is another improvement on the extraction of subject, properties, objects and entities. Nevertheless, the complexity of the idea of iterating over triples also produces hallucinated triples that will lower all performance metrics.
 
-\begin{itemize}
-  \item Simplification of agent state representations (e.g., Gen1 → Gen1v2)
-\end{itemize}
-
-\subsection{One-Agent Architecture with Tool Usage}
+\subsection{ReAct Architecture}
 \label{subsec:one_agent_architecture_tool_usage}
-\begin{itemize}
-  \item Centralization of all tasks into a single agent
-  \item Use of external tools to perform sub-tasks
-\end{itemize}
+
+In contrast to the \ac{SSA} and \ac{SSSA}, the ReAct architecture implementation has gone the full contrast. Using the original URI retrieval tool from the initial baseline within a ReAct agent, the architecture simplified the whole agentic system. The idea was to check the joint-optimisation approach and also a most simplified approach within the use of a \ac{LLM}-agent. The main agent was then in charge for the variety of task like the whole extraction, planning, mapping URIs and output a final result. It should also show the ability of the \ac{LLM} in regards of how many tasks can be done at once\footnote{The snapshot of this configuration can be found under: \url{https://github.com/maxlautenbach/CIExMAS/tree/91e14e7561e2ed6ba85e944f8063aca813d173e6}}.
+
+With this simple approach, 97\% of the initial baseline performance could be reached with the achieved triple F1 of 0.312. In addition, the ReAct agent could lower the token use in contrast to the updated baseline with error incorporation by nearly 11\%, as for the benchmark 670 thousand tokens instead of 753 thousand tokens were used. While being more efficient, the ReAct agent was more simple to tune, as there was a single point to do it. This also added complexity as the capability of the used Llama 3.3 70B showed high limitation in instruction following, being hard to tune towards the goal.
+
+In all categories the ReAct agent showed a larger gap between precision and recall, with precision being higher than recall. This is unlike the earlier models and shows that the ReAct agent was focussed on a few but therefore correct triples. Unlike the \ac{SSSA} fewer triples will be generated overall.
+
+Nevertheless, the ReAct agent a showed new high-scores among the previous models in the F1 of extracting subjects. Other than that the ReAct agent showed scores in the remaining categories that were matching the one of the \ac{SSSA} implementation. In addition the error rate is 12\% instead of 4\% like in the \ac{SSSA} what also goes back to context window issues. This implies, that the ReAct architecture has a theoretical potential of scoring 0.354, if the scores scale proportianal.
+
+An result limiting factor is the missing sense for the usage of the URIs like in all previous models. As an example the sentence \enquote{Herman Heijermans was a citizen of the Kingdom of the Netherlands.} expected the property \enquote{country of citizenship}.
+
+\textbf{ERROR EXPLANATION}
+
+The simple combination of the URI retrieval tool and a ReAct agent shows high potential. The joint optimisation idea leads to near initial baseline performance, which remains the best approach. Nevertheless, the simple idea can be extended by using further tools and ideas in order to create better results.
 
 \subsection{URI Retrieval Filtering}
 \label{subsec:uri_retrieval_filtering}
-\begin{itemize}
-  \item Switch to Filtering on Entities and Properties
-\end{itemize}
+
+As already outlined in section \ref{subsec:modularization_agent_tasks} for the first implementation of the \ac{SSA}, a problem of the URI search terms were, that the search modes were not used properly. Mostly the label search mode was used for entities whereas the description mode was used for properties. In order to take the agent the opportunity of using the search modes for distinct searches, another filter mode was introduced. The goal of it was that the agent is able to filter for entities or properties, while deciding if the search is conducted on the label or the description\footnote{The snapshot of this configuration can be found under: \url{https://github.com/maxlautenbach/CIExMAS/commit/35ff8fc370103a9453aaf7babb8e62f576fd8650}}.
+
+In detail, this filtering mode was another keyword behind the search term. For instance [LABEL-Q] executes a similarity search on the rdfs:label filtered on entities. This filtering mode was given to the ReAct architecture as well as to the \ac{SSSA}, as both seemed the most promising according to the results.
+
+The adaption had positive results for the \ac{SSSA}, while the ReAct solution was achieving similar results than before. The implementation \ac{SSSA} had a slightly higher error rate of 6\%, while achieving XY\% better results with a F1-score of XYZ than the original \ac{SSSA} implementation. On the other side the ReAct agent had achieved a 0\% error rate, but nevertheless the F1-score decreased to XYZ. Therefore, the \ac{SSSA}, ReAct agent and various baseline implementation are scoring close to each other.
+
+When taking a look into the seperate parts of the evaluation, it get visible, that the ReAct agent with the new filtering mode can score up top or nearly top of the prior models. Espeically subjects and entities overall get very good extracted by the ReAct agent with F1-score of XYZ and XYZ. On the property and object category it is defeated by the baseline architecture with error incorporation. In addition, the updated \ac{SSSA} is also able to score nearly as good as the ReAct agent, explaining the improved F1-scores on the triple category. The property F1-scores are lowered  for the \ac{SSSA} by XY\%, while being increase for the ReAct agent by XY\%, which shows that the URI-filtering had no high effect.
+
+As the extraction of subject, objects is already nearly perfect, the biggest limiting factor remains the extraction of properties and the merging of all parts into correct triples. In traces it is shown, that... \textbf{ERROR EXPLANATION - URI Retrieval doesn't found}. In addition, the soft matches show high potential in achieve higher triple F1-scores, with the parental F1 being XY\% higher than the normal F1, which goes also for properties.
+
+All in all the URI retrieval filtering reveals a high potential in extracting correct triples. The ReAct agent achieves near perfect extraction for subject and entities with scores above XYZ F1. Also the \ac{SSSA} achieves scores lower, but also similar to the ReAct agent. Nevertheless, the problem is, that the high scores in those categories are not reflected in the triple F1-scores. In addition, the URI-filtering does not have shown an effect on the property or triple F1 score.
 
 \subsection{Knowledge Graph Integration}
 \label{subsec:knowledge_graph_integration}
-\begin{itemize}
-  \item Incorporation of domain-specific knowledge via:
-        \begin{itemize}
-          \item Network Traversal (and why deleted later)
 
-        \end{itemize}
-\end{itemize}
+In previous configurations, a dominant problem was, that the parental and related F1 scores were significantly higher than the hard matched F1. Espeically the parental F1-score explains the most of the gap. This implies that the approaches are more over to general in their extraction. An idea to cover this problem and close the gap is to integrate the underlying knowledge graph directly into the agentic system\footnote{The snapshot of this configuration can be found under: \url{https://github.com/maxlautenbach/CIExMAS/tree/9ae8a7b8b5d5aa54c0875684a0f42a41cf740e04}}.
+
+The property extraction, no matter whether it was done by a separate agent or not, for instance opened up a gap of maximum XYZ\% worse than on the subject category. Therefore, the expectation is, that if the properties are correct, but just soft matches, the correct ones can be found within the property hierarchy of Wikidata for the case of synthIE. In addition, this hierarchy may also give an intend of the semantics of the original property.
+
+In this configuration the network traversal tool like described in section \ref{subsec:network_traversal} is used to create this connection. As this is an earlier implementation of the knowledge graph integration, Wikidata is accessed directly. Therefore, only the direct sub and superproperties were used, which is based on Wikidata not being loopfree and additional on the immense amount of properties that could appear in the output. As context window overflows were already a problem, bloating the context with even more properties does not seemed targeted.
+
+As the ReAct archiecture remained simpler to develop, it was the architecture of choice to test the knowledge graph integration with the network traversal tool. First of all, the result is that when the agent evaluates a property as not matching, it starts to use the network traversal tool. As example \textbf{INSERT EXAMPLE FROM LANGFUSE}
+
+In the end, this does not lead to the expected effect of higher triple F1-scores. Instead the knowledge graph integration lowers the F1 by XYZ\%, achieving XYZ F1. This goes also for all remaining categories. Nevertheless, two effects are apparent in the detailed evaluation. First, the scores on all categories do show a high gap to the top previous models, but the F1-score is not as affected as it could be expected. Second, the error rate is at 22\% and shows the problem of context overflowing, which is mainly caused by the agent trying to use the URI search tool with various search terms and modes. The error rate shows a much higher potential F1 of XYZ\%.
+
+As an idea the message deletion tool like described in section \ref{subsec:message_deletion} was tested in small test batches, without any successful implementation. The main problem was, that the agent could then delete messages, that were useful for the further processing, like URI retrievals. Without prior summaries, the relevant context got deleted and therefore, the results also got worse. That is why the decision was taken, to focus mainly on providing precise and small context.
+
+\textbf{ERROR DESCRIPTION}
+
+All in all the knowledge graph integration remains an experiment, that shows that such tools not always bring an improvement, especially if the data basis has not the highest quality. The knowledge graph integration shows that also the knowledge graph could be leveraged by agents, but nevertheless the experiment has shown that this tool makes the development incrementaly harder, but adding to the context. This limits the editability of the prompt and context even more. Therefore, the network traversal tool will not be used in one of the remaining configurations.
 
 \subsection{Network Agent Architecture}
 \label{subsec:full_network_agent_architecture}
+
+Throughout this approach, various experiences could be gathered. First of all, it has been shown, that more complex system like the \ac{SSA} do not necessarily produce better results. With major improvements, the performance of the \ac{SSA} and later the \ac{SSSA} could match the baseline performance. In contrast the most simple solution of using one agent in addition with the URI retrieval tool showed matching results to the baseline, while taking complexity out of the process. And in the middle, there is the baseline which keeps one of the best scores with a simple pipeline process implemented in a supervisor architecture.
+
+The network agent architecture, also presented in section \ref{subsec:network}, combines the findings into three agents\footnote{The snapshot of this configuration can be found under: \url{https://github.com/maxlautenbach/CIExMAS}}. First of all, the finding of the high performance of the ReAct archiecture revealed, that one agent is able to extract the full triple at once. On the otherside, the \ac{SSA} and \ac{SSSA} showed iterations and result reviews, that seemed logical, but at the end not improving the results. The network traversal tool showed the potential of incorporating the knowledge graph, but nevertheless was not helpful either.
+
+In addition, the previous approaches showed problems with getting the correct properties and hallucinating URIs. Furthermore, the semantics of the properties were not included by using the knowledge graph integration. In addition, central planning like in the supervisor architectures was often showing bad capabilities. Also, the URI search tool was often used incorrect even after the filter modes, as the agents search for descriptions using labels as inputs. Nevertheless, the URI summaries used in some of the previous approaches except for the ReAct architecture based, showed more condensed results. In general, the \ac{SSSA} proved, that more simple states and contexts will lead to less errors.
+
+As all previous configuration followed either a one agent architecture or a supervison pattern, which is also adapted to a custom pattern, this configuration was also a test to use specialised agents that decide about the agentic flow. The iteration triggered but the result reviewer was the inspiration to provide a validation and testing agent. This agent was set up with the semantic validation and turtle to label tool, in order to give a sense of semantics into the agentic system and reduce hallucination. As outlined the semantic validation tool was used with a filtered Wikidata dump, that was loopfree and locally hosted other than the network traversal tool.
+
+In addition, many of the prompt design features were not already exhausted. Especially the from \citet{Brown2020} advertised in-context learning was therefore used for the triple extraction agent. In the triple extractor prompt, three samples of the synthIE-text validation-split were human-filtered. In addition, the triple extraction was asked to give a type of the entity for simpler disambiguation in the search, as the embeddings will also embed a semantical sense of the word.
+
+For the URI search, the search and filter modes got simplified. The URI retrieval tool just accepted entity and property filtering, while using rdfs:label for the similarity comparison. For the property filtering there was an additional search mode to search by a example. The idea is that the agent can input the triple and the example search leads to properties, that embed the correct semantic of what is meant by the text. The URI mapping and refinement agent was asked, to use both search modes in order to find any suitable property.
+
+From a qualitative point of view, the improvements showed their expected impact. The validation and output agent showed the ability to reinforce request back to the URI mapping and refinement agent, for instance when a type restriction was violated. To show one reasoning example of the validation and output tool: \enquote{The semantic triple checking tool has identified a type restriction mismatch for the object of the triple, so the uri\_mapping\_and\_refinement agent is called to refine the triple and resolve the mismatch.}
+
 \begin{itemize}
   \item Combination of insights from Baseline, Gen1, and One-Agent approaches
   \item Network-based collaboration between specialized agents
@@ -947,10 +986,10 @@ In the end, the \ac{SSSA} is a adaption of the \ac{SSA} in order to keep the ide
   \item Turtle to Label conversion
 \end{itemize}
 
-\subsection{Integration of Tool Improvements to One Agent and Baseline Architecture}
+\subsection{Integration of Tool Improvements to ReAct and Baseline Architecture}
 \label{subsec:performance_increases_gen2}
 \begin{itemize}
-  \item One Agent
+  \item ReAct
   \item Baseline
 \end{itemize}
 
@@ -971,6 +1010,7 @@ In the end, the \ac{SSSA} is a adaption of the \ac{SSA} in order to keep the ide
   \item Implications on LLM, when hallucination prevention and validation mechanics has to be used.
 \end{itemize}
 
+\paragraph{Discussion}
 \begin{itemize}
   \item Hallucination of URIs
   \item Wikidata Incorporation in Dataset
@@ -980,6 +1020,9 @@ In the end, the \ac{SSSA} is a adaption of the \ac{SSA} in order to keep the ide
   \item Small SOTA Models
   \item Different Prompts per Config
   \item Usage of Property Extraction Agent in SSSA Questionable, but give it a chance
+  \item Context Window Issues
+  \item Limitation of Wikidata on Relevant Results -> Simplicity of switching datasets, Time efficiency, Performance
+  \item No Limitation of Outputs like in synthIE -> Therefore, very adaptable
 \end{itemize}
 
 \chapter{Conclusion and Outlook}
@@ -1093,12 +1136,12 @@ In the end, the \ac{SSSA} is a adaption of the \ac{SSA} in order to keep the ide
     Error Incorp. (SSA)                  & 0.613                                          & 0.755          & 0.640          & 0.160          \\
     Error Incorp. (Baseline)             & 0.756                                          & 0.848          & 0.749          & 0.000          \\
     Agent System Simplification          & 0.702                                          & 0.843          & 0.719          & 0.040          \\
-    One Agent Architecture               & 0.813                                          & 0.738          & 0.751          & 0.120          \\
+    ReAct Architecture                   & 0.813                                          & 0.738          & 0.751          & 0.120          \\
     URI Retrieval (SSSA)                 & 0.800                                          & 0.818          & 0.777          & 0.060          \\
-    URI Retrieval (One Agent)            & 0.910                                          & 0.848          & 0.848          & 0.000          \\
+    URI Retrieval (ReAct)                & 0.910                                          & 0.848          & 0.848          & 0.000          \\
     Knowledge Graph Integration          & 0.693                                          & 0.720          & 0.690          & 0.220          \\
     \textbf{Network Architecture (Gen2)} & \textbf{0.930}                                 & \textbf{0.915} & \textbf{0.907} & \textbf{0.000} \\
-    Advanced Adapt. (One Agent)          & 0.870                                          & 0.833          & 0.837          & 0.020          \\
+    Advanced Adapt. (ReAct)              & 0.870                                          & 0.833          & 0.837          & 0.020          \\
     Advanced Adapt. (Baseline)           & 0.800                                          & 0.948          & 0.840          & 0.000          \\
     \bottomrule
   \end{tabular}
@@ -1119,12 +1162,12 @@ In the end, the \ac{SSSA} is a adaption of the \ac{SSA} in order to keep the ide
     Error Incorp. (SSA)                  & 0.325                                            & 0.315          & 0.294          & 0.378          & 0.394          & 0.160          \\
     Error Incorp. (Baseline)             & 0.413                                            & 0.424          & 0.408          & 0.503          & 0.517          & 0.000          \\
     Agent System Simplification          & 0.399                                            & 0.389          & 0.365          & 0.449          & 0.465          & 0.040          \\
-    One Agent Architecture               & 0.418                                            & 0.351          & 0.374          & 0.455          & 0.470          & 0.120          \\
+    ReAct Architecture                   & 0.418                                            & 0.351          & 0.374          & 0.455          & 0.470          & 0.120          \\
     URI Retrieval (SSSA)                 & 0.396                                            & 0.334          & 0.355          & 0.438          & 0.442          & 0.060          \\
-    URI Retrieval (One Agent)            & 0.485                                            & 0.367          & 0.400          & 0.480          & 0.496          & 0.000          \\
+    URI Retrieval (ReAct)                & 0.485                                            & 0.367          & 0.400          & 0.480          & 0.496          & 0.000          \\
     Knowledge Graph Integration          & 0.445                                            & 0.352          & 0.376          & 0.465          & 0.469          & 0.220          \\
     \textbf{Network Architecture (Gen2)} & \textbf{0.784}                                   & \textbf{0.672} & \textbf{0.710} & \textbf{0.782} & \textbf{0.790} & \textbf{0.000} \\
-    Advanced Adapt. (One Agent)          & 0.746                                            & 0.548          & 0.616          & 0.676          & 0.683          & 0.020          \\
+    Advanced Adapt. (ReAct)              & 0.746                                            & 0.548          & 0.616          & 0.676          & 0.683          & 0.020          \\
     Advanced Adapt. (Baseline)           & 0.645                                            & 0.640          & 0.631          & 0.724          & 0.735          & 0.000          \\
     \bottomrule
   \end{tabular}
@@ -1145,12 +1188,12 @@ In the end, the \ac{SSSA} is a adaption of the \ac{SSA} in order to keep the ide
     Error Incorp. (SSA)                  & 0.621                                         & 0.636          & 0.598          & 0.160          \\
     Error Incorp. (Baseline)             & 0.804                                         & 0.798          & 0.779          & 0.000          \\
     Agent System Simplification          & 0.722                                         & 0.723          & 0.691          & 0.040          \\
-    One Agent Architecture               & 0.793                                         & 0.664          & 0.708          & 0.120          \\
+    ReAct Architecture                   & 0.793                                         & 0.664          & 0.708          & 0.120          \\
     URI Retrieval (SSSA)                 & 0.789                                         & 0.750          & 0.746          & 0.060          \\
-    URI Retrieval (One Agent)            & 0.848                                         & 0.665          & 0.719          & 0.000          \\
+    URI Retrieval (ReAct)                & 0.848                                         & 0.665          & 0.719          & 0.000          \\
     Knowledge Graph Integration          & 0.681                                         & 0.600          & 0.618          & 0.220          \\
     \textbf{Network Architecture (Gen2)} & \textbf{0.960}                                & \textbf{0.823} & \textbf{0.867} & \textbf{0.000} \\
-    Advanced Adapt. (One Agent)          & 0.862                                         & 0.637          & 0.714          & 0.020          \\
+    Advanced Adapt. (ReAct)              & 0.862                                         & 0.637          & 0.714          & 0.020          \\
     Advanced Adapt. (Baseline)           & 0.906                                         & 0.949          & 0.918          & 0.000          \\
     \bottomrule
   \end{tabular}
@@ -1171,12 +1214,12 @@ In the end, the \ac{SSSA} is a adaption of the \ac{SSA} in order to keep the ide
     Error Incorp. (SSA)                  & 0.737                                          & 0.703          & 0.704          & 0.160          \\
     Error Incorp. (Baseline)             & 0.914                                          & 0.880          & 0.885          & 0.000          \\
     Agent System Simplification          & 0.807                                          & 0.798          & 0.785          & 0.040          \\
-    One Agent Architecture               & 0.835                                          & 0.747          & 0.781          & 0.120          \\
+    ReAct Architecture                   & 0.835                                          & 0.747          & 0.781          & 0.120          \\
     URI Retrieval (SSSA)                 & 0.868                                          & 0.810          & 0.829          & 0.060          \\
-    URI Retrieval (One Agent)            & 0.935                                          & 0.792          & 0.840          & 0.000          \\
+    URI Retrieval (ReAct)                & 0.935                                          & 0.792          & 0.840          & 0.000          \\
     Knowledge Graph Integration          & 0.714                                          & 0.656          & 0.670          & 0.220          \\
     \textbf{Network Architecture (Gen2)} & \textbf{0.966}                                 & \textbf{0.876} & \textbf{0.907} & \textbf{0.000} \\
-    Advanced Adapt. (One Agent)          & 0.895                                          & 0.718          & 0.785          & 0.020          \\
+    Advanced Adapt. (ReAct)              & 0.895                                          & 0.718          & 0.785          & 0.020          \\
     Advanced Adapt. (Baseline)           & 0.963                                          & 0.970          & 0.964          & 0.000          \\
     \bottomrule
   \end{tabular}
