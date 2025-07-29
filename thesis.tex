@@ -130,8 +130,15 @@
 \label{ch:intro}
 
 \begin{itemize}
+  \item World of GenAI -> Knowledge Graph gains traction again \url{https://www.cio.com/article/3808569/knowledge-graphs-the-missing-link-in-enterprise-ai.html?utm_source=chatgpt.com}
+  \item Building KG remains hard, especially from unstructured documents \cite{Zhao2024}
+  \item Several approaches (GenIE, synthIE) already showed great performance, with the need of being fine-tuned \cite{Josifoski2021,Josifoski2023}
+  \item Advent of GenAI, no need for fine-tuning anymore, ICL way to go \cite{Brown2020}
+  \item First works shown effectiveness \cite{Shi2024}
   \item RQ1: How effective is a multi-agent system at solving closed information extraction tasks?
   \item RQ2: Which multi-agent architecture pattern achieves the highest performance on closed information extraction tasks?
+  \item Method
+  \item Strucutre of Work
 \end{itemize}
 % Your introduction goes here
 
@@ -632,11 +639,11 @@ The evaluation setup consists out of three essential parts. First, is the subsec
 \subsection{Dataset and Comparison Models}
 \label{sec:dataset}
 
-The evaluation is based on the datasets synthIE and REBEL. Both datasets, which are described in section \ref{sec:related_datasets}, contain triples, that are extracted out of a given text. Each extracted triples contains unique identifiers from Wikidata for each part of the triple, which make them ideal for closed information extraction. Each identifier could be resolved within the entity namespace \texttt{https://www.wikidata.org/entity/}.
+The evaluation is based on the dataset synthIE, with one experiment conduct using REBEL. Both datasets, which are described in section \ref{sec:related_datasets}, contain triples, that are extracted out of a given text. Each extracted triples contains unique identifiers from Wikidata for each part of the triple, which make them ideal for closed information extraction. Each identifier could be resolved within the entity namespace \texttt{https://www.wikidata.org/entity/}.
 
 Both datasets follow a similar structure. Both datasets are stored in json lines, which is a line separated format of objects consisting of entities, relations and triples. Each entity and relation, which can also be named as property, is further split down into a surfaceform and uri, which is a unique identifier. The surfaceform is exactly how the entities and relations are written in the given text. The uri field is the local part of the Wikidata Qname. A Qname itself has a prefix, which is the namespace in the case of Wikidata, and a local part which is the unique identifier \cite{ASF2010}. This means that the uri field is for instance Q120 with the surfaceform \enquote{June}. The full entity \enquote{June} can only be detected in the namespace of \texttt{https://www.wikidata.org/entity/}. The triples contain of a subject, object and predicate, which itself are build up like entities and relations.
 
-As already outlined in section \ref{sec:related_datasets} there are two datasets of synthIE, which are synthIE-code and synthIE-text. Both datasets differ in the GPT-3.5 model used for the text generation. As the text model showed better performances, the evaluation is strictly done on synthIE-text.
+As already outlined in section \ref{sec:related_datasets} there are two datasets of synthIE, which are synthIE-code and synthIE-text. Both versions of the datasets differ in the GPT-3.5 model used for the text generation. As the text model showed better performances, the evaluation is strictly done on synthIE-text.
 
 Nevertheless, all evaluation configurations until section \ref{subsec:knowledge_graph_integration} were developed on synthIE-code, as of the larger amount of training data could have provided are more extensive development set in order to detect as much edge cases as possible. For development reasons, the train-split of synthIE-code was used and sorted, so that the document with id one is the first in the jsonlines file.
 
@@ -660,9 +667,9 @@ To illustrate the distinction between \texttt{synthIE-code} and \texttt{synthIE-
   \label{tab:triple-example}
 \end{table}
 
-In addition, to the synthIE dataset, benchmarking on the best CIExMAS models were done on the REBEL dataset. Like in the synthIE evaluation, the first 50 samples in the sorted test-split were used. Like already outline, CIExMAS focussed mainly on synthIE as foundation for developing the agents, which can conclude in worse results on REBEL.
+As it was planned to benchmark the best CIExMAS models on the REBEL dataset, the first 50 samples in the sorted test-split were uploaded in the vector databases. Like already outline, CIExMAS focussed mainly on synthIE as foundation for developing the agents, which could conclude in worse results on REBEL. As of testing, no approach scored over 0.1 F1-score, which is why REBEL was not further used for evaluation. The results of the testing can be found in the section \ref{sec:rebel_testing} of the appendix.
 
-Both datasets were evaluated on various different models before. Espeically for the synthIE dataset, the solutions of \citet{Josifoski2023} synthIE- and GenIE were used as they were used pre-trained under \url{https://github.com/epfl-dlab/SynthIE}. For the synthIE solution all three versions synthIE$_{T5-base}$, synthIE$_{T5-base-SC}$ and synthIE$_{T5-large}$ were evaluated. For the GenIE solution the version GenIE$_{T5-base}$ and GenIE$_{T5-base-SC}$ were tested. The abbreviation \textit{SC} stands for subject-collapsed, which means, that those variants outputs subject grouped triples. All models are using the Flan-T5 \ac{LM}. Like the CIExMAS solution, those solutions were also evaluated against the same samples of synthIE-text. For REBEL, no comparison models were evaluated, as the clear focus of CIExMAS is on synthIE, as of the higher dataset quality.
+Both datasets were evaluated on various different models before. Espeically for the synthIE dataset, the solutions of \citet{Josifoski2023} synthIE- and GenIE were used as they were used pre-trained under \url{https://github.com/epfl-dlab/SynthIE}. For the synthIE solution all three versions synthIE$_{T5-base}$, synthIE$_{T5-base-SC}$ and synthIE$_{T5-large}$ were evaluated. For the GenIE solution the version GenIE$_{T5-base}$ and GenIE$_{T5-base-SC}$ were tested. The abbreviation \textit{SC} stands for subject-collapsed, which means, that those variants outputs subject grouped triples. All models are using the Flan-T5 \ac{LM}. Like the CIExMAS solution, those solutions were also evaluated against the same samples of synthIE-text.
 
 Overall the first 50-sample sorted synthIE-text dataset serves as benchmark for CIExMAS and comparison models. In addition, the dataset can also show which evaluation configuration changes had which impact on the overall performance. Other datasets like REBEL were tested, but not extensive.
 
@@ -978,7 +985,7 @@ For the URI search, the search and filter modes got simplified. The URI retrieva
 
 From a qualitative point of view, the improvements showed their expected impact. The validation and output agent showed the ability to reinforce request back to the URI mapping and refinement agent, for instance when a type restriction was violated. To show one reasoning example of the validation and output tool: \enquote{The semantic triple checking tool has identified a type restriction mismatch for the object of the triple, so the uri\_mapping\_and\_refinement agent is called to refine the triple and resolve the mismatch.}
 
-From the quantitative point of view, the collection of improvements lead to the best CIExMAS result overall. Reaching a F1-score of 0.665 showed the potential of bringing all experiences together. In addition, the precision remains higher than the recall showing, that the output of the network agents are few but mostly correct triples. Furthermore, the error rate is lowered to 0\%, which means that the context adaption to a simple context, that includes all needed information shows a result. In addition, neither the further updated baseline nor the future update ReAct agent could come near to the network agents.
+From the quantitative point of view, the collection of improvements lead to the best CIExMAS result overall. Reaching a F1-score of 0.665 showed the potential of bringing all experiences together. In addition, the precision remains higher than the recall showing, that the output of the network agents are few but mostly correct triples. Furthermore, the error rate is lowered to 0\%, which means that the context adaption to a simple context, that includes all needed information shows a result. In addition, neither the further updated baseline nor the future update ReAct agent could come near to the network agents. Nevertheless F1-score of the soft matches of the network agent architecture remain about 10\% higher than the hard matches. This comes primarily from properties, that were parent properties of the searched properties.
 
 In detail the network architecture shows a near perfect ability to extract subjects and entities overall with F1-scores of 0.9 and above. The object extraction is leading to a F1 of 0.867. Further more the precision in all categories is 0.93 and above, which indiciates best-in-class or near best-in-class subject, object and entity extraction.
 
@@ -1014,6 +1021,7 @@ In the end it shows the potential that can also be revealed within all approache
                                    & Prec.                                         & Rec.           & F1             & Par. F1        & Rel. F1        & Err.           \\
     \midrule
     Llama 3.3 70B 4-bit AWQ (vLLM) & \textbf{0.728}                                & \textbf{0.635} & \textbf{0.665} & \textbf{0.728} & \textbf{0.728} & \textbf{0.000} \\
+    Llama 3.3 70B (SambaNova)      & 0.650                                         & 0.599          & 0.608          & 0.647          & 0.647          & 0.000          \\
     Llama 4 Maverick (Groq)        & 0.346                                         & 0.306          & 0.321          & 0.391          & 0.391          & 0.200          \\
     Kimi-K2 Instruct (Groq)        & 0.060                                         & 0.043          & 0.049          & 0.049          & 0.049          & 0.060          \\
     \bottomrule
@@ -1024,9 +1032,9 @@ In the end it shows the potential that can also be revealed within all approache
 
 The in CIExMAS used Llama 3.3 70B model matches the performance of OpenAIs GPT-4 models from end of 2023 \cite{Chiang2024}. As already outlined in section \ref{sec:language_models} Meta released a newer herd of Llama 4 models, where the best model is as today Llama 4 Maverick. In addition, Kimi-K2 was released and scores near state-of-the-art scores. Both models could outperform Llama 3.3 70B by a significant margin on the LMSys Chatbot Arena benchmark. That is why it is relevant to test those models against Llama 3.3 70B.
 
-The configuration taken is the network agent architecture presented in section \ref{subsec:full_network_agent_architecture}. All tools and prompts, stayed the same for the evaluation of the comparison models. Both comparison models were executed on the provider Groq, instead of running them locally in a quantised model on vLLM. This is caused by the significant bigger size of both models, as Llama 4 Maverick is a 109 billion parameter model with 17 billion being active, whereas Kimi-K2 has 1 trillion parameters, whereas only 32B are active. Nevertheless, both models remain to large for the used infrastructure.
+The configuration taken is the network agent architecture presented in section \ref{subsec:full_network_agent_architecture}. All tools and prompts, stayed the same for the evaluation of the comparison models. The comparison models were executed on the provider Groq and SambaNova, instead of running them locally in a quantised model on vLLM. This is caused by the significant bigger size of both models, as Llama 4 Maverick is a 109 billion parameter model with 17 billion being active, whereas Kimi-K2 has 1 trillion parameters, whereas only 32B are active. Nevertheless, both models remain to large for the used infrastructure. In addition, SambaNova was used to run an unquantised version of Llama 3.3 70B, which was also mainly used for the agent engineering.
 
-The evaluation shown in table \ref{tab:model_variation_comparison} reveals, that both models have significant lower scores across all metrics. Especially Kimi-K2 just reaches a 0.049 F1-score, which is 7.4\% of the score achieved with Llama 3.3 70B. Llama 4 Maverick performs better, but in the end the 0.321 F1-score is matching the initial baseline achieved with Llama 3.3 70B. Both models therefore have higher error rates, with Llama 4 Maverick having 20\% of errors, while Kimi-K2 has just 6\%.
+The evaluation shown in table \ref{tab:model_variation_comparison} reveals, that all models have lower scores across all metrics. Especially Kimi-K2 just reaches a 0.049 F1-score, which is 7.4\% of the score achieved with Llama 3.3 70B. Llama 4 Maverick performs better, but in the end the 0.321 F1-score is matching the initial baseline achieved with Llama 3.3 70B. Both models therefore have higher error rates, with Llama 4 Maverick having 20\% of errors, while Kimi-K2 has just 6\%. The unquantised version shows a 8.5\% worse result than the quantised model. This shows that the quantisation has an effect, which in this case is now beneficial for the closed information extraction.
 
 As it seems counterintuitive that immense bigger models, show near complete failure of errors, whereas a smaller older models shows near state-of-the-art result, it is necessary to anaylse the traces. First of all, many errors of Llama 4 are caused by recursion limit errors. Those are mostly caused through syntax problems between the agent and the semantic validation tool, as the validation and output agent using Llama 4 outputs turtle like \enquote{@prefix wd: <http://www.wikidata.org/entity/>.\\nwd:Q907827 wd:P1546 wd:Q877781}. In this string \textit{\\nwd} is not expected and leads to a syntax error, that the agent is unable to fix. This leads to recursion limit errors, as the agent keeps looping over the error.
 
@@ -1034,7 +1042,7 @@ For the remaining loss, it can be assumed according to the traces, that the mode
 
 An idea to conduct an experiment using Gemma3 as another smaller open source, but very capable model failed. The traces showed problems with Gemma3 following the output guidelines. Instead of the xml tags, Gemma3 outputed json structured output, which can not be processed by the CIExMAS setup.
 
-All in all the various \acp{LLM} showed no improvement at all, while also being more expensive and slower than Llama 3.3 70B. Some models like Kimi-K2 or Gemma3 were problematic to produce any result with F1 greater than zero or even a result. In regards of this comparison, which was also done empirical throguht the configuration iterations of CIExMAS, the model of choice stayed Llama 3.3 70B.
+All in all the various \acp{LLM} showed no improvement at all, while also being more expensive and slower than Llama 3.3 70B 4-bit quantised. Some models like Kimi-K2 or Gemma3 were problematic to produce any result with F1 greater than zero or even a result. In regards of this comparison, which was also done empirical throguht the configuration iterations of CIExMAS, the model of choice stayed Llama 3.3 70B.
 
 \section{Discussion}
 \label{sec:discussion}
@@ -1057,35 +1065,35 @@ The baseline and ReAct architecture could be optimised much further and easier t
 
 Especially the low instruction following capabilities enabled through the prompts were limiting the most simplest architectures. As additional guidelines in the prompts did not led to a solution to edge case errors, another solution needed to be established. This showed that especially the complexity in the connection of triples to URIs in Wikidata led CIExMAS to employ a multi-agent system. In addition, the network solution has shown clearly scoped agents, where the overhead of the agentic system was spread over the whole system. This has been very effictive, as the agent flow could be considered in the context of the needs of the agents. This also complies with the various agent design ideas like a human-understandable and consise agent design presented in section \ref{sec:agent_design}.
 
-\paragraph{Interpretation}
-\begin{itemize}
-  \item URI Filtering -> Simplicity/Complexity
-  \item Implications on LLM, when hallucination prevention and validation mechanics has to be used.
-  \item Turtle to Label Tool could reduce hallucinations
-  \item Baseline (Supervisor) Architecture very powerful -> No hallucination prevention tools, instead really good either.
-  \item Tools for better Knowledge Graph Integration with the good underlying data quality produces good results (Semantic Validation Tool)
-  \item Properties remain the limiting factor
-\end{itemize}
+Another decision about simplicity against complexity is about the URI search mechanism. Throughout the process of creating the various CIExMAS approaches, it has been shown that more complex filter and search modes does not led to higher results. In the end, the \ac{LLM} has to understand perfectly when to use what search and filter mode, which did not become evident. Especially the search modes label and description were not used as intended. In the end the simplicity of filtering on entities and properties was the best, when combined with a property example search. Again, closed information extraction requires a minimum of complexity, as especially the mapping of labels to URIs is a problem in CIExMAS.
+
+The usage of LLMs as models did add additional complexity. Those models showed hallucination in the URI Mapping, even when the URI retrieval tool was used. A paper of \citet{Xu2025} proposed that \acp{LLM} inevitably hallucinate. Nevertheless, the employed methods to prevent hallucination and check on the results of the agents has been shown useful in the network architecture and in the updated approaches of the ReAct architecture and the baseline architecture. Especially the turtle to lable tool could show hallucinated results, which could be \ac{LLM}-detected.
+
+On the other side a architecture which was not advanced by additional tool use and hallucination prevention is the baseline architecture, with one supervisor, two extractos and the URI retrieval tool with \ac{LLM}-summary. This architecture could be optimised solely by using prompt optimisations, error incorporation and the best URI search modes and then it achieved good results either. Therefore, it can be assumed that most of the performance gain of the network architecture and the updated ReAct architecture come from the switched URI modes. Nevertheless, as the validation tools lead the agents to keep non-sense triples out of the output, it is likely to have a positive effect on the F1-score, especially on the precision.
+
+What can also be assumed from the results achieved with knowledge graph integration tool, is that the quality needs to be high for those tools to work. The network traversal tool based on Wikidata showed performance losses, whereas the semantic validation tool which is based on a filtered subset of Wikidata showed overall performance gains. Especially the data needs to be loop free and efficient to crawl. Otherwise, the retrieval would take unconsiderabely long or run into timeouts.
+
+In the end of the interpretation of the results, it remains visible that the biggest problem are the properties. Error rates could be eliminated by using error incorporation and to decrease the context size by design. Subject, object and entity extraction could be optimised by using in-context learning and prompt optimisation. Those parts of the triple could also be consistently found using the URI retrieval tool. On the property side, most of the properties were not written like they were in Wikidata. The sentence \enquote{Daniel Johannsen is a Tenor} will lead the agents to extract \textit{is a} as the free-form property. Then it will search for \textit{is a}, which is likely to return something like \textit{wd:P361}, which has the label \textit{part of}. To prevent this result, the agent has got the ability to search with the full triple, which is in this case the full sentence. Nevertheless, the traces and experiments showed, that only a part of the missing properties could be found via this search method.
+
+Overall the meaningfulness of the results remains limited as only 50 samples are used for testing, with even less samples used for a manual training. The comparability to the comparison models is nevertheless given, as they were tested on the same samples. Exactly those models also show an underperformance on those samples, as \citet{Josifoski2023} show a macro F1-score for triple extraction of 0.93 for their best synthIE model on the full dataset. Therefore, the chosen samples could have led to worse results on CIExMAS either. The decision to use just 50 samples is grounded in the fact, that for instance the \ac{SSA} and \ac{SSSA} already took a runtime of approximately 6 hours on those 50 samples on the vLLM Llama 3.3 70B setup with 2x Nvidia A100 cards. In addition, the focus of this work was to evaluate, whether it may be possible to process closed information extraction with multi agent system and to detect the most effective architecture. To test this in regards to a given time limit of 12 hours runtime, it was the decision not to include more samples on testing.
+
+The URI mapping remains a point for discussion. The Wikidata knowledge graph is most likely included in one of the datasets used to train Llama 3.3 70B or other models. Therefore, the models might already memorise URIs and their mapping, which could give a benefit in triple formation and also in the URI retrieval. On the otherside traces that have shown no interaction with the URI retrieval tool at all mostly have hallucinated URIs, that are foremost limiting the results. In addition, the Wikidata incorporation leads to a problem, where properties were outputed in the namespace \textit{wdt:}, which in fact is the correct namespace for properties. Nevertheless, for a simpler evaluation, especially for the detection of soft matches in the property hierarhcy, the namespace \textit{wd:} was necessary.
+
+Additionally, the synthIE dataset could additionally be inside the training dataset of various \acp{LLM}. Also, examples of the dataset are used for in-context learning. As the performance of CIExMAS is nowhere near perfect, it can be assumed, that a possible inclusion of synthIE data in the training data or in the prompt has near zero effect on the extraction performance.
+
+The agent engineering was conduct for most of the models on synthIE-code instead of the text version of synthIE. As the quality of synthIE-code remains lower than on synthIE-text, the prompts could tend towards edge only existant in synthIE-code. As an example the code version included \enquote{Herman Heijermans was born in the Netherlands.} and the text version included \enquote{Herman Heijermans was a citizen of the Kingdom of the Netherlands.}. Both version searched for the triple \textit{(Herman Heijermans; country of citizenship; Kingdom\_of\_the\_Netherlands)}. Nevertheless in experiements, the same models have shown improved results when comparing the code and the text versions. Espeically, as edge cases were not given by example instead there were generalised.
+
+The dataset used for the knowledge graph integration tools of network traversal and semantic validation variied. The network traversal showed with the full Wikidata dataset limitation in regards of the depth of the SPARQL query evaluating if type restrictions are matched or not. The semantic validation instead could use the full depth using a filtered wikidata class and property hierarchy, which are both loopfree. As the dataset was not part of the development of CIExMAS it will not be further described. Nevertheless, this shows, that the network traversal could have performed better on another dataset. In the end, other topics like the integration of the validation tools to the ReAct architecture and updating the search mode were prioritised. Due to time constraints the network traversal tool, which would also have needed additional optimision, was not implemented.
+
+All prompts were manually created and adapted, except for some help through ChatGPT 4o or Cursor. This kind of manual prompt engineering is not necessarily leading to the best overall prompts. In addition, the prompts are and had to be adapted with every configuration to adapt to new tools or new tool implementations. This could lead one architecture to be accidentially score higher F1-scores than others. Nevertheless, a clear trend of architectural ideas could be seen throughout the evaluation, which leads to the assumption, that the prompt had a minor effect, than implementation and design details like the search type and state, which were kept constant per architecture.
+
+The same time and resource constraints that led to the sample reduction also limited the use of models. Nevertheless, as outlined in section \ref{subsec:eval_language_models} \acp{LLM} with up to 70 billion parameters show near state-of-the-art results on benchmarks. In the case of CIExMAS, the model of Llama 3.3 70B showed the best overall performance against other and especially more capable models when relying on benchmarks. As \acp{LLM} remain prompt senstive and especially to format of output that is expect remains unstructured, it can lead to worse results. In addition, modern models support longer context, with the new Llama 4 models supporting up to 10 million tokens. As a constraint of multiple providers and the system used for testing on the synthIE dataset, the context in CIExMAS is limited to 8192 tokens. In addition, the limitation made problems throughout the whole process. On the positive side, the context needed therefore to be designed precise while also allowing iterations.
+
+In addition, CIExMAS was designed to work with multiple datasets and also provide the ability to be extended by the generation of entities in a knowledge graph later on instead of just using what is already provided in the knowledge graph. That is why, unlike in synthIE, the results were not limited towards predefined tokens that form the triples. In addition, there were multiple entities of various datasets and datasplits imported in the vector database used for the URI retrieve. This could affect the URI retrieval performance negeatively, but on the other side is a more realistic scenario, espeically as not all entities and properties of synthIE and REBEL were imported. In addition, uploading multiple dataset to the vector stores gave the ability to switch through the datasets easily without handling multiple vector store collections or filtering on datasets. Furthermore, it could be assumed that some entities and properties are the same and that the URI retrieval should find only relevant URIs according to the search term and search mode.
 
 \paragraph{Discussion}
 \begin{itemize}
-  \item Hallucination of URIs
-  \item Wikidata Incorporation in Dataset
-  \item Dataset inquiries (synthIE examples for in-context learning)
-  \item synthIE code for development
-  \item Manual Prompt Engineering
-  \item Small SOTA Models, but better than Flan-T5
-  \item Different Prompts per Config, Maybe not systematic
   \item Usage of Property Extraction Agent in SSSA Questionable, but give it a chance
-  \item Context Window Issues
-  \item Limitation of Wikidata on Relevant Results -> Simplicity of switching datasets, Time efficiency, Performance
-  \item No Limitation of Outputs like in synthIE -> Therefore, very adaptable
-  \item Method of URI retrieval
-  \item Limiting the Token like in synthIE
-  \item Questionable to compare various LLMs on the same prompt
-  \item Hybrid Models
-  \item Finetuning Models
-  \item CIExMAS Setup not using structured outputs
 \end{itemize}
 
 \chapter{Conclusion and Outlook}
@@ -1095,8 +1103,14 @@ Especially the low instruction following capabilities enabled through the prompt
 
 \begin{itemize}
   \item Switchback to QNames
-  \item Finetuning Models
-  \item
+  \item Finetuning Models, Hybrid Models
+  \item Limiting the Token like in synthIE
+  \item Try out more methods for property mapping
+  \item Try out different approaches (Sentence by Sentence or Subject-Object connection, the property description)
+  \item Rebuild on structured outputs
+  \item Different Datasets without Wikidata Incorporation
+  \item Method of URI retrieval
+  \item Bigger context limit
 \end{itemize}
 
 % Your conclusions go here
@@ -1106,6 +1120,91 @@ Especially the low instruction following capabilities enabled through the prompt
 \appendix
 \chapter{Additional Material}
 \label{ch:additional_material}
+
+\section{REBEL Testing}
+\label{sec:rebel_testing}
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{l|rrrrrr}
+    \toprule
+    \textbf{Model} & \multicolumn{6}{c}{\textit{\textbf{Triples}}}                                                     \\
+                   & Precision                                     & Recall & F1    & Parental F1 & Related F1 & Err.  \\
+    \midrule
+    Baseline       & 0.080                                         & 0.189  & 0.100 & 0.081       & 0.081      & 0.400 \\
+    ReAct          & 0.107                                         & 0.115  & 0.089 & 0.085       & 0.085      & 0.100 \\
+    Network        & 0.063                                         & 0.121  & 0.076 & 0.059       & 0.059      & 0.120 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Comprehensive performance comparison on the REBEL dataset for different CIExMAS configurations.}
+  \label{tab:rebel_comprehensive_results}
+\end{table}
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{l|rrr}
+    \toprule
+    \textbf{Configuration} & \multicolumn{3}{c}{\textit{\textbf{Subjects}}}                  \\
+                           & Precision                                      & Recall & F1    \\
+    \midrule
+    Baseline               & 0.417                                          & 0.507  & 0.414 \\
+    ReAct                  & 0.577                                          & 0.410  & 0.447 \\
+    Network                & 0.310                                          & 0.305  & 0.280 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Subject recognition performance on the REBEL dataset for different CIExMAS configurations.}
+  \label{tab:rebel_subjects}
+\end{table}
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{l|rrrrr}
+    \toprule
+    \textbf{Configuration} & \multicolumn{5}{c}{\textit{\textbf{Properties}}}                                             \\
+                           & Precision                                        & Recall & F1    & Parental F1 & Related F1 \\
+    \midrule
+    Baseline               & 0.176                                            & 0.362  & 0.214 & 0.276       & 0.300      \\
+    ReAct                  & 0.253                                            & 0.247  & 0.217 & 0.259       & 0.318      \\
+    Network                & 0.148                                            & 0.194  & 0.149 & 0.184       & 0.214      \\
+    \bottomrule
+  \end{tabular}
+  \caption{Property recognition performance on the REBEL dataset for different CIExMAS configurations.}
+  \label{tab:rebel_properties}
+\end{table}
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{l|rrr}
+    \toprule
+    \textbf{Configuration} & \multicolumn{3}{c}{\textit{\textbf{Objects}}}                  \\
+                           & Precision                                     & Recall & F1    \\
+    \midrule
+    Baseline               & 0.163                                         & 0.384  & 0.208 \\
+    ReAct                  & 0.198                                         & 0.200  & 0.161 \\
+    Network                & 0.122                                         & 0.186  & 0.134 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Object recognition performance on the REBEL dataset for different CIExMAS configurations.}
+  \label{tab:rebel_objects}
+\end{table}
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{l|rrr}
+    \toprule
+    \textbf{Configuration} & \multicolumn{3}{c}{\textit{\textbf{Entities}}}                  \\
+                           & Precision                                      & Recall & F1    \\
+    \midrule
+    Baseline               & 0.311                                          & 0.582  & 0.382 \\
+    ReAct                  & 0.383                                          & 0.370  & 0.342 \\
+    Network                & 0.211                                          & 0.309  & 0.241 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Entity recognition performance on the REBEL dataset for different CIExMAS configurations.}
+  \label{tab:rebel_entities}
+\end{table}
+
+\newpage
 
 \section{Evaluation Results by Category}
 
@@ -1189,7 +1288,7 @@ Especially the low instruction following capabilities enabled through the prompt
   \label{tab:evaluation_entities}
 \end{table}
 
-\newpage
+
 
 \clearpage
 \section{Detailed Performance Analysis by Category}
