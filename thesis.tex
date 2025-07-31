@@ -122,28 +122,100 @@
   \acro{LM}{Language Model}
   \acro{SSA}{Splitted Supervisor Architecture}
   \acro{SSSA}{Simplified Splitted Supervisor Architecture}
+  \acro{IE}{Information Extraction}
+  \acro{cIE}{Closed Information Extraction}
+  \acro{KG}{Knowledge Graph}
+  \acro{ICL}{In-Context Learning}
+  \acro{NLP}{Natural Language Processing}
+
 \end{acronym}
 
 \mainmatter
 
 \chapter{Introduction}
-\label{ch:intro}
+\label{ch:introduction}
+
+\acp{LM}, and especially modern \acp{LLM}, have significantly improved the ability of machines to understand and generate human language. These models have enabled progress in various downstream tasks ranging from question answering to summarization and reasoning \cite{Brown2020}. However, their static training data limits their ability to incorporate new or domain-specific knowledge — a limitation known as the knowledge cutoff problem. Most \acp{LLM} are trained once on large corpora and as a result, they have no built-in access to information that emerged after the end of their training period and cannot retrieve up-to-date or external knowledge out of the box \cite{Brown2020,Grattafiori2024}.
+
+As a result, there is a growing interest in structured external knowledge sources, especially \acp{KG}, to provide reliable and semantically rich context for generative models \cite{Korolov2025}. \acp{KG} allow information to be represented in a formal, machine-interpretable way, which makes them highly suitable for integration into retrieval-augmented generation systems, question answering pipelines, and reasoning engines \cite{Korolov2025,Paulheim2016}. The increasing use of \ac{LLM}-based applications has therefore renewed attention on \acp{KG} as critical infrastructure for trustworthy and explainable \ac{AI} \cite{Korolov2025}.
+
+At the same time, this demand creates a practical challenge: many enterprise or domain-specific knowledge graphs do not yet exist in structured form. Most relevant knowledge is still locked in unstructured text documents, reports, or communication logs \cite{Korolov2025}. To make this information accessible to downstream applications, it must be transformed into structured representations — ideally in a way that aligns with a predefined ontology or knowledge schema.
+
+This transformation process leads directly to the research field of \ac{cIE}. As a specialized task within the broader area of \ac{IE}, \ac{cIE} focuses on extracting subject–predicate–object triples from text such that all components can be linked to valid entries in a target knowledge graph \cite{Josifoski2021}. This makes \ac{cIE} a crucial enabling technology for automated knowledge graph construction and maintenance.
+
+\section{Motivation and Problem Statement}
+\label{sec:motivation}
+
+The automatic extraction of structured information from text is a long-standing goal in natural language processing. This task, generally referred to as \ac{IE}, includes subtasks such as named entity recognition, entity linking, and relation extraction. These components aim to identify real-world entities in text, assign them canonical identifiers, and detect semantic relationships between them \cite{Zhao2024}.
+
+\ac{cIE} is a constrained subtask of \ac{IE}, where the goal is to extract subject–predicate–object triples that exactly match the identifiers and relations of a predefined \ac{KG}. In contrast to open \ac{IE} approaches, where relations may be freely expressed in natural language, \ac{cIE} requires strict alignment with the vocabulary and structure of a target ontology. This constraint makes \ac{cIE} especially relevant for applications that involve structured knowledge integration or automated \ac{KG} construction \cite{Josifoski2021}.
+
+State-of-the-art models such as GenIE and synthIE have shown that \ac{cIE} can be performed with very high accuracy, particularly when the models are fine-tuned on a specific dataset. However, \cite{Josifoski2021,Josifoski2023} demonstrate a crucial limitation: models trained on one dataset (e.g., GenIE) do not generalize well to others (e.g., synthIE), even when the task and \ac{KG} structure remain similar. This lack of generalization highlights a key drawback of current \ac{IE} systems, which often rely on supervised fine-tuning and are closely coupled to a specific domain or knowledge graph.
+
+This tight coupling reduces reusability and makes it difficult to adapt systems to new domains or ontologies without significant retraining. Consequently, researchers are exploring more modular alternatives that promise better generalisation without the need for task-specific fine-tuning \cite{Shi2024}.
+
+\acp{LLM} have demonstrated strong \ac{ICL} capabilities. Rather than encoding knowledge directly into model weights, \acp{LLM} can be guided to perform tasks dynamically using prompts, examples, and external tools \cite{Brown2020}. This opens up the possibility of solving \ac{cIE} through prompting alone, without any task-specific fine-tuning.
+
+At the same time, recent work in agentic AI explores how \acp{LLM} can be organized into multi-agent systems that interact via tool use, planning, and role-based coordination~\cite{OpenAI2025,Anthropic2024,Wiesinger2025}. These systems have shown promise for complex reasoning tasks and dynamic workflows. \citet{Shi2024} further demonstrate that even single-agent architectures can achieve state-of-the-art performance on \ac{IE} tasks.
+
+These developments motivate the hypothesis that multi-agent systems may offer an effective and generalizable approach to \ac{cIE}. Unlike monolithic pipelines or fine-tuned models, multi-agent architectures can decompose the task into modular roles such as entity extraction, URI disambiguation, and triple validation, and combine the flexibility of prompting with external tool access. This is especially relevant when generating \ac{KG}-ready triples, as these often require lookups or validation against the underlying graph structure. Such tool use is increasingly common in modern agentic frameworks \citet{OpenAI2025} and forms the foundation of the CIExMAS architecture proposed in this thesis.
+
+\section{Research Objectives and Questions}
+\label{sec:research_questions}
+
+This thesis investigates whether \ac{cIE} can be solved effectively by \ac{LLM}-based multi-agent systems — without relying on model fine-tuning. The central idea is to replace the monolithic, task-specific IE pipelines with distributed, role-based agents that coordinate through a shared plan or workflow. These agents can perform tasks such as entity and relation extraction, URI matching, or validation, using prompting and tool use.
+
+The following research questions guide this investigation:
 
 \begin{itemize}
-  \item World of GenAI -> Knowledge Graph gains traction again \url{https://www.cio.com/article/3808569/knowledge-graphs-the-missing-link-in-enterprise-ai.html?utm_source=chatgpt.com}
-  \item Building KG remains hard, especially from unstructured documents \cite{Zhao2024}
-  \item Several approaches (GenIE, synthIE) already showed great performance, with the need of being fine-tuned \cite{Josifoski2021,Josifoski2023}
-  \item Advent of GenAI, no need for fine-tuning anymore, ICL way to go \cite{Brown2020}
-  \item First works shown effectiveness \cite{Shi2024}
-  \item RQ1: How effective is a multi-agent system at solving closed information extraction tasks?
-  \item RQ2: Which multi-agent architecture pattern achieves the highest performance on closed information extraction tasks?
-  \item Method
-  \item Strucutre of Work
+  \item[\textbf{RQ1}] To what extent can \ac{LLM}-based \acp{MAS} perform closed information extraction on unstructured text?
+  \item[\textbf{RQ2}] Which agentic architectures (e.g., single-agent, supervisor-agent, or agent networks) perform best for this task in terms of accuracy and robustness?
 \end{itemize}
-% Your introduction goes here
+
+\section{Methodological Approach}
+\label{sec:methodology}
+
+To address these questions, this thesis presents CIExMAS, a Closed Information Extraction Multi-Agent System. CIExMAS was developed through an iterative process that emphasised modularity and extensibility, but followed no rigid pipeline. Rather, agents and prompts were initially tested on a small sample set and improved step by step, using qualitative trace inspection and targeted adjustments. This empirical, trial-and-error driven strategy was followed by evaluation on a larger benchmark subset.
+
+The system was implemented using the LangGraph framework, which provides abstractions for \ac{LLM}-based agent flows and tool orchestration. Multiple configurations were developed and tested, including a single-agent baseline, supervisor-worker hierarchies, and decentralized agent networks. Each setup was designed to extract valid triples from unstructured documents, relying solely on prompt engineering and tool usage—without any model fine-tuning.
+
+To evaluate this agentic approach, pre-trained snapshots of existing comparison models (GenIE and synthIE) were used. Both were run on the same subset of the \textit{synthIE-text} dataset as CIExMAS configurations, enabling a fair comparison. Performance was measured using macro-F1 and entity-level precision, recall, and coverage.
+
+The overall goal was not only to assess absolute performance, but also to evaluate how well such systems generalise and adapt across tasks without retraining. By relying on prompt-guided reasoning and external tools, this approach explores a more flexible paradigm for solving \ac{cIE} with \acp{LLM}.
+
+\section{Contribution of this Thesis}
+\label{sec:contribution}
+
+This thesis introduces a novel approach to closed information extraction by proposing a network-based multi-agent system that leverages large language models in combination with external tools. The proposed system incorporates agents specialized in URI retrieval, semantic validation, and transformation of triples from Turtle notation to human-readable labels. It systematically evaluates the performance of multiple architectural patterns, including single-agent baselines, supervisor-worker models, customized pipelines, and decentralized networks.
+
+Furthermore, the work empirically demonstrates the effectiveness of knowledge graph incorporation and tool-supported URI matching for improving extraction quality. It also shows that recent open-source large language models are capable of solving the task of closed information extraction without the need for model fine-tuning. The resulting framework is designed to be both extensible and generalizable, thus laying the groundwork for future research in agentic systems for knowledge-based reasoning and extraction.
+
+\section{Limitations}
+\label{sec:limitations}
+
+Despite its promising results, this thesis has several limitations. The evaluation is restricted to a single synthetic benchmark dataset and does not include multilingual scenarios or real-world enterprise data. The primary focus is on validating the functionality and coordination of the multi-agent system; as a result, deeper semantic modeling, ontology alignment, or integration into production-level knowledge graph infrastructure remains outside the scope of this work.
+
+In addition, this work does not explicitly address ethical risks such as knowledge bias or error propagation through incorrectly generated triples. The use of pre-trained \acp{LLM} may introduce unintended biases, and the extraction process lacks mechanisms for ensuring fairness or factual correctness in sensitive domains. These aspects should be carefully considered in downstream applications.
+
+\section{Structure of the Thesis}
+\label{sec:structure}
+
+The thesis unfolds over six chapters and one appendix, each building on the previous to guide the reader from basic concepts to empirical evidence and, finally, to broader implications.
+
+Chapter~\ref{ch:background} lays the conceptual groundwork. After introducing essential terminology and formalisms of knowledge graphs (Section~\ref{sec:knowledge_graphs}), it narrows the focus to closed information extraction (Section~\ref{sec:closed_information_extraction}) and the capabilities of modern language models (Section~\ref{sec:language_models}). Subsequent sections explore sentence-level representations for semantic similarity (Section~\ref{sec:sentence_embeddings}), the paradigm of retrieval-augmented generation (Section~\ref{sec:retrieval_augmented_generation}), and the principles of AI agents and multi-agent systems (Sections~\ref{sec:ai_agents}–\ref{sec:multi_agent_systems}). The chapter closes by discussing agent design patterns (Section~\ref{sec:agent_design}) that later inform the CIExMAS architecture.
+
+Building on this foundation, Chapter~\ref{ch:related_work_chapter} surveys prior research. Section~\ref{sec:related_datasets} catalogues publicly available datasets that target entity and relation extraction, while Section~\ref{sec:related_approaches} analyses state-of-the-art approaches—ranging from end-to-end transformer models to pipeline-based systems. Particular attention is paid to generative AI methods and their reported generalisation gaps, an observation that motivates the agentic direction taken in this thesis.
+
+Chapter~\ref{ch:approach} details the proposed solution. Section~\ref{sec:agent_architectures} compares five agent-architecture patterns, including a baseline, several supervisor variants, a ReAct implementation, and a decentralised network. Section~\ref{sec:agent_tools} lists the bespoke tools (URI retrieval, network traversal, semantic validation, and others) required by the agents, whereas Section~\ref{sec:iterative_prompt_engineering} explains the iterative prompt-engineering strategy adopted. Error-handling routines are summarised in Section~\ref{sec:error_incorportion}.
+
+The empirical setup appears in Chapter~\ref{ch:evaluation}. Section~\ref{sec:evaluation_setup} describes the dataset split, competing models and knowledge-graph access rules. Evaluation metrics are justified in Section~\ref{sec:evaluation_metrics}, followed by an overview of experiment groups in Section~\ref{sec:evaluation_overview} and a fine-grained description of nine configuration stages in Section~\ref{sec:evaluation_configurations}. Section~\ref{sec:discussion} discusses the quantitative results, highlighting the influence of architectural choices, tool ablations and language-model variation.
+
+Chapter~\ref{ch:conclusion_outlook} closes the thesis by summarising contributions, acknowledging limitations and sketching three avenues for future research: multilingual extension, domain adaptation and ontology-driven refinement.
+
+Finally, Appendix~A houses supplementary material, including prompt templates, extended result tables and a detailed category-wise performance analysis that supports the claims made in the main text.
 
 \chapter{Background}
-\label{ch:related_work}
+\label{ch:background}
 In the following chapter, the necessary theoretical background to understand core concepts of this approach will be described. Therefore, the chapter will start with an explanation of knowledge graphs (section \ref{sec:knowledge_graphs}). Building on that foundation, a section on closed information extraction (section \ref{sec:closed_information_extraction}), which is the problem that is approached in this work, will follow. Afterwards the theoretical background on the multi-agent-system approach will be defined starting with the core language and embedding models alognside with the retrieval augmented generation use case (section \ref{sec:language_models}, \ref{sec:sentence_embeddings} and \ref{sec:retrieval_augmented_generation}) over to defining what \ac{AI} agents and multi-agent-systems are (section \ref{sec:ai_agents} and \ref{sec:multi_agent_systems}), leading to a section on agent design best practises (section \ref{sec:agent_design}).
 \section{Knowledge Graphs}
 \label{sec:knowledge_graphs}
@@ -968,6 +1040,10 @@ In the end also this configuration shows similar errors like the previous config
 
 All in all the knowledge graph integration remains an experiment, that shows that such tools not always bring an improvement, especially if the data basis has not the highest quality. The knowledge graph integration shows that also the knowledge graph could be leveraged by agents, but nevertheless the experiment has shown that this tool makes the development incrementaly harder, but adding to the context. This limits the editability of the prompt and context even more. Therefore, the network traversal tool will not be used in one of the remaining configurations.
 
+\begin{itemize}
+  \item Disambiguation no problem, as type of entity is used within search terms -> Corfe Castle example
+\end{itemize}
+
 \subsection{Network Agent Architecture}
 \label{subsec:full_network_agent_architecture}
 
@@ -1091,29 +1167,71 @@ The same time and resource constraints that led to the sample reduction also lim
 
 In addition, CIExMAS was designed to work with multiple datasets and also provide the ability to be extended by the generation of entities in a knowledge graph later on instead of just using what is already provided in the knowledge graph. That is why, unlike in synthIE, the results were not limited towards predefined tokens that form the triples. In addition, there were multiple entities of various datasets and datasplits imported in the vector database used for the URI retrieve. This could affect the URI retrieval performance negeatively, but on the other side is a more realistic scenario, espeically as not all entities and properties of synthIE and REBEL were imported. In addition, uploading multiple dataset to the vector stores gave the ability to switch through the datasets easily without handling multiple vector store collections or filtering on datasets. Furthermore, it could be assumed that some entities and properties are the same and that the URI retrieval should find only relevant URIs according to the search term and search mode.
 
-\paragraph{Discussion}
+All in all, the process of CIExMAS needs to be discussed as whole. In general, the iterative process showed how the experience with specific agents could enhance architectures. For instance the experience with the ReAct agent lead to consilidation of extraction agents in the network architecture. Nevertheless, the CIExMAS process did not progressed the trajectory from simple to more complex. Starting with the baseline architecture, which hold the steps of the pipeline approach for closed information extraction, and then going over to the more complex \ac{SSA} skipped the step of starting with the most simplistic architecture. Nevertheless, all steps were done based on the experiements with the architectures. In the end, every learning of especially also the more complex architecture led to the CIExMAS overall result.
+
+In addition, multiple ideas were further optimised before being scraped. For instance the property extraction agent, that showed a worse result when being included in the \ac{SSA}, was also implemented in th \ac{SSSA}. As a background all of the tools had the idea to target a single issue. As for instance properties remain a present issue throught all appraoches the agent was further optimisation. On the otherside, the comparisons of the impact of each agent could have furthermore improved the understanding of why an agent works and why not. In addition, CIExMAS was trained as a whole, instead of training the single steps to be peak perfect. This made it easier to train all agents and tools towards an common goal.
+
+Overall, CIExMAS remains a successful approach to do closed information extraction using multi-agent systems. Compared to especially synthIE the result of 0.665 F1-score was achieved without heavy fine-tuning or extensive in-context learning. Other approaches like GenIE could be outperformed. In addition, the process of CIExMAS may not have been perfectly streamlined it showed the flaws and drawbacks of each configuration and showed, that simplicity should be used before complexity, while in the closed information extraction domain some complexity is likely to be necessary, especially when \acp{LLM} with limited capabilites were used.
+
 \begin{itemize}
-  \item Usage of Property Extraction Agent in SSSA Questionable, but give it a chance
+  \item Limitation of one Dataset
+  \item Embedding Model Discussion -> Not detected as problem, mainly wrong search term
+  \item Manual Prompt Engineering -> Auto Prompt Engineering cost intense.
+  \item synthIE Limitation on correct URIs, no real URI retrieval challenge
 \end{itemize}
 
 \chapter{Conclusion and Outlook}
 \label{ch:conclusion_outlook}
 
-\paragraph{Outlook}
+In this master thesis CIExMAS was developed as an answer to the two research questions of to what extent \ac{LLM}-based \acp{MAS} can perform closed information extraction on unstructured text and which agentic architectures (e.g., single-agent, supervisor-agent, or agent networks) perform best for this task in terms of accuracy and robustness. The evaluation on a 50-sample dataset out of synthIE-text could show, that the best CIExMAS approach could score 0.665 F1-score on the triple extraction. Therefore, CIExMAS reaches 80\% of the compared synthIE${_T5-large}$ model, which is fine-tuned on the train split of the dataset. Another model of \citet{Josifoski2021} reaches just 0.392 F1 for the same metric on the same samples, but in comparison is trained on another dataset, with less quality.
 
-\begin{itemize}
-  \item Switchback to QNames
-  \item Finetuning Models, Hybrid Models
-  \item Limiting the Token like in synthIE
-  \item Try out more methods for property mapping
-  \item Try out different approaches (Sentence by Sentence or Subject-Object connection, the property description)
-  \item Rebuild on structured outputs
-  \item Different Datasets without Wikidata Incorporation
-  \item Method of URI retrieval
-  \item Bigger context limit
-\end{itemize}
+In more detailed evaluations it can be shown that MAS especially with the choosen way of embedding-based similarity searches for URI-retrieval, excels on extracting subjects, objects but also entities in general. Nevertheless, throughout various configurations, the prevalent problem remain the property extraction. It could be seen, that this is also the limiting factor on synthIE or GenIE models. Therefore, the answer is that the \ac{LLM}-based \acp{MAS} tested in this thesis can already perform closed information extraction to a high extend, but not to the highest extend or near perfect.
 
-% Your conclusions go here
+The agentic architectures varied highly from the count of agents and tools over the state to their overall capabilities. A clear trajectory can be drawn across the general complexity of the architectures. The most simple but also most precise archiecture, prompt or tool can achieve the best results. Complex architecture require complex prompts and complex optimisation, while tend to bloat the context and therefore create more errors. In the evaluations of the thesis it has shown, that especially more complex models, do also in non-erronous runs produce no better results than simpler architecture. That is why the ReAct and baseline architecture, last is a supervisor archiecture, are one of the best architectures, which are only surpassed by the network architecture. It has been shown that the usage of \acp{LLM} and an URI retrieval can make use of extra agents for the URI mapping task as well as for a validation. Therefore, it is not the simplest architecture with the network architecture that performs the best for the \ac{cIE} task in terms of accuracy and robustness.
+
+The approach of CIExMAS introduces multiple \ac{MAS} architectures that can process closed information extraction tasks. The work therefore, contributes to an overall goal of generating knowledge graphs out of unstructured text. The work therefore contributes to latest research within the overall field of using \acp{LLM} for various \ac{IE} tasks with a general proof of concept of using \ac{MAS} for closed information extraction, which can be used for further development.
+
+CIExMAS proposes in general five architectural patterns for the use in \ac{cIE}. From those, the supervisor, ReAct and network patterns have been found most useful after the testing. In addition, CIExMAS introduces advantages and disadvantages of various kinds of agents and tools used for the closed information extraction. Therefore, knowledge graph incorporation and a URI retrieval on rdfs:label, but also on property examples have been found useful.
+
+As the area of \acp{LLM}, sentence embeddings and agentic AI is a fast evolving research field, the work first of all will and can not include all recent improvements. In addition, the development of \ac{MAS} opens a broad area for optimisations. For instance the usage of agents is highly depended on the users ideas. This large solution space could not searched exhaustively throughout CIExMAS, with the limited timeframe of a master thesis. Instead the focus was on architectures and knowledge graph incorporation.
+
+This focus led to various other limitations of CIExMAS. First, the prompt engineering was done manually. Second, CIExMAS does not include any finetuned models. Both limitations were additionally caused by limited resources. Against the fine-tuned models spoke the overall proposal of \citet{Brown2020} that proposes in-context learning as nearly as good alternative to fine-tuning of models.
+
+In general, the evaluation was also done on 50-samples which limits the meaningfulness of the exact F1-score. Nevertheless, the results indicate a general behavior. In addition, the generalisation idea that was designed closely to all architectures, has never been tested extensively. Therefore, no statement can be done about the generalisation capabilities of CIExMAS nor on the compared synthIE models.
+
+In addition, as the area of \acp{LLM} is fastly evolving, driven through big tech companies, \acp{LLM} are published with a high velocity \cite{Brown2020,Grattafiori2024,MetaAI2025,Chiang2024}. Therefore, there are definite better models than \textsc{Llama 3.3 70B} published. The same goes for the use of \textsc{bge-m3} as embedding model to retrieve \acp{URI}. Other models were tested, but not exhaustively, especially larger and now SOTA models. Nevertheless, those models have not been found to perform better.
+
+In the end the whole processing of the creating CIExMAS was manually. Ranging from the architectures of the agentic system to the single prompts of each agent CIExMAS was developed by hand. Automated approaches have shown greate success, but also need multiple \ac{LLM}-calls. As this was not the focus of the thesis, the iterative trial and error process was more expendit.
+
+The work of CIExMAS and the connected limitations with this works reveals enormous ideas for future work. The high focus on the generalisation, where also in-context learning was prefered over fine-tuning, needs to tested on other datasets. Until now, the REBEL or REDFM are closely comparable to the synthIE dataset \cite{HuguetCabot2021,Cabot2023}. Nevertheless, both datasets miss out on quality or comparisons. Therefore, it could also be useful to wait for other high quality closed information extraction datasets. In addition, document-level datasets could be evaluated. In addition, the free-form triple extraction could be tested on multiple other datasets to be comparable to various \ac{IE} approaches. In addition, datasets without Wikidata as underlying knowledge graph could be used to exclude the error source of test data inclusion in training data.
+
+Parallel to switching the dataset, the models used for the agents and URI retrieval could be exchanged. Especially as \acp{LLM} are prompt sensitive it could be assumed, that if another model would have been used and optimised model-specific, well performing models could also have scored high scores on the \ac{cIE} tasks. In addition, future research will open up for even more capable models, which could be used in various CIExMAS configurations.
+
+Another idea could to use another setup. In general, Llama 3.3 70B could support up to 128,000 tokens \cite{Meta2024}, but the setup with fast-inference providers on the on side limiting the context length to 8192 and 2x A100 on the other side limited the maximal context length. Therefore, the tradeoff of slower inference but therefore larger context lengths could be used in the future.
+
+In addition to switching models, different models than \acp{LLM} could be used for specific tasks, as other \ac{NLP} models could also perform well on tasks like relation extraction or entity recognition. In general, the Llama 3.3 70B model could also be further fine-tuned for each specific task. With this step, especially the expected properties could be extracted into the resulting triples. Nevertheless, the generalisation factor has to be re-evaluated when using fine-tuned models.
+
+The generalisation also led CIExMAS to allow for completely free-form triples, which in the end made it harder for the agent to retrieve the matching URIs for especially properties. Other approaches like synthIE are using a smart limitation mechanism for possible outputs. Such ideas could also be used in CIExMAS.
+
+Another problem are the outputs of CIExMAS that could be further approved. First and foremost, the switch to the standardised structured output format could be improving the overall performance. Espeically errors in parsing the custom format will be evaded. In addition, the output of turtle strings remains hard in some configurations. More interestingly the output of QNames also worked in the initial baseline and outperformed various other more complex approaches. Using another output format could also make it easier to create correct machine-readable triples.
+
+The major problem remains the property extraction. The idea of providing extra agents has not been found useful in CIExMAS. Nevertheless other approaches like describing the property instead of extracting a free-form label for the property extraction could be used. Especially as this task could be considered as rather hard, as properties could be hidden within relations between subjects and objects in simple words that mean a specific property, it could be useful to thing out of the box. For instance the subject, object connection could be created using one agent and the properties describing this relation being created with another agent. Providing better properties could then also lead to simpler URI search.
+
+In general, other approaches could be tested on closed information extraction. All CIExMAS appraoches mainly approach through agents that are processing the triples step by step, but sequential. This appraoch could be considered as pipeline approach, which have shown inferior to joint approaches. Therefore, possible URIs, entities, relations and other useful things could be gathered in one step, where in the other one agent puts all information into a final output, except for question. The usage of \acp{LLM} opens up for even more of such ideas, that combine a workflow with an agentic idea.
+
+In addition, the documents, which are mostly consisting out of maximum three sentences, could be processed in another way. First of all, they are processed at once in CIExMAS. This could be replaced by a sentence by sentence processing. In addition, the text keeps exact the free-form properties that are a problem to all CIExMAS solutions. Therefore, prior to the run of CIExMAS, the sentences could be rewritten by an \ac{LLM} in order to highlight especially properties.
+
+In addition, the URI retrieval could also be a point to enhance the property extraction capabilities of CIExMAS. The sample search mode alongside with the property label search mode has already revealed the role that the URI retrieval tool plays. As an example, the properties can get more detailed described by CIExMAS and than be search on the description again. Especially, as this mode has never been exhaustively used by the agents before, it would be worth to try it again in future research. In addition, the URI retrieval is done via embeddings as of now. Systems like GraphRAG proposed by \citet{Edge2025} also use the knowledge graph directly and let the \ac{LLM} evaluate on the usefulness of subgraphs.
+
+In general, the knowledge graph incorporation could be intensified in future research. CIExMAS has already proven the usefulness of semantic validation and turtle to label tools. An final conclusion to the network traversal tool can not be drawn. Nevertheless, an access to the knowledge graph via an SPARQL endpoint could be given directly to the agents in future research. Therefore, the agents could to things like network traversal searches or semantic validation themselves, when prompted correctly.
+
+Another core optimisation point remains the prompt itself. The prompt do already follow some best practises, as it contains a general structure and constains few-shot examples for in-context learning. In the end, automated methods like proposed by \citet{Agrawal2025} have shown high effectiveness in prompt tuning. Especially as \acp{LLM} are able to understand language and problems, they show great performance in checking the problems of a prompt and an output \cite{Agrawal2025}. This would provide less subjective iterations, that are build on human-logic and would tend towards a more reproducable process.
+
+In addition to using automated prompt engineering, it could be interesting in future research, to check on using more sophisticated prompt techniques. For instance, the prompt of the triple extractor could use more few-shot examples and an even more explicit chain of thought. In addition, the prompts could be reworked from ground up to try with more readable prompts.
+
+In the end CIExMAS remains a starting point for future research. As of the modular design of a \ac{MAS}, CIExMAS could either be narrowed towards extracting just properties or disambiguate entities, but it could also be extended to create whole knowledge graphs. As of now the \ac{cIE} task already shows high limitations and challenges. When those challenges can be tackled and the F1 score is near perfect, the CIExMAS approaches could go for the next step and create entities or properties that can not be found in the knowledge graph, as otherwise they would find it in the knowledge graph. Nevertheless, this would transfer to another research field where datasets are currently missing, but where the usefulness in real-world use-cases can be shown.
+
+Overall CIExMAS reveals a part of the overall potential of the usage of \ac{MAS}. It can reach 80\% of SOTA comparison models, while not using fine-tuning and outputting turtle strings. In the end the CIExMAS work showed that especially simpler, but also precise and capable approaches showed high performances. This resulted in a network architecture with agents for triple extraction, URI mapping and validation and output with corresponding tools to perform the best. Nevertheless, CIExMAS only covers a focussed part of the \ac{MAS} and \ac{KG} possibilities, which can lead to outperforming of state-of-the-art results. In addition, CIExMAS is a starting point for future research including different appraoches to extract properties and to optimise the overall agentic system.
 
 \bibliography{references/references}
 
