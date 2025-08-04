@@ -101,32 +101,44 @@ Closed information extraction has so far relied mainly on fine-tuned transformer
 \tableofcontents%
 \endgroup
 
+\begingroup%
+\hypersetup{hidelinks}%
+\listoffigures%
+\addcontentsline{toc}{chapter}{List of Figures}
+\endgroup
+
+\begingroup%
+\hypersetup{hidelinks}%
+\listoftables%
+\addcontentsline{toc}{chapter}{List of Tables}
+\endgroup
+
 \chapter{List of Abbreviations}
 \begin{acronym}
   \acro{AI}{Artificial Intelligence}
-  \acro{CRM}{Customer Relationship Management}
   \acro{CoT}{Chain of Thought}
+  \acro{CRM}{Customer Relationship Management}
+  \acro{DBMS}{Database Management System}
+  \acro{GPT}{Generative Pre-trained Transformer}
+  \acro{ICL}{In-Context Learning}
+  \acro{IE}{Information Extraction}
+  \acro{KG}{Knowledge Graph}
   \acro{LLM}{Large Language Model}
+  \acro{LLaMA}{Large Language Model Meta AI}
+  \acro{LM}{Language Model}
   \acro{MAS}{Multi-Agent System}
   \acro{ML}{Machine Learning}
+  \acro{NLP}{Natural Language Processing}
   \acro{OWL}{Web Ontology Language}
   \acro{RAG}{Retrieval Augmented Generation}
   \acro{RDF}{Resource Description Framework}
   \acro{RDFS}{Resource Description Framework Schema}
   \acro{SPARQL}{SPARQL Protocol and RDF Query Language}
-  \acro{URI}{Uniform Resource Identifier}
-  \acro{VDBMS}{Vector Database Management System}
-  \acro{DBMS}{Database Management System}
-  \acro{GPT}{Generative Pre-trained Transformer}
-  \acro{LLaMA}{Large Language Model Meta AI}
-  \acro{LM}{Language Model}
   \acro{SSA}{Splitted Supervisor Architecture}
   \acro{SSSA}{Simplified Splitted Supervisor Architecture}
-  \acro{IE}{Information Extraction}
+  \acro{URI}{Uniform Resource Identifier}
+  \acro{VDBMS}{Vector Database Management System}
   \acro{cIE}{Closed Information Extraction}
-  \acro{KG}{Knowledge Graph}
-  \acro{ICL}{In-Context Learning}
-  \acro{NLP}{Natural Language Processing}
 
 \end{acronym}
 
@@ -219,9 +231,11 @@ Finally, Appendix~A houses supplementary material, including prompt templates, e
 In the following chapter, the necessary theoretical background to understand core concepts of this approach will be described. Therefore, the chapter will start with an explanation of knowledge graphs (section \ref{sec:knowledge_graphs}). Building on that foundation, a section on closed information extraction (section \ref{sec:closed_information_extraction}), which is the problem that is approached in this work, will follow. Afterwards the theoretical background on the multi-agent-system approach will be defined starting with the core language and embedding models alognside with the retrieval augmented generation use case (section \ref{sec:language_models}, \ref{sec:sentence_embeddings} and \ref{sec:retrieval_augmented_generation}) over to defining what \ac{AI} agents and multi-agent-systems are (section \ref{sec:ai_agents} and \ref{sec:multi_agent_systems}), leading to a section on agent design best practises (section \ref{sec:agent_design}).
 \section{Knowledge Graphs}
 \label{sec:knowledge_graphs}
-Knowledge graphs are a concept to store knowledge in a way that the semantic in the knowledge is machine-retrievable \cite{GomezPerez2017}. In order to accomplish this goal, knowledge graphs are directed graphs, whereas the nodes define real world entities and the edges define the relationsship between the entities \cite{Paulheim2016}. To define the domain and give a knowledge graph a set of rules, the types of entities and relations are predefined in what is called an ontology \cite{GomezPerez2017,Paulheim2016}. Following those definition, the ecosystem of knowledge graphs is build from three building blocks: knowledge graph construction, knowledge graph storage, knowledge graph consumption \cite{GomezPerez2017}.
+Knowledge graphs are a concept to store knowledge in a way that the semantic in the knowledge is machine-retrievable \cite{GomezPerez2017}. In order to accomplish this goal, knowledge graphs are directed graphs, whereas the nodes define real world entities and the edges define the relationsship between the entities \cite{Paulheim2016}. Ontologies not only define the types of entities and relations but also provide logical constraints that govern how instances can be interpreted within a domain. \cite{GomezPerez2017,Paulheim2016}. Following those definition, the ecosystem of knowledge graphs is build from three building blocks: knowledge graph construction, knowledge graph storage, knowledge graph consumption \cite{GomezPerez2017}.
 
-Starting from the construction, knowledge graphs are represented in \ac{RDF}, which is the standard to represent knowledge graphs. \ac{RDF} is build of triples, whereas each triple could be seen as description of a relation by the three parts \textit{Start Node, Edge and Target Node}. All parts of the triple are either a resource identifier, a blank node or a literal. In the case of this work, the used resource identifier is a \ac{URI} like for example \textit{\url{http://example.org/entity/Angela_Merkel}}, that is why all chapters the term \ac{URI} will used consisent instead of change to more general or more specific identifiers. Exception to the general denotation by \acp{URI} are blank nodes and literals. Blank nodes is a concept where a resource could not be specified. This could be the case, if the relation that is described by the triple includes concepts like \textit{someone} or \textit{something}. Literals are simple values, like integers or strings \cite{VillazonTerrazas2017}.
+Starting from the construction, knowledge graphs are build around specification, modelling and data lifting. In specification, it is needed to define the requirements for the knowledge graph itself and from thereon define an ontology. From there on the data source out of which the data in the knowledge graph should be build must be processed \cite{VillazonTerrazas2017a}.
+
+Knowledge graphs are represented in \ac{RDF}, which is the standard to represent knowledge graphs \cite{VillazonTerrazas2017}. Therefore, it is necessary to transform the original datasource to the \ac{RDF} format \cite{VillazonTerrazas2017a}. \ac{RDF} is build of triples, whereas each triple could be seen as description of a relation by the three parts \textit{Start Node, Edge and Target Node}. All parts of the triple are either a resource identifier, a blank node or a literal. In the case of this work, the used resource identifier is a \ac{URI} like for example \textit{\url{http://example.org/entity/Angela_Merkel}}, that is why all chapters the term \ac{URI} will used consisent instead of change to more general or more specific identifiers. Exception to the general denotation by \acp{URI} are blank nodes and literals. Blank nodes is a concept where a resource could not be specified. This could be the case, if the relation that is described by the triple includes concepts like \textit{someone} or \textit{something}. Literals are simple values, like integers or strings \cite{VillazonTerrazas2017}.
 
 The relation described by the triples can also be seen as a simple english sentence consisting of subject matching the start node, predicate matching the edge and object matching the target node. For each of those there are common rules, when defining the knowledge graph. Subjects can be either an \ac{URI} or a blank node. Predicates, which are called properties from now on as predicates are named properties throughout in knowledge graphs, can only be \acp{URI}. An Object can be an \ac{URI}, a blank node or a literal. Inheriting this concept the \ac{RDF} contains multiple syntactical representations of knowledge graphs, one of which Turtle is \cite{VillazonTerrazas2017}.
 
@@ -259,7 +273,7 @@ Besides defining the entities and their relationship, turtle is also used to imp
 
 Following up to the building block of knowledge graph construction, it is necessary to introduce triple stores as the building block of knowledge graph storage. Triple stores are build to save and retrieve identities form a triplex collection, which means that triple stores are connection construction and retrieval. The triplex collection has to comply with the \ac{RDF} standard \cite{Rusher2003}. One triple store implementation is Apache Jena. Jena provides a whole triple store stack, allowing to manipulate and retrieve an \ac{RDF} graph via API or direct I/O modules in Java. In addition, Jena supports all mentioned standard like \ac{RDF}, \ac{RDFS} and \ac{OWL} \cite{Carroll2004}. To support the de-facto standard knowledge graph query language \ac{SPARQL} \cite{VillazonTerrazas2017}, the Apache Jena Toolset implements Jena Fuseki which is working as a \ac{SPARQL} server \cite{Chokshi2022}.
 
-The idea of \ac{SPARQL} is to retrieve data from a \ac{RDF} knowledge graph, but also to manipulate data in it. The language is following the standards of turtle, when it comes to query construction. Three most essential query types are select, ask and insert queries. Select queries are able to retrieve content from the graph. Ask queries are simplified select queries, that can just acknowledge on an existance of the requested query. Insert queries are ones to manipulate the data in the graph \cite{VillazonTerrazas2017}.
+The idea of \ac{SPARQL} is to consume data from a \ac{RDF} knowledge graph, but also to manipulate data in it. The language is following the standards of turtle, when it comes to query construction. Three most essential query types are select, ask and insert queries. Select queries are able to retrieve content from the graph. Ask queries are simplified select queries, that can just acknowledge on an existance of the requested query. Insert queries are ones to manipulate the data in the graph \cite{VillazonTerrazas2017}.
 
 In general a \ac{SPARQL} query begins with the query type followed with the \textit{WHERE} keyword and the query definition. In the case of select queries, the query type keyword is followed by variables, which are defined be a leading question mark followed by the variable name (i.e. \textit{?organisation}). As \ac{SPARQL} follows the turtle language also prefixes can be defined. In addition \ac{SPARQL} queries can take filtering and query options like limits or offsets \cite{VillazonTerrazas2017}. To show an example, if you want to search the organisations Angela Merkel is member of, a \ac{SPARQL} query could look like this:
 
@@ -305,7 +319,7 @@ Following this idea, \citet{Vaswani2023} proposed the concept of multi-head atte
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.5\textwidth]{figures/Transformer.png}
-  \caption{Architecture of a Transformer model. \cite{Vaswani2023}}
+  \caption[Architecture of a Transformer model]{Architecture of a Transformer model. \cite{Vaswani2023}}
   \label{fig:transformer}
 \end{figure}
 
@@ -341,7 +355,7 @@ Sentence embeddings in general have the idea to represent a text in a vector \ci
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.6\textwidth]{figures/cosine_similarity.jpeg}
-  \caption{Visualization of cosine similarity between two vectors showing how the angle between vectors determines their similarity score. \cite{Leys2022}}
+  \caption[Visualization of cosine similarity between two vectors showing how the angle between vectors determines their similarity score]{Visualization of cosine similarity between two vectors showing how the angle between vectors determines their similarity score. \cite{Leys2022}}
   \label{fig:cosine_similarity}
 \end{figure}
 
@@ -359,7 +373,7 @@ As \acp{LM} are trained on large-size snapshots of corpora, they are by default 
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.8\textwidth]{figures/RAG.png}
-  \caption{Overview of the Retrieval Augmented Generation (RAG) architecture showing the indexing, retrieval, and generation pipeline. \cite{Gao2024}}
+  \caption[Overview of the Retrieval Augmented Generation (RAG) architecture showing the indexing, retrieval, and generation pipeline]{Overview of the Retrieval Augmented Generation (RAG) architecture showing the indexing, retrieval, and generation pipeline. \cite{Gao2024}}
   \label{fig:rag}
 \end{figure}
 
@@ -412,7 +426,7 @@ The agentic architecture patterns of a \ac{LLM}-based \ac{MAS} follows the class
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.8\textwidth]{figures/Multi-agent architectures.png}
-  \caption{Example multi-agent architecture patterns showing supervisor, hierarchical, network, and custom patterns for LLM-based multi-agent systems (self-created after \cite{LangChain2025b})}
+  \caption[Example multi-agent architecture patterns showing supervisor, hierarchical, network, and custom patterns for LLM-based multi-agent systems]{Example multi-agent architecture patterns showing supervisor, hierarchical, network, and custom patterns for LLM-based multi-agent systems (self-created after \cite{LangChain2025b})}
   \label{fig:mas_architecture}
 \end{figure}
 
@@ -508,7 +522,7 @@ In the following section the various agent architectures will be outlined. This 
 \begin{figure}[h]
   \centering
   \includegraphics[width=\textwidth]{figures/Baseline Architecture.png}
-  \caption{Baseline architecture showing the pipeline approach with specialized agents for each step of the closed information extraction process (self created)}
+  \caption[Baseline architecture showing the pipeline approach with specialized agents for each step of the closed information extraction process]{Baseline architecture showing the pipeline approach with specialized agents for each step of the closed information extraction process (self created)}
   \label{fig:baseline_architecture}
 \end{figure}
 
@@ -528,7 +542,7 @@ All in all the idea can be lead to a flow where first the entities get extracted
 \begin{figure}[h]
   \centering
   \includegraphics[width=\textwidth]{figures/Splitted Supervisor Architecture.png}
-  \caption{Splitted supervisor architecture showing the decomposition of the supervisor agent into specialized sub-agents for better task management (self created)}
+  \caption[Splitted supervisor architecture showing the decomposition of the supervisor agent into specialized sub-agents for better task management]{Splitted supervisor architecture showing the decomposition of the supervisor agent into specialized sub-agents for better task management (self created)}
   \label{fig:splitted_supervisor_architecture}
 \end{figure}
 
@@ -549,7 +563,7 @@ Overall the \ac{SSA} is an extensive interpretation of splitting up complex task
 \begin{figure}[h]
   \centering
   \includegraphics[width=\textwidth]{figures/Simplified Splitted Supervisor Architecture.png}
-  \caption{Simplified splitted supervisor architecture showing a streamlined version of the supervisor decomposition with optimized agent interactions (self created)}
+  \caption[Simplified splitted supervisor architecture showing a streamlined version of the supervisor decomposition with optimized agent interactions]{Simplified splitted supervisor architecture showing a streamlined version of the supervisor decomposition with optimized agent interactions (self created)}
   \label{fig:simplified_splitted_supervisor_architecture}
 \end{figure}
 
@@ -568,7 +582,7 @@ Overall the \ac{SSSA} is designed for less resource consumption and more efficie
 \begin{figure}[h]
   \centering
   \includegraphics[width=\textwidth]{figures/ReAct Architecture.png}
-  \caption{ReAct architecture showing the single-agent approach with reasoning and action capabilities for closed information extraction (self created)}
+  \caption[ReAct architecture showing the single-agent approach with reasoning and action capabilities for closed information extraction]{ReAct architecture showing the single-agent approach with reasoning and action capabilities for closed information extraction (self created)}
   \label{fig:react_architecture}
 \end{figure}
 
@@ -586,7 +600,7 @@ The ReAct architecture is not a multi-agent system, but it remains one step to c
 \begin{figure}[h]
   \centering
   \includegraphics[width=\textwidth]{figures/Network Architecture.png}
-  \caption{Network architecture showing the fully connected multi-agent system with dynamic routing and reasoning capabilities (self created)}
+  \caption[Network architecture showing the fully connected multi-agent system with dynamic routing and reasoning capabilities]{Network architecture showing the fully connected multi-agent system with dynamic routing and reasoning capabilities (self created)}
   \label{fig:network_architecture}
 \end{figure}
 
@@ -717,7 +731,7 @@ Both datasets follow a similar structure. Both datasets are stored in json lines
 
 As already outlined in section \ref{sec:related_datasets} there are two datasets of synthIE, which are synthIE-code and synthIE-text. Both versions of the datasets differ in the GPT-3.5 model used for the text generation. As the text model showed better performances, the evaluation is strictly done on synthIE-text.
 
-Nevertheless, all evaluation configurations until section \ref{subsec:knowledge_graph_integration} were developed on synthIE-code, as of the larger amount of training data could have provided are more extensive development set in order to detect as much edge cases as possible. For development reasons, the train-split of synthIE-code was used and sorted, so that the document with id one is the first in the jsonlines file.
+Nevertheless, all evaluation configurations until section \ref{subsec:knowledge_graph_integration} were developed on synthIE-code, as of the larger amount of training data could have provided are more extensive development set in order to detect as much edge cases as possible. For development reasons, the train-split of synthIE-code was used for those configuration and sorted, so that the document with id one is the first in the jsonlines file.
 
 As of upcoming limitations due to dataset quality and the experience of developing on at most ten examples, the latest developments were done on the validation-split of synthIE-text, which is also sorted and includes the same underlying triples but different text. The validation split is used, as synthIE-text does not offer a train split. In the end, this offers a higher quality of text and might produce more solvable edge cases, than triples that are hard to find in the text.
 
@@ -743,7 +757,9 @@ As it was planned to benchmark the best CIExMAS models on the REBEL dataset, the
 
 Both datasets were evaluated on various different models before. Espeically for the synthIE dataset, the solutions of \citet{Josifoski2023} synthIE- and GenIE were used as they were used pre-trained under \url{https://github.com/epfl-dlab/SynthIE}. For the synthIE solution all three versions synthIE$_{T5-base}$, synthIE$_{T5-base-SC}$ and synthIE$_{T5-large}$ were evaluated. For the GenIE solution the version GenIE$_{T5-base}$ and GenIE$_{T5-base-SC}$ were tested. The abbreviation \textit{SC} stands for subject-collapsed, which means, that those variants outputs subject grouped triples. All models are using the Flan-T5 \ac{LM}. Like the CIExMAS solution, those solutions were also evaluated against the same samples of synthIE-text.
 
-Overall the first 50-sample sorted synthIE-text dataset serves as benchmark for CIExMAS and comparison models. In addition, the dataset can also show which evaluation configuration changes had which impact on the overall performance. Other datasets like REBEL were tested, but not extensive.
+In the end the REBEL dataset showed very low scores on testing on the best models like depicted in the appendix \ref{sec:rebel_testing}. To provide an example of the data quality, in the following sentence \enquote{Richard H. Weisberg is a professor of constitutional law at the Cardozo School of Law at Yeshiva University in New York City, a leading scholar on law and literature.}, the two triples \textit{(Cardozo School of Law; headquarters location; New York City)} and \textit{(Yeshiva University; located in the administrative territorial entity; New York City)} are expected. This is just a very small subset of triples, that could be derived from the text. In addition, many texts are spreading across two paragraphs, making the \ac{cIE} task harder. As the scores were below 0.1 F1 for the triple extraction and the triple quality in this test set can be found below what is human extractable, it was decided to not further proceed with an REBEL optimisation.
+
+Overall the first 50-sample sorted synthIE-text dataset serves as benchmark for CIExMAS and comparison models. In addition, the dataset can also show which evaluation configuration changes had which impact on the overall performance.
 
 \subsection{Knowledge Graph Access}
 
@@ -1040,10 +1056,6 @@ In the end also this configuration shows similar errors like the previous config
 
 All in all the knowledge graph integration remains an experiment, that shows that such tools not always bring an improvement, especially if the data basis has not the highest quality. The knowledge graph integration shows that also the knowledge graph could be leveraged by agents, but nevertheless the experiment has shown that this tool makes the development incrementaly harder, but adding to the context. This limits the editability of the prompt and context even more. Therefore, the network traversal tool will not be used in one of the remaining configurations.
 
-\begin{itemize}
-  \item Disambiguation no problem, as type of entity is used within search terms -> Corfe Castle example
-\end{itemize}
-
 \subsection{Network Agent Architecture}
 \label{subsec:full_network_agent_architecture}
 
@@ -1135,6 +1147,8 @@ The setup of CIExMAS has the intend to create an approach that is dataset-agnost
 
 The results showed that the initial baseline could already score a reasonable result compared to various later used approaches like the \ac{SSA} or the knowledge graph integration. What could be shown within the various configurations is, that the various kinds of approaches had problems, as the output expected the properties to be in the entity namespace of wikidata. The initial baseline was indented to output QNames instead of full URIs, which made the output process simpler.
 
+Additional, it has to be mentioned, that the GenIE and synthIE model has not looked onto the problem of URI retrieval. Instead both models had limited possible tokens, that they could output. As follow up of the output restriction, also no hallucination has to been handled by \citet{Josifoski2023}. That could cause better results, as the result checking and output limiting must be heavily enforced via different agents in CIExMAS configurations.
+
 The overall configuration comparison also shows that the idea of using the simplest architecture possible is also apparent for closed information extraction. Like outlined in section \ref{sec:agent_design} multi-agent system should be started if the agent start to fail to follow instructions. Combined with \citet{Anthropic2024} this implies to prefer simplicity before complexity.
 
 The baseline and ReAct architecture could be optimised much further and easier than complex and individual solution like the \ac{SSA} or \ac{SSSA}. In the end, the work of CIExMAS approached the multi-agent system first, as models showed low instruction following. Nevertheless, the \ac{SSSA}, but more especially the \ac{SSSA} solution has not been the appropriate solution to that. Instead testing out the capabilities of the used \ac{LLM} was leading to the best configuration. Especially the high capabilities showed by the ReAct agent, but also the idea of iterating over a solution like a human or the \ac{SSA} and \ac{SSSA} would to came together in the network approach.
@@ -1157,28 +1171,25 @@ The URI mapping remains a point for discussion. The Wikidata knowledge graph is 
 
 Additionally, the synthIE dataset could additionally be inside the training dataset of various \acp{LLM}. Also, examples of the dataset are used for in-context learning. As the performance of CIExMAS is nowhere near perfect, it can be assumed, that a possible inclusion of synthIE data in the training data or in the prompt has near zero effect on the extraction performance.
 
-The agent engineering was conduct for most of the models on synthIE-code instead of the text version of synthIE. As the quality of synthIE-code remains lower than on synthIE-text, the prompts could tend towards edge only existant in synthIE-code. As an example the code version included \enquote{Herman Heijermans was born in the Netherlands.} and the text version included \enquote{Herman Heijermans was a citizen of the Kingdom of the Netherlands.}. Both version searched for the triple \textit{(Herman Heijermans; country of citizenship; Kingdom\_of\_the\_Netherlands)}. Nevertheless in experiements, the same models have shown improved results when comparing the code and the text versions. Espeically, as edge cases were not given by example instead there were generalised.
+The agent engineering was conduct for most of the configurations on synthIE-code instead of the text version of synthIE. As the quality of synthIE-code remains lower than on synthIE-text, the prompts could tend towards edge only existant in synthIE-code. As an example the code version included \enquote{Herman Heijermans was born in the Netherlands.} and the text version included \enquote{Herman Heijermans was a citizen of the Kingdom of the Netherlands.}. Both version searched for the triple \textit{(Herman Heijermans; country of citizenship; Kingdom\_of\_the\_Netherlands)}. Nevertheless in experiements, the same models have shown improved results when comparing the code and the text versions. Espeically, as edge cases were not given by example instead there were generalised.
 
 The dataset used for the knowledge graph integration tools of network traversal and semantic validation variied. The network traversal showed with the full Wikidata dataset limitation in regards of the depth of the SPARQL query evaluating if type restrictions are matched or not. The semantic validation instead could use the full depth using a filtered wikidata class and property hierarchy, which are both loopfree. As the dataset was not part of the development of CIExMAS it will not be further described. Nevertheless, this shows, that the network traversal could have performed better on another dataset. In the end, other topics like the integration of the validation tools to the ReAct architecture and updating the search mode were prioritised. Due to time constraints the network traversal tool, which would also have needed additional optimision, was not implemented.
 
-All prompts were manually created and adapted, except for some help through ChatGPT 4o or Cursor. This kind of manual prompt engineering is not necessarily leading to the best overall prompts. In addition, the prompts are and had to be adapted with every configuration to adapt to new tools or new tool implementations. This could lead one architecture to be accidentially score higher F1-scores than others. Nevertheless, a clear trend of architectural ideas could be seen throughout the evaluation, which leads to the assumption, that the prompt had a minor effect, than implementation and design details like the search type and state, which were kept constant per architecture.
+All prompts were manually created and adapted, except for some help through ChatGPT 4o or Cursor. This kind of manual prompt engineering is not necessarily leading to the best overall prompts. In addition, the prompts are and had to be adapted with every configuration to adapt to new tools or new tool implementations. This could lead one architecture to be accidentially score higher F1-scores than others. Nevertheless, a clear trend of architectural ideas could be seen throughout the evaluation, which leads to the assumption, that the prompt had a minor effect, than implementation and design details like the search type and state, which were kept constant per architecture. In addition, automatic prompt engineering is ressource or cost intensive, without a guarantee of the desired outcome.
 
 The same time and resource constraints that led to the sample reduction also limited the use of models. Nevertheless, as outlined in section \ref{subsec:eval_language_models} \acp{LLM} with up to 70 billion parameters show near state-of-the-art results on benchmarks. In the case of CIExMAS, the model of Llama 3.3 70B showed the best overall performance against other and especially more capable models when relying on benchmarks. As \acp{LLM} remain prompt senstive and especially to format of output that is expect remains unstructured, it can lead to worse results. In addition, modern models support longer context, with the new Llama 4 models supporting up to 10 million tokens. As a constraint of multiple providers and the system used for testing on the synthIE dataset, the context in CIExMAS is limited to 8192 tokens. In addition, the limitation made problems throughout the whole process. On the positive side, the context needed therefore to be designed precise while also allowing iterations.
 
+In addition to the restriction on \acp{LLM}, also the Embedding model has to be open-source. In total two models were tested with nomic-embed-text and bge-m3. In the bge-m3 showed better results in small experiments and also supervisor results in embedding benchmarks \cite{Muennighoff2023}. In the end, there are better models available, which either use more memory, were later published or were not available on Ollama. In addition, the main attention was put into the \acp{LLM}, but especially in the agent engineering, as the embeddings have been shown working like outlined at multiple points in the thesis.
+
 In addition, CIExMAS was designed to work with multiple datasets and also provide the ability to be extended by the generation of entities in a knowledge graph later on instead of just using what is already provided in the knowledge graph. That is why, unlike in synthIE, the results were not limited towards predefined tokens that form the triples. In addition, there were multiple entities of various datasets and datasplits imported in the vector database used for the URI retrieve. This could affect the URI retrieval performance negeatively, but on the other side is a more realistic scenario, espeically as not all entities and properties of synthIE and REBEL were imported. In addition, uploading multiple dataset to the vector stores gave the ability to switch through the datasets easily without handling multiple vector store collections or filtering on datasets. Furthermore, it could be assumed that some entities and properties are the same and that the URI retrieval should find only relevant URIs according to the search term and search mode.
+
+Furthermore, a high focus was put on the generalisation of CIExMAS to other dataset. Nevertheless, CIExMAS was extensively evaluated on only one dataset. It showed, that many configurations were already necessary to push the overall performance of the CIExMAS configurations. In addition, other datasets like REBEL, that would be comparable to many other models, was found non sufficient in its data quality. Therefore, CIExMAS was designed generalisable, but it remains untested as the switch from synthIE-code to synthIE-text was no switch in the expected triples, just of the texts.
 
 All in all, the process of CIExMAS needs to be discussed as whole. In general, the iterative process showed how the experience with specific agents could enhance architectures. For instance the experience with the ReAct agent lead to consilidation of extraction agents in the network architecture. Nevertheless, the CIExMAS process did not progressed the trajectory from simple to more complex. Starting with the baseline architecture, which hold the steps of the pipeline approach for closed information extraction, and then going over to the more complex \ac{SSA} skipped the step of starting with the most simplistic architecture. Nevertheless, all steps were done based on the experiements with the architectures. In the end, every learning of especially also the more complex architecture led to the CIExMAS overall result.
 
 In addition, multiple ideas were further optimised before being scraped. For instance the property extraction agent, that showed a worse result when being included in the \ac{SSA}, was also implemented in th \ac{SSSA}. As a background all of the tools had the idea to target a single issue. As for instance properties remain a present issue throught all appraoches the agent was further optimisation. On the otherside, the comparisons of the impact of each agent could have furthermore improved the understanding of why an agent works and why not. In addition, CIExMAS was trained as a whole, instead of training the single steps to be peak perfect. This made it easier to train all agents and tools towards an common goal.
 
 Overall, CIExMAS remains a successful approach to do closed information extraction using multi-agent systems. Compared to especially synthIE the result of 0.665 F1-score was achieved without heavy fine-tuning or extensive in-context learning. Other approaches like GenIE could be outperformed. In addition, the process of CIExMAS may not have been perfectly streamlined it showed the flaws and drawbacks of each configuration and showed, that simplicity should be used before complexity, while in the closed information extraction domain some complexity is likely to be necessary, especially when \acp{LLM} with limited capabilites were used.
-
-\begin{itemize}
-  \item Limitation of one Dataset
-  \item Embedding Model Discussion -> Not detected as problem, mainly wrong search term
-  \item Manual Prompt Engineering -> Auto Prompt Engineering cost intense.
-  \item synthIE Limitation on correct URIs, no real URI retrieval challenge
-\end{itemize}
 
 \chapter{Conclusion and Outlook}
 \label{ch:conclusion_outlook}
