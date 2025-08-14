@@ -93,7 +93,7 @@
 \maketitle
 
 \chapter{Abstract}
-Closed information extraction has so far relied mainly on fine-tuned transformer models that require large training datasets. Large language models have been used for open information extraction, but their application to closed information extraction has not yet been explored, nor has the use of artificial intelligence agents in this domain. In this work, we introduce CIExMAS, a collection of modular architectures based on multi-agent systems for closed information extraction without the need for fine-tuning, designed as an exploratory framework to test a broad range of architectural setups and evaluate the general feasibility of multi-agent systems in this domain. The best architecture comprises specialized agents for triple extraction, uniform resource identifier mapping and validation, supported by tools for integration with knowledge graphs. In the evaluation, CIExMAS achieved up to 80\% of the performance of current state-of-the-art models, despite requiring no fine-tuning. This result highlights the effectiveness of approaches based on artificial intelligence agents in closed information extraction and points to their potential as flexible, scalable and lightweight alternatives. As an initial study in this direction, CIExMAS lays the foundation for further research combining artificial intelligence agents and closed information extraction.
+Closed information extraction has primarily depended on fine-tuned Transformer models, which require large training datasets. However, large language models have demonstrated a reduced need for fine-tuning, eliminating this requirement. While these models have been applied to open information extraction, their potential use in closed information extraction has not yet been investigated. Additionally, the application of artificial intelligence agents in this area remains unexplored. In this work, we introduce CIExMAS, a collection of multi-agent system architectures for closed information extraction based on large language models, designed without the need for fine-tuning. It serves as an exploratory framework to test a broad range of architectural setups and evaluate the general feasibility of multi-agent systems in this domain. The best architecture comprises specialized agents for triple extraction, uniform resource identifier mapping and validation, supported by tools for integration with knowledge graphs. In the evaluation, CIExMAS achieved up to 80\% of the performance of current state-of-the-art models, despite requiring no fine-tuning. This result highlights the effectiveness of approaches based on artificial intelligence agents in closed information extraction and points to their potential as flexible, scalable and lightweight alternatives. As an initial study in this direction, CIExMAS lays the foundation for further research combining artificial intelligence agents and closed information extraction.
 
 \begingroup%
 \hypersetup{hidelinks}%
@@ -133,13 +133,13 @@ Closed information extraction has so far relied mainly on fine-tuned transformer
   \acro{NLP}{natural language processing}
   \acro{OWL}{Web Ontology Language}
   \acro{PropEx}{property extraction}
-  \acro{RAG}{retrieval augmented generation}
+  \acro{RAG}{retrieval-augmented generation}
   \acro{RDF}{Resource Description Framework}
   \acro{RDFS}{Resource Description Framework Schema}
-  \acro{ReAct}{Reasoning and Acting}
+  \acro{ReAct}{reasoning and acting}
   \acro{SPARQL}{SPARQL Protocol and RDF Query Language}
-  \acro{SSA}{Splitted Supervisor Architecture}
-  \acro{SSSA}{Simplified Splitted Supervisor Architecture}
+  \acro{SSA}{splitted supervisor architecture}
+  \acro{SSSA}{simplified splitted supervisor architecture}
   \acro{URI}{Uniform Resource Identifier}
   \acro{VDBMS}{vector database management system}
   \acro{W3C}{World Wide Web Consortium}
@@ -153,7 +153,7 @@ Closed information extraction has so far relied mainly on fine-tuned transformer
 
 \acresetall
 
-Recent progress in \acp{LM}, particularly with modern \acp{LLM}, has significantly improved machines’ proficiency in both understanding and generating human language. These models have enabled progress in various downstream tasks ranging from question answering to summarisation and reasoning \cite{Brown2020}. However, their static training data limits their ability to incorporate new or domain-specific knowledge, a limitation known as the knowledge cutoff problem. Most \acp{LLM} are trained once on large corpora, and as a result, they have no built-in access to information that emerged after the end of their training period and cannot retrieve up-to-date or external knowledge out of the box \cite{Brown2020,Grattafiori2024}.
+Recent progress in \acp{LM}, particularly with modern \acp{LLM}, has significantly improved machines’ proficiency in both understanding and generating human language. These models have enabled progress in various downstream tasks ranging from question answering to summarisation and reasoning \cite{Brown2020}. However, their static training data limits their ability to incorporate new or domain-specific knowledge, a limitation known as the knowledge cutoff problem \cite{Cheng2024}. Most \acp{LLM} are trained once on large corpora, and as a result, they have no built-in access to information that emerged after the end of their training period and cannot retrieve up-to-date or external knowledge out of the box \cite{Brown2020,Grattafiori2024}.
 
 As a result, there is a growing interest in structured external knowledge sources, especially \acp{KG}, to provide reliable and semantically rich context for generative models \cite{Korolov2025}. Knowledge graphs store knowledge in a form that allows machines to retrieve and interpret semantic relationships \cite{GomezPerez2017}. They are typically modelled as directed graphs where nodes represent real-world entities and edges define the relationships between these entities \cite{Paulheim2016}. Ontologies specify the types of entities and relationships and provide logical constraints that govern how instances can be interpreted within a domain \cite{GomezPerez2017,Paulheim2016}. The increasing use of \ac{LLM}-based applications has therefore renewed attention on \acp{KG} as critical infrastructure for trustworthy and explainable \ac{AI} \cite{Korolov2025}.
 
@@ -166,15 +166,15 @@ This transformation process leads directly to the research field of \ac{cIE}. As
 
 The automatic extraction of structured information from text is a long-standing goal in \ac{NLP}. This task, generally referred to as \ac{IE}, includes subtasks such as named entity recognition, entity linking, and relation extraction. These components aim to identify real-world entities in text, assign them canonical identifiers, and detect semantic relationships between them \cite{Zhao2024}.
 
-\Ac{cIE} is a constrained subtask of \ac{IE}, where the goal is to extract subject--predicate--object triples that exactly match predefined entries in a \ac{KG}. In contrast to open \ac{IE} approaches, where relations may be freely expressed in natural language, \ac{cIE} requires strict alignment with the vocabulary and structure of a target ontology \cite{Josifoski2021}. An ontology is a formal specification of the types of entities, their properties, and the relationships between them \cite{Gayo2018}. This constraint makes \ac{cIE} especially relevant for applications that involve structured knowledge integration or automated \ac{KG} construction \cite{Josifoski2021}.
+\Ac{cIE} is a constrained subtask of \ac{IE}, where the goal is to extract subject--predicate--object triples that exactly match predefined entries in a \ac{KG}. In contrast to open \ac{IE} approaches, where relations may be freely expressed in natural language, \ac{cIE} requires strict alignment with the vocabulary and structure of a target ontology \cite{Josifoski2021}. This constraint makes \ac{cIE} especially relevant for applications that involve structured knowledge integration or automated \ac{KG} construction \cite{Josifoski2021}.
 
-This strong coupling between the extracted information and the specific target \ac{KG} reduces reusability and makes it difficult to adapt systems to new domains or ontologies without significant retraining. Consequently, researchers are exploring more modular alternatives that promise better generalisation without the need for task-specific fine-tuning \cite{Shi2024}.
+The strong coupling between the extracted information and the specific target \ac{KG} reduces reusability and makes it difficult to adapt systems to new domains or ontologies without significant retraining. Consequently, researchers are exploring more modular alternatives that promise better generalisation without the need for task-specific fine-tuning \cite{Shi2024}.
 
-State-of-the-art models such as GenIE (\cite{Josifoski2021}) and synthIE (\cite{Josifoski2023}) have shown that \ac{cIE} can be performed with very high accuracy, particularly when the models are fine-tuned on a high-quality dataset. However, \citet{Josifoski2021,Josifoski2023} demonstrate a limitation that models trained on one dataset do not generalise well to others (e.g., synthIE) even when the task and \ac{KG} structure remain similar. This lack of generalisation highlights a key drawback of current \ac{IE} systems, which often rely on supervised fine-tuning and are closely coupled to a specific domain or \ac{KG}.
+State-of-the-art models such as GenIE \cite{Josifoski2021} and synthIE \cite{Josifoski2023} have shown that \ac{cIE} can be performed with very high accuracy, particularly when the models are fine-tuned on a high-quality dataset. However, \citet{Josifoski2021,Josifoski2023} demonstrate a limitation that models trained on one dataset do not generalise well to others even when the task and \ac{KG} structure remain similar. This lack of generalisation highlights a key drawback of current \ac{IE} systems, which often rely on supervised fine-tuning and are closely coupled to a specific domain or \ac{KG}.
 
 To address such challenges, large language models have been explored for \ac{IE} tasks in general, leveraging their strong \ac{ICL} capabilities. These capabilities allow \acp{LLM} to adapt to new tasks and domains based on a few examples or instructions provided at inference time, rather than requiring retraining. This property makes them a promising candidate for overcoming both the limited generalisation and the need for extensive fine-tuning in current \ac{cIE} models.
 
-While LLM-based approaches have shown promise for \ac{IE}, their potential for the more constrained setting of \ac{cIE} has not yet been systematically investigated. This opens up the possibility of solving \ac{cIE} through prompting alone, without any task-specific fine-tuning.
+While LLM-based approaches have shown promise for \ac{IE}, their potential for the constrained setting of \ac{cIE} has not yet been investigated. This opens up the possibility of solving \ac{cIE} through prompting alone, without any task-specific fine-tuning.
 
 At the same time, recent work in agentic AI explores how \acp{LLM} can be used as decision engines in \acp{MAS} that interact via tool use, planning, and role-based coordination~\cite{OpenAI2025,Anthropic2024,Wiesinger2025}. These systems have shown promise for complex reasoning tasks and dynamic workflows. \citet{Shi2024} further demonstrate that even single-agent architectures can achieve state-of-the-art performance on \ac{IE} tasks.
 
@@ -183,12 +183,12 @@ These developments motivate the hypothesis that \acp{MAS} with \acp{LLM} as deci
 \section{Research Questions and Objectives}
 \label{sec:research_questions}
 
-This thesis investigates whether \ac{cIE} can be solved effectively by \ac{LLM}-based \acp{MAS} without relying on model fine-tuning. The central idea is to test such systems as an alternative to traditional supervised fine-tuned \ac{cIE} models. These agents operate in distributed, role-based settings and coordinate through a shared plan or workflow, performing tasks such as entity and relation extraction, \ac{URI} matching, or validation by means of prompting and tool use.
+This thesis investigates whether \ac{cIE} can be solved effectively by \ac{LLM}-based \acp{MAS} without relying on model fine-tuning. The central idea is to test such systems as an alternative to traditional supervised fine-tuned \ac{cIE} models. The system's agents operate in distributed, role-based settings and coordinate through a shared plan or workflow, performing tasks such as entity and relation extraction, \ac{URI} matching, or validation by means of prompting and tool use.
 
 The following research questions guide this investigation:
 
 \begin{itemize}
-  \item[\textbf{RQ1}] To what extent can \ac{LLM}-based \acp{MAS} perform closed information extraction on unstructured text?
+  \item[\textbf{RQ1}] To what extent can large language model-based multi-agent systems perform closed information extraction on unstructured text?
   \item[\textbf{RQ2}] Which agentic architectures (e.g., single-agent, supervisor-agent, or agent networks) perform best for this task in terms of accuracy and robustness?
 \end{itemize}
 
@@ -197,21 +197,18 @@ The following research questions guide this investigation:
 
 To address these questions, this thesis presents CIExMAS, a closed information extraction multi-agent system. CIExMAS was developed through an iterative process that emphasised modularity and extensibility, but followed no rigid pipeline. Rather, agents and prompts were initially tested on a small sample set and improved step by step, using qualitative trace inspection and targeted adjustments. This empirical, trial-and-error driven strategy followed the principles of agile development as described by \citet{Abrahamsson2017} and was followed by evaluation on a larger benchmark subset.
 
-The various \acp{MAS} were implemented using the LangGraph framework, which provides abstractions for \ac{LLM}-based agent flows and tool orchestration, and served as the foundation for developing and testing several configurations. These configurations ranged from a single-agent to supervisor–worker hierarchies and decentralised agent networks. In all setups, the goal was to extract valid triples from unstructured documents using only prompt engineering and tool usage, without any model fine-tuning.
+The various \acp{MAS} were implemented using Python and the LangGraph framework, which provides abstractions for \ac{LLM}-based agent flows and tool orchestration, and served as the foundation for developing and testing several configurations \cite{LangChain2025}. These configurations ranged from a single-agent to supervisor–worker hierarchies and decentralised agent networks. In all setups, the goal was to extract valid triples from unstructured documents using only prompt engineering and tool usage, without any model fine-tuning.
 
-To evaluate this agentic approach, pre-trained snapshots of existing comparison models, GenIE \cite{Josifoski2021} and the synthIE model \cite{Josifoski2023}, were used. Both were run on the same subset of the synthIE dataset as the CIExMAS configurations, enabling a fair comparison. Performance was assessed using macro-F1 as well as entity-level precision, recall, and coverage to capture both overall and component-specific effectiveness.
-
-The evaluation considered both absolute performance and the ability of the systems to generalise without retraining. All CIExMAS configurations and the comparison models were run on the same subset of the synthIE dataset to ensure comparability, using only tool access and prompting for task execution.
+To evaluate this agentic approach, pre-trained snapshots of existing comparison models, GenIE \cite{Josifoski2021} and the synthIE model \cite{Josifoski2023}, were used. Both were run on the same subset of the synthIE dataset as the CIExMAS configurations, enabling a fair comparison. Performance was assessed using macro-F1, as well as precision and recall, at the triple, subject, property, object, and entity levels to capture both overall and component-specific effectiveness.
 
 \section{Contribution of this Thesis}
 \label{sec:contribution}
 
-We introduce a novel approach to \ac{cIE}, proposing several \ac{MAS} architectures that leverage large language models in combination with external tools. The proposed systems incorporate agents specialised in \ac{URI} retrieval, semantic validation, and transformation of triples from \texttt{Turtle} notation to human-readable labels. They systematically evaluate the performance of multiple architectural patterns, including single-agent baselines, supervisor–worker models, customised pipelines, and decentralised networks.
+We introduce a novel approach to \ac{cIE}, proposing several \ac{MAS} architectures that leverage \acp{LLM} in combination with external tools. The proposed systems incorporate agents specialised in \ac{URI} retrieval, semantic validation, and transformation of triples from \texttt{Turtle} notation to human-readable labels. They systematically evaluate the performance of multiple architectural patterns, including single-agent baselines, supervisor–worker models, customised pipelines, and decentralised networks.
 
-The evaluation shows that recent open-source large language models, when embedded in a multi-agent setup with targeted specialisation and tool support, can solve \ac{cIE} without any model fine-tuning while achieving up to 80\% of the performance of state-of-the-art fine-tuned baselines. Across tasks, subject, object, and entity extraction reached high accuracy, while property extraction remained the main bottleneck. Among the tested designs, the \textit{network architecture} proved most effective, combining zero error rate with the highest overall $F_{1}$ score.
+The evaluation shows that recent open-source \acp{LLM}, when embedded in a multi-agent setup with targeted specialisation and tool support, can solve \ac{cIE} without any model fine-tuning while achieving up to 80\% of the performance of state-of-the-art fine-tuned comparison models. Subject, object, and entity extraction reached high accuracy, while property extraction remained the main bottleneck. Among the tested designs, the \textit{network architecture} proved most effective, combining zero error rate with the highest overall $F_{1}$ score.
 
-Furthermore, the work empirically demonstrates that incorporating \acp{KG} and using tool-supported \ac{URI} matching are essential for producing correct \ac{cIE} output. The developed framework is both extensible and generalisable, providing a foundation for further research in combining multi-agent systems with knowledge-based reasoning and extraction.
-
+Furthermore, the work empirically demonstrates that incorporating \acp{KG} and using tool-supported \ac{URI} matching are essential for producing correct \ac{cIE} output. The developed framework is extensible, providing a foundation for further research in combining multi-agent systems with knowledge-based reasoning and extraction.
 
 \section{Limitations}
 \label{sec:limitations}
@@ -225,7 +222,7 @@ In addition, this work does not explicitly address ethical risks such as knowled
 
 The thesis unfolds over six chapters and one appendix, each building on the previous to guide the reader from basic concepts to empirical evidence and, finally, to broader implications.
 
-Chapter~\ref{ch:background} lays the conceptual groundwork. After introducing essential terminology and formalisms of \acp{KG} (Section~\ref{sec:knowledge_graphs}), it narrows the focus to \ac{cIE} (Section~\ref{sec:closed_information_extraction}) and explains the functioning and training of modern \ac{LM} (Section~\ref{sec:language_models}). Subsequent sections explore sentence-level representations for semantic similarity (Section~\ref{sec:sentence_embeddings}), the paradigm of retrieval-augmented generation (Section~\ref{sec:retrieval_augmented_generation}), and the principles of AI agents and \acp{MAS} (Sections~\ref{sec:ai_agents}–\ref{sec:multi_agent_systems}). The chapter concludes with best practices for agent design (Section~\ref{sec:agent_design}), which later inform the CIExMAS architecture.
+After the introduction Chapter~\ref{ch:introduction}, Chapter~\ref{ch:background} lays the conceptual groundwork. After introducing essential terminology and formalisms of \acp{KG} (Section~\ref{sec:knowledge_graphs}), it narrows the focus to \ac{cIE} (Section~\ref{sec:closed_information_extraction}) and explains the functioning and training of modern \ac{LM} (Section~\ref{sec:language_models}). Subsequent sections explore sentence-level representations for semantic similarity (Section~\ref{sec:sentence_embeddings}), the paradigm of retrieval-augmented generation (Section~\ref{sec:retrieval_augmented_generation}), and the principles of AI agents and \acp{MAS} (Sections~\ref{sec:ai_agents}–\ref{sec:multi_agent_systems}). The chapter concludes with best practices for agent design (Section~\ref{sec:agent_design}), which later inform the CIExMAS architecture.
 
 Building on this foundation, Chapter~\ref{ch:related_work_chapter} surveys prior research. Section~\ref{sec:related_datasets} catalogues publicly available datasets that target entity and relation extraction, while Section~\ref{sec:related_approaches} analyses state-of-the-art approaches. Particular attention is given to methods that leverage generative AI and to the generalisation gaps observed in other approaches, which in turn motivate the agentic direction taken in this thesis.
 
@@ -300,7 +297,7 @@ Since \ac{RDFS} has limited expressiveness, \ac{OWL} was developed to support ad
 
 Following the construction phase, the next component is \ac{KG} storage. This task is handled by so-called triple stores, which are systems designed to persist and retrieve \ac{RDF} triples. Triple stores serve as the central component that links data construction with data consumption, and they must comply with the \ac{RDF} specification \cite{Rusher2003}. One widely used implementation of a triple store is Apache Jena. Jena provides a comprehensive software stack for storing and querying \ac{RDF} data. It offers direct API and I/O access in Java and supports all relevant standards, including \ac{RDFS} and \ac{OWL} \cite{Carroll2004}. To enable access via \ac{SPARQL}, the de facto standard query language for RDF data, Apache Jena includes the Fuseki module, which functions as a \ac{SPARQL} endpoint \cite{Chokshi2022}.
 
-Within the consumption building block of the \ac{KG} ecosystem, \ac{SPARQL} is a \ac{W3C}\footnote{\url{https://www.w3.org/}} recommendation and thus effectively the standard language for querying and modifying data in \ac{RDF} \acp{KG} \cite{Prudhommeaux2008}. Its syntax closely resembles \texttt{Turtle}, which facilitates its adoption in RDF-based systems. Commonly used query forms include \texttt{SELECT}, \texttt{ASK}, and \texttt{INSERT}. While \texttt{SELECT} queries are used to retrieve specific data from the graph, \texttt{ASK} queries return a boolean value indicating whether at least one match for the given pattern exists in the graph. In contrast, \texttt{INSERT} queries are used to add new data into the graph \cite{VillazonTerrazas2017}.
+Within the consumption building block of the \ac{KG} ecosystem, \ac{SPARQL} is a \ac{W3C}\footnote{\url{https://www.w3.org/}} recommendation and thus effectively the standard language for querying and modifying data in \ac{RDF} \acp{KG} \cite{Prudhommeaux2008}. Its syntax closely resembles \texttt{Turtle}, which facilitates its adoption in RDF-based systems. Commonly used queries include \texttt{SELECT}, \texttt{ASK}, and \texttt{INSERT}. While \texttt{SELECT} queries are used to retrieve specific data from the graph, \texttt{ASK} queries return a boolean value indicating whether any match for the given pattern exists in the graph. \texttt{INSERT} queries are used to add new data into the graph \cite{VillazonTerrazas2017}.
 
 A typical \ac{SPARQL} query begins with the query type, followed by the \texttt{WHERE} clause that specifies the graph pattern to be matched. In \texttt{SELECT} queries, variables are identified by a leading question mark (e.g., \texttt{? organisation}). Similar to \texttt{Turtle}, \ac{SPARQL} supports the use of prefixes to simplify long \acp{URI}. In addition, queries can include filtering conditions and modifiers such as \texttt{LIMIT} or \texttt{OFFSET} to constrain or paginate the results \cite{VillazonTerrazas2017}. The following example illustrates a query that retrieves all organisations Angela Merkel is a member of:
 
@@ -315,7 +312,7 @@ A typical \ac{SPARQL} query begins with the query type, followed by the \texttt{
 
 With the core components of \acp{KG} defined, one practical use case can help illustrate their capabilities and associated challenges. The project HAVAS 18 aimed to monitor start-up activity, tech trends, and tech talent using \acp{KG}. It relied on existing relationships between such entities in social networks to reveal hidden connections and gain deeper insights into the evolution of start-ups and technologies. Since social networks already provide structured relational data, they serve as a valuable data source for such graphs \cite{Monti2017}. However, \citet{Monti2017} also emphasise key challenges such as entity resolution, disambiguation, and processing of unstructured data. These challenges are also central to the present work.
 
-In addition to specific applications, broader initiatives such as Wikidata and DBpedia aim to represent Wikipedia as a \ac{KG}. Wikidata was created to serve as a structured, multilingual knowledge base for factual content in Wikipedia. It eliminates redundancy and enables machine-readability of facts. As a community-driven project, it allows users to edit and maintain its content, and it now serves as the central factual backbone of Wikipedia \cite{Vrandecic2014}. In contrast, DBpedia focuses on extracting structured data from Wikipedia using syntactic patterns in MediaWiki. The extracted data is then transformed into \ac{RDF}, making it usable in semantic web applications \cite{Auer2007}.
+In addition to specific applications, initiatives such as Wikidata and DBpedia aim to represent Wikipedia as a \ac{KG}. Wikidata was created to serve as a structured, multilingual knowledge base for factual content in Wikipedia. It eliminates redundancy and enables machine-readability of facts. As a community-driven project, it allows users to edit and maintain its content, and it now serves as the central factual backbone of Wikipedia \cite{Vrandecic2014}. In contrast, DBpedia focuses on extracting structured data from Wikipedia using syntactic patterns in MediaWiki. The extracted data is then transformed into \ac{RDF}, making it usable in semantic web applications \cite{Auer2007}.
 
 In conclusion, \acp{KG} provide semantically rich data by combining graph structures with standardised frameworks and languages. Publicly available at scale, they offer significant potential in many domains. Nevertheless, implementations often face challenges such as processing unstructured data and resolving ambiguous entities.
 
@@ -371,7 +368,7 @@ In addition, positional encodings are added to token embeddings to inject inform
   \label{fig:transformer}
 \end{figure}
 
-These scores are referred to as logits, which are real-valued outputs representing the model’s raw, unnormalised preferences for each possible next token. Let $\mathbf{z} \in \mathbb{R}^n$ denote the vector of logits for all $n$ tokens in the vocabulary, where $z_i$ is the logit assigned to the $i$-th token and $z_j$ the logit for the $j$-th token. To convert these logits into a probability distribution over the vocabulary, the softmax function is applied. A temperature parameter $T$ can be used to control the randomness of the sampling process \cite{Peeperkorn2024}. The softmax function is defined as:
+These scores are referred to as logits, which are real-valued outputs representing the model’s raw, unnormalised preferences for each possible next token. Let $\mathbf{z} \in \mathbb{R}^n$ denote the vector of logits for all $n$ tokens in the vocabulary, where $z_i$ is the logit assigned to the $i$-th token and $z_j$ the logit for the $j$-th token. To convert these logits into a probability distribution over the vocabulary, the softmax function is applied. \linebreak[4]A temperature parameter $T$ can be used to control the randomness of the sampling process \cite{Peeperkorn2024}. The softmax function is defined as:
 \begin{equation}
   \label{eq:softmax}
   \mathrm{softmax}(\mathbf{z})_i = \frac{\exp\left(\frac{z_i}{T}\right)}{\sum_{j=1}^{n} \exp\left(\frac{z_j}{T}\right)}.
@@ -430,11 +427,11 @@ In the indexing step, unstructured text documents are encoded into dense vector 
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.8\textwidth]{figures/RAG.png}
-  \caption[Overview of the Retrieval-Augmented Generation (RAG) architecture showing the indexing, retrieval, and generation pipeline]{Overview of the Retrieval-Augmented Generation (RAG) architecture showing the indexing, retrieval, and generation pipeline. \cite{Gao2024}}
+  \caption[Overview of the retrieval-augmented generation architecture showing the indexing, retrieval, and generation pipeline]{Overview of the retrieval-augmented generation architecture showing the indexing, retrieval, and generation pipeline. \cite{Gao2024}}
   \label{fig:rag}
 \end{figure}
 
-Figure~\ref{fig:rag} illustrates the architecture of a typical RAG pipeline. While indexing is performed offline, the retrieval and generation steps occur at runtime. During retrieval, the user query is embedded into the same vector space using the same embedding model. Based on this embedding, a similarity search is performed on the vector database, retrieving the most relevant documents. The retrieved documents are then combined with the original user prompt and, if applicable, a system instruction to form the final prompt. The resulting prompt is passed to the \ac{LM}, which generates a response informed by the retrieved context \cite{Gao2024}.
+Figure~\ref{fig:rag} illustrates the architecture of a typical \ac{RAG} pipeline. While indexing is performed offline, the retrieval and generation steps occur at runtime. During retrieval, the user query is embedded into the same vector space using the same embedding model. Based on this embedding, a similarity search is performed on the vector database, retrieving the most relevant documents. The retrieved documents are then combined with the original user prompt and, if applicable, a system instruction to form the final prompt. The resulting prompt is passed to the \ac{LM}, which generates a response informed by the retrieved context \cite{Gao2024}.
 
 A key component of the \ac{RAG} pipeline is the \ac{VDBMS}. Similar to traditional database systems, a \ac{VDBMS} comprises a query processor and a storage manager. The query processor handles vector-based similarity search and optimises query execution. One example \ac{VDBMS} is Qdrant, which employs filtering strategies and adaptive execution paths depending on the size of the vector collection. For large collections, Qdrant reduces the search space through pre-filtering mechanisms, after which a brute-force search is performed on the remaining candidate vectors. The storage manager handles data persistence and access \cite{Pan2024,Qdrant2025}.
 
@@ -471,7 +468,7 @@ In summary, \ac{AI} agents are autonomous systems that make decisions using lang
 
 As stated in the previous section, agents are often limited to a single task, making them inflexible when addressing broader problems. A solution to this limitation can be found in \ac{MAS}. The idea is to develop a cost-efficient, flexible and reliable system by using multiple agents instead of a single one. In this setup, a complex task can either be decomposed into multiple simpler tasks or the same task can be executed multiple times in parallel. The underlying theory is that such task distributions lead to more efficient solutions, which in turn compensate for the overhead associated with managing a \ac{MAS} \cite{Dorri2018}.
 
-To make a general \ac{MAS} work, different agents are defined for specific subtasks. In some cases, several agents may handle the same task to increase redundancy or scalability. This requires a well-defined routing strategy within the \ac{MAS}, which can follow either a static or dynamic topology. In a static topology, a leader agent coordinates the other agents and serves as the central point of communication. In contrast, a leaderless \ac{MAS} allows each agent to decide autonomously which agent to invoke next \cite{Dorri2018}.
+To make a general \ac{MAS} work, different agents are defined for specific subtasks. In some cases, several agents may handle the same task to increase redundancy or scalability. This requires a well-defined routing strategy within the \ac{MAS}, which can follow either a static or dynamic topology. In a static topology, a leader agent coordinates the other agents and serves as the central point of communication. In contrast, a leaderless \ac{MAS} allows each agent to decide autonomously which agent to invoke next \cite{Dorri2018}. \pagebreak[4]
 
 Leaderless systems introduce greater flexibility, but they also increase the complexity of coordination. Ensuring that all agents contribute effectively toward a shared goal becomes more challenging. Moreover, organising inter-agent communication and assigning the correct tasks with appropriate inputs becomes increasingly difficult. Fault propagation and fault detection are also harder to manage when multiple agents contribute to a single outcome \cite{Dorri2018}.
 
@@ -482,7 +479,7 @@ Each \ac{LLM}-based agent generally shares the same architectural components dis
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.8\textwidth]{figures/Multi-agent architectures.png}
-  \caption[Example multi-agent architecture patterns showing supervisor, hierarchical, network, and custom patterns for LLM-based \acp{MAS}]{Example multi-agent architecture patterns showing supervisor, hierarchical, network, and custom patterns for LLM-based \acp{MAS} (self-created after \cite{LangChain2025b})}
+  \caption[Example multi-agent architecture patterns showing supervisor, hierarchical, network, and custom patterns for large language model-based multi-agent systems]{Example multi-agent architecture patterns showing supervisor, hierarchical, network, and custom patterns large language model-based multi-agent systems (self-created after \cite{LangChain2025b})}
   \label{fig:mas_architecture}
 \end{figure}
 
@@ -524,7 +521,7 @@ In summary, given the limitations of \acp{LLM}, careful agent design is essentia
 \chapter{Related Work}
 \label{ch:related_work_chapter}
 
-This chapter presents the current state-of-the-art training and benchmarking datasets as well as various approaches in the field of \ac{IE}, with a particular focus on solutions in the area of \ac{cIE}. Section~\ref{sec:related_datasets} discusses the REBEL dataset, one of the first large-scale datasets for open and closed \ac{IE}, followed by the synthIE dataset, a synthetically generated resource based on models from the \texttt{GPT-3.5} family. Section~\ref{sec:related_approaches} outlines different methodological approaches, ranging from transformer fine-tuning and prompt tuning to the use of \ac{AI} agents for open and closed \ac{IE}.
+This chapter presents the current state-of-the-art training and benchmarking datasets as well as various approaches in the field of \ac{IE}, with a particular focus on solutions in the area of \ac{cIE}. Section~\ref{sec:related_datasets} discusses the REBEL dataset, one of the first large-scale datasets for open and closed \ac{IE}, followed by the synthIE dataset, a synthetically generated resource based on models from the \texttt{GPT-3.5} family. Section~\ref{sec:related_approaches} outlines different methodological approaches, ranging from Transformer fine-tuning and prompt tuning to the use of \ac{AI} agents for open and closed \ac{IE}.
 
 \section{Related Datasets}
 \label{sec:related_datasets}
@@ -590,7 +587,7 @@ This section presents the different agent architectures developed in this work. 
 \begin{figure}[tp]
   \centering
   \includegraphics[width=0.7\textwidth]{figures/Baseline Architecture.png}
-  \caption[\textit{baseline architecture} showing the pipeline approach with specialised agents for each step of the \ac{cIE} process]{\textit{baseline architecture} showing the pipeline approach with specialised agents for each step of the \ac{cIE} process (self-created)}
+  \caption[\textit{Baseline architecture} showing the approach with specialised agents for each step of a closed information extraction process]{\textit{Baseline architecture} showing the approach with specialised agents for each step of a closed information extraction process (self-created)}
   \label{fig:baseline_architecture}
 \end{figure}
 
@@ -625,7 +622,7 @@ Overall, this baseline design results in a pipeline, in case any result is error
 \begin{figure}[tp]
   \centering
   \includegraphics[width=0.7\textwidth]{figures/Splitted Supervisor Architecture.png}
-  \caption[Splitted supervisor architecture showing the decomposition of the supervisor agent into specialised sub-agents for better task management]{Splitted supervisor architecture showing the decomposition of the supervisor agent into specialised sub-agents for better task management (self-created)}
+  \caption[\textit{Splitted supervisor architecture} showing the decomposition of the supervisor agent into specialised sub-agents for better task management]{\textit{Splitted supervisor architecture} showing the decomposition of the supervisor agent into specialised sub-agents for better task management (self-created)}
   \label{fig:splitted_supervisor_architecture}
 \end{figure}
 
@@ -637,7 +634,7 @@ To support the expanded supervision logic in the \textit{\ac{SSA}}, the system s
 
 \begin{table}[h]
   \centering
-  \caption{State fields in the \textit{\ac{SSA}} architecture}
+  \caption{State fields in the \textit{splitted supervisor architecture}}
   \label{tab:ssa_state}
   \begin{tabular}{p{3cm}p{10cm}}
     \toprule
@@ -656,7 +653,7 @@ At the core of the \textit{\ac{SSA}} is the \textit{planner agent}. It initiates
 
 Functioning as the quality control unit, the \textit{result checker agent} plays a critical role in this architecture. This agent evaluates whether the specialised agents are producing meaningful results and identifies missing or incorrect elements. Based on this evaluation, the \textit{result checker agent} provides feedback to the \textit{planner agent} and encourages iterative improvement over the extraction process.
 
-The specialised agents for \textit{entity extraction} and \textit{triple extraction} behave similarly to those in the \textit{baseline architecture}, with adjustments made regarding where their results are stored in the updated state. The later added \textit{property extractor} agent, introduced in Section~\ref{subsec:error_message_incorporation}, was created following the design guideline discussed in Section~\ref{sec:agent_design}, which recommends splitting tasks when agents consistently fail to perform them reliably. In this case, property extraction, which was previously handled directly within the \textit{triple extraction} agent, was separated into its own agent to address persistent errors. The \textit{\ac{URI} retrieval tool} remains conceptually the same as in the \textit{baseline architecture}, though its outputs are now written to the centralised \texttt{results} field.
+The specialised agents for \textit{entity extraction} and \textit{triple extraction} behave similarly to those in the \textit{baseline architecture}, with adjustments made regarding where their results are stored in the updated state. The later added \textit{property extractor} agent, introduced in Section~\ref{subsec:error_message_incorporation}, was created following the design guideline discussed in Section~\ref{sec:agent_design}, which recommends splitting tasks when agents consistently fail to perform them reliably. In this case, property extraction, which was previously handled directly within the \textit{triple extraction} agent, was separated into its own agent to address persistent errors. The \textit{\ac{URI} retrieval tool} remains conceptually the same as in the \textit{baseline architecture}, though its outputs are now written to the centralised \texttt{results} field. \pagebreak[4]
 
 In summary, the \textit{\ac{SSA}} is an expanded interpretation of the supervisor pattern, aimed at breaking down complex orchestration into smaller, more specialised components. The state has been enhanced to support this increased granularity by providing more transparency and structure, enabling a greater degree of control and adaptability across the agent system.
 
@@ -666,7 +663,7 @@ In summary, the \textit{\ac{SSA}} is an expanded interpretation of the superviso
 \begin{figure}[tp]
   \centering
   \includegraphics[width=0.7\textwidth]{figures/Simplified Splitted Supervisor Architecture.png}
-  \caption[Simplified splitted supervisor architecture showing a streamlined version of the supervisor decomposition with optimised agent interactions]{Simplified splitted supervisor architecture showing a streamlined version of the supervisor decomposition with optimised agent interactions (self-created)}
+  \caption[\textit{Simplified splitted supervisor architecture} showing a streamlined version of the supervisor decomposition with optimised agent interactions]{\textit{Simplified splitted supervisor architecture} showing a streamlined version of the supervisor decomposition with optimised agent interactions (self-created)}
   \label{fig:simplified_splitted_supervisor_architecture}
 \end{figure}
 
@@ -676,7 +673,7 @@ A central change of the \textit{\ac{SSSA}} lies in its redesigned state. The gen
 
 \begin{table}[h]
   \centering
-  \caption{State fields in the \textit{\ac{SSSA}} architecture}
+  \caption{State fields in the \textit{simplified splitted supervisor architecture}}
   \label{tab:sssa_state}
   \begin{tabular}{p{3cm}p{10cm}}
     \toprule
@@ -702,7 +699,7 @@ This architectural simplification is motivated primarily by practical considerat
 \begin{figure}[tp]
   \centering
   \includegraphics[width=0.6\textwidth]{figures/ReAct Architecture.png}
-  \caption[\ac{ReAct} architecture showing the single-agent approach with reasoning and action capabilities for \ac{cIE}]{\ac{ReAct} architecture showing the single-agent approach with reasoning and action capabilities for \ac{cIE} (self-created)}
+  \caption[\textit{ReAct architecture} showing the single-agent approach with reasoning and action capabilities for closed information extraction]{\textit{ReAct architecture} showing the single-agent approach with reasoning and action capabilities for closed information extraction (self-created)}
   \label{fig:react_architecture}
 \end{figure}
 
@@ -722,7 +719,7 @@ While the \textit{\ac{ReAct} architecture} does not qualify as a \ac{MAS}, it pl
 \begin{figure}[tp]
   \centering
   \includegraphics[width=\textwidth]{figures/Network Architecture.png}
-  \caption[Network architecture showing the fully connected \ac{MAS} with dynamic routing and reasoning capabilities]{Network architecture showing the fully connected \ac{MAS} with dynamic routing and reasoning capabilities (self-created)}
+  \caption[\textit{Network architecture} showing the fully connected multi-agent system with dynamic routing and reasoning capabilities]{\textit{Network architecture} showing the fully connected multi-agent system with dynamic routing and reasoning capabilities (self-created)}
   \label{fig:network_architecture}
 \end{figure}
 
@@ -797,7 +794,7 @@ In summary, the \textit{\ac{URI} retrieval tool} equips agents with retrieval-au
 
 The \textit{network traversal tool} represents a further step in incorporating \ac{KG} information into the agent workflow. Its primary purpose is to support agents in addressing the challenge of selecting appropriate properties, particularly in cases where the input sentence does not contain the exact label of the target property. This issue could lead to the selection of super-properties or sub-properties. By querying structural information from the \ac{KG}, the tool enables agents to explore property hierarchies and make more informed decisions.
 
-To achieve this, the tool executes \ac{SPARQL} queries on Wikidata, focusing on the \textit{subproperty of} relation. These queries retrieve both direct super-properties and sub-properties of a given property. To enhance the usability of the output, labels are also queried for each retrieved property. Where available, example triples are included for additional context. The resulting output provides related properties and supporting examples, enabling an agent to assess semantic proximity.
+To achieve this, the tool executes \ac{SPARQL} queries on Wikidata, focusing on the \textit{subproperty of} relation. These queries retrieve both direct super-properties and sub-properties of a given property. To enhance the usability of the output, labels are also queried for each retrieved property. Where available, example triples are included for additional context. The resulting output provides related properties and supporting examples, enabling an agent to assess semantic proximity. \pagebreak[4]
 
 An illustrative example can be found in the property hierarchy involving \texttt{member of political party} (\texttt{P102}). This property is a subproperty of \texttt{member of} (\texttt{P463}), which in turn is a subproperty of \texttt{part of} (\texttt{P361}). Suppose an agent extracts the triple \textit{Angela Merkel; member of; CDU}. The tool could then reveal in the hierarchy both \texttt{part of} with the example \textit{ear; part of; head} and \texttt{member of political party} with the example \textit{Eleanor Roosevelt; member of political party; Democratic Party}. In such a straightforward case, an agent could recognise that \texttt{part of} is too general, while \texttt{member of political party} better captures the intended meaning, since the CDU is a political party.
 
@@ -914,11 +911,11 @@ To illustrate the distinction between \texttt{synthIE-code} and \texttt{synthIE-
     Groovin\_Blue    & performer         & Curtis\_Amy            \\
     \bottomrule
   \end{tabular}
-  \caption{Surfaceform Triplets – DocID: 0 – \texttt{synthIE-code} \& \texttt{synthIE-text}}
+  \caption{Surfaceform triplets (DocID~0) from the \texttt{synthIE-code} and \texttt{synthIE-text} datasets}
   \label{tab:triple-example}
 \end{table}
 
-To benchmark the performance on the REBEL dataset as well, the first 50 samples from the sorted test split were evaluated. Since CIExMAS was primarily developed using the synthIE dataset, its generalisation to REBEL was limited. In testing, none of the CIExMAS configurations achieved an F1 score above 0.1, resulting in the exclusion of REBEL from further evaluation. The complete test results are documented in Appendix~\ref{sec:rebel_testing}.
+To benchmark the performance on the REBEL dataset as well, the first 50 samples from the sorted test split were evaluated. Since CIExMAS was developed using the synthIE datasets, its generalisation to REBEL was limited. In testing, none of the CIExMAS configurations achieved an F1 score above 0.1, resulting in the exclusion of REBEL from further evaluation. The complete test results are documented in Appendix~\ref{sec:rebel_testing}.
 
 The synthIE dataset was ultimately used to evaluate both CIExMAS configurations and the comparison models. For the synthIE model and GenIE (see Section~\ref{sec:related_approaches}), the pre-trained versions provided by \citet{Josifoski2023}\footnote{Available at \url{https://github.com/epfl-dlab/SynthIE}} were used. Although GenIE was initially introduced by \citet{Josifoski2021}, the versions applied here are those retrained and published by \citet{Josifoski2023}. All models are based on the \texttt{Flan-T5} language model, following the setup by \citet{Josifoski2023}. Although the original GenIE implementation in \citet{Josifoski2021} was based on \texttt{BART}, the current models are based on \ texttt {Flan-T5}.
 
@@ -931,9 +928,9 @@ In summary, the sorted 50-sample test split of the \texttt{synthIE-text} dataset
 
 As outlined in multiple sections concerning \ac{KG} incorporation tools (cf. Section~\ref{sec:agent_tools}), it is necessary to provide the agent system with direct access to Wikidata as the underlying \ac{KG}. To achieve lower latency, this is realised through a setup consisting of Qdrant as a vector database, Redis as a key-value store, and Apache Jena Fuseki as a local \ac{SPARQL} endpoint. All components are hosted on a virtual private server, which, in practice, showed reduced latency compared to direct usage of Wikidata's public \ac{SPARQL} endpoint. Nonetheless, direct access to the public \ac{SPARQL} endpoint is required in the \textit{network traversal tool} and the \textit{turtle-to-label tool} to retrieve specific restrictions.
 
-The \textit{\ac{URI} retrieval tool} (cf. Section~\ref{subsec:uri_retrieval}) requires a search index to generate relevant mappings. A database supporting similarity search was therefore necessary to enable the described approach, a requirement fulfilled in this setup by Qdrant. In the present evaluation, each search index corresponds to one collection within the hosted Qdrant vector storage.
+The \textit{\ac{URI} retrieval tool} (cf. Section~\ref{subsec:uri_retrieval}) requires a search index to generate relevant mappings and supporting similarity search. A requirement fulfilled in this setup by Qdrant. In the present evaluation, each search index corresponds to one collection within the Qdrant vector storage.
 
-To populate the Qdrant collections, relevant entity and property data were pre-collected from all datasets used during development and benchmarking. Specifically, the first 50 samples from the sorted validation and test splits of the \texttt{synthIE-text} dataset, the sorted train and test splits of the \texttt{synthIE-code} dataset, and the sorted test split of the REBEL dataset (cf. Section~\ref{subsec:dataset}) were processed. From these samples, all referenced entities and properties were extracted and indexed into the Wikidata-based collections.
+To populate the Qdrant collections, relevant entity and property data were pre-collected from all datasets used during development and benchmarking. Specifically, the first 50 samples from the sorted validation and test splits of the \texttt{synthIE-text} dataset, the sorted train and test splits of the \texttt{synthIE-code} dataset, and the sorted test split of the REBEL dataset (cf. Section~\ref{subsec:dataset}) were processed. From these samples, all referenced entities and properties were extracted and indexed into the collections.
 
 This approach ensures that the agent system can resolve all required \acp{URI} regardless of which dataset is currently used, while also preparing CIExMAS for practical deployment scenarios where operation over the entire \ac{KG} is required. It further allows efficient switching between datasets in development and benchmarking without the need to rebuild or reindex the knowledge base.
 
@@ -954,7 +951,7 @@ During the work, \texttt{Llama-3.3-70B} consistently demonstrated the strongest 
 
 The achieved performance of \texttt{Llama-3.3-70B} was in line with the benchmark results reported by \citet{Meta2024}, which demonstrated results comparable to those of \texttt{GPT-4o} and \texttt{Claude-3.5-Sonnet}. These models were considered state-of-the-art at the time, but they required more parameters and were not open-source. The \texttt{Llama-3} series follows a similar architecture to \texttt{GPT} models, yet benefits from training on a large volume of high-quality data. This approach allowed the parameter count to be reduced to 405~billion for \texttt{Llama-3} and 70~billion for \texttt{Llama-3.3} while maintaining competitive performance~\cite{Grattafiori2024,Meta2024}.
 
-More recently, Google released \texttt{Gemma-3}, an open-source model ranked among the best in the human-evaluated LMSys Chatbot Arena~\cite{Chiang2024}, while maintaining a comparatively low 27~billion parameters~\cite{Team2025}. In publicly available benchmarks such as \textit{MMLU-Pro} (see Section~\ref{sec:language_models}), \texttt{Gemma-3} scored slightly lower than \texttt{Llama-3.3-70B}. In CIExMAS experiments, it additionally exhibited weaknesses in instruction following and logical agent flow execution.
+More recently, Google released \texttt{Gemma-3}, an open-source model ranked among the best in the human-evaluated LMSys Chatbot Arena~\cite{Chiang2024}, while maintaining a comparatively low 27~billion parameters~\cite{Team2025}. In publicly available benchmarks such as MMLU-Pro (see Section~\ref{sec:language_models}), \texttt{Gemma-3} scored slightly lower than \texttt{Llama-3.3-70B}. In CIExMAS experiments, it additionally exhibited weaknesses in instruction following and logical agent flow execution.
 
 Newer model architectures, such as \textit{Mixture-of-Experts} and reasoning models, notably emerged with the release of \texttt{DeepSeek-R1}, \texttt{Kimi-K2} and \texttt{Llama-4}~\cite{KimiTeam2025,DeepSeekAI2025,MetaAI2025}. These models have achieved high benchmark scores while maintaining lower parameter counts compared to top-end state-of-the-art models, in some cases even outperforming larger models. However, their reasoning capability involves iterative processing over the \ac{LLM}, which results in increased token usage and higher resource demands. Due to hardware limitations and time constraints for evaluation runs, these models were not employed for development.
 
@@ -1324,17 +1321,17 @@ In summary, none of the tested \acp{LLM} improved over the 4-bit quantised \text
 \section{Discussion}
 \label{sec:discussion}
 
-To investigate the effectiveness of \acp{MAS} for the task of \ac{cIE} and to identify the most effective agentic architecture patterns, CIExMAS was developed through an iterative design process. This process evaluated supervisor, network, and single-agent configurations, along with modified variants such as a splitting supervisor and a simplified splitting supervisor. All configurations were compared against the GenIE and \textit{synthIE models}~\cite{Josifoski2021,Josifoski2023}, using the first 50 samples of the \texttt{synthIE-text} dataset.
+To investigate the effectiveness of \acp{MAS} for the task of \ac{cIE} and to identify the most effective agentic architecture patterns, CIExMAS was developed through an iterative design process. This process evaluated supervisor, network, and single-agent configurations, along with modified variants such as a splitting supervisor and a simplified splitting supervisor. All configurations were compared against the GenIE and synthIE models~\cite{Josifoski2021,Josifoski2023}, using the first 50 samples of the \texttt{synthIE-text} dataset.
 
-Evaluation results indicate strong performance of the CIExMAS approach, achieving an overall $F_{1}$ score of 0.665. Among the tested configurations, the \textit{network architecture} consistently delivered the highest scores, while the custom design with a splitting supervisor performed worst. On the same dataset, comparison models achieved a maximum of 0.831 when fine-tuned, whereas CIExMAS relied solely on \ac{ICL}.
+Evaluation results indicate strong performance of the CIExMAS approach, achieving an overall $F_{1}$ score of 0.665. Among the tested configurations, the \textit{network architecture} consistently delivered the highest scores, while the custom design with a splitting supervisor performed worst. On the same dataset, comparison models achieved a maximum $F_{1}$ score of 0.831 when fine-tuned, whereas CIExMAS relied solely on \ac{ICL}.
 
-A more granular analysis revealed that CIExMAS outperformed all other approaches in subject, object, and entity extraction, reaching $F_{1}$ scores above 0.86 in each of these categories. Several CIExMAS configurations also achieved the top score in at least one category. The only notable weakness was observed in property extraction, where the top-performing synthIE model outperformed the best CIExMAS configuration by 24\%.
+A more granular analysis revealed that CIExMAS outperformed all other approaches in subject, object, and entity extraction, reaching $F_{1}$ scores above 0.86 in each of these categories. The only notable weakness was observed in property extraction, where the top-performing synthIE model outperformed the best CIExMAS configuration by 24\%.
 
-These results must be interpreted in the context of prior work. \citet{Josifoski2023}, for example, fine-tuned their \ac{LM} on the synthIE-code training split containing more than 1.8 million documents. At the same time, CIExMAS was developed using manual prompt engineering based on only five examples from the \texttt{synthIE-text} validation split. GenIE, like CIExMAS, was not fine-tuned on the synthIE dataset and performed even worse, achieving only 52\% of synthIE's performance compared to CIExMAS's 81\%.
+These results must be interpreted in the context of prior work. \citet{Josifoski2023}, for example, fine-tuned their \ac{LM} on the synthIE-code training split containing more than 1.8 million documents. At the same time, CIExMAS was developed using manual prompt engineering based on primarily five examples from the \texttt{synthIE-text} validation split. GenIE, like CIExMAS, was not fine-tuned on the synthIE dataset and performed even worse, achieving only 52\% of synthIE's performance compared to CIExMAS's 80\%.
 
 The design of CIExMAS aims to be dataset-agnostic. To familiarise the system with the expected triple format, prompt engineering was combined with \ac{ICL} rather than fine-tuning or extensive example-based adaptation. Notably, the initial baseline already produced competitive results compared to more complex configurations such as the \textit{\ac{SSA}} or those incorporating \ac{KG} integration. Some approaches faced challenges because the output specification required properties to be expressed in the Wikidata entity namespace. In contrast, the baseline's use of QNames instead of whole \acp{URI} simplified the output process.
 
-It is also worth noting that neither GenIE nor \textit{synthIE models} addressed the problem of \ac{URI} retrieval. Both systems were constrained by a fixed token set for output generation, avoiding hallucination by design. CIExMAS, in contrast, required hallucination prevention and output validation through dedicated agents to maintain the quality of results. This difference in design likely contributed to performance differences.
+It is also worth noting that neither GenIE nor synthIE models addressed the problem of \ac{URI} retrieval. Both systems were constrained by a fixed token set for output generation, avoiding hallucination by design \cite{Josifoski2021,Josifoski2023}. CIExMAS, in contrast, required hallucination prevention and output validation through dedicated agents to maintain the quality of results. This difference in design likely contributed to performance differences.
 
 Taken together, the configuration comparison reinforces that, for \ac{cIE}, simplicity should be prioritised over complexity, as discussed in Section~\ref{sec:agent_design}. This was reflected in the \textit{baseline} and \textit{\ac{ReAct}} architectures, which proved easier to optimise than more complex, highly customised solutions such as the \textit{\ac{SSA}} or \textit{\ac{SSSA}}. CIExMAS initially adopted a multi-agent setup because the tested models demonstrated limited instruction-following capabilities. However, the \textit{\ac{SSSA}}, and particularly its more elaborate variants, did not prove to be the proper remedy. The most effective configuration ultimately emerged from systematically probing the capabilities of the chosen \ac{LLM}. The strong performance of the \textit{\ac{ReAct}} agent, combined with the problem-solving and validation approach seen in human reasoning and reflected in both \textit{\ac{SSA}} and \textit{\ac{SSSA}}, naturally converged in the \textit{network architecture}.
 
@@ -1344,7 +1341,7 @@ Low instruction-following skills, even when supported by well-crafted prompts, l
 
 The use of \acp{LLM} introduced additional difficulties, particularly hallucination in \ac{URI} mapping, even when the \ac{URI} retrieval tool was employed. \citet{Xu2025} argue that hallucination is an inherent property of \acp{LLM}. Nevertheless, the hallucination-prevention methods and verification steps integrated into CIExMAS proved effective, particularly in the \textit{network architecture} and in refined versions of the \ac{ReAct} and baseline setups. For example, the \textit{semantic validation tool} reliably exposed hallucinated results, enabling \ac{LLM}-based detection and filtering.
 
-In contrast, the \textit{baseline architecture} relied solely on one supervisor, two extractors, and the \ac{URI} retrieval tool with an \ac{LLM}-generated summary, without advanced hallucination-prevention mechanisms. Even so, targeted prompt optimisation, error incorporation, and effective \ac{URI} search modes yielded strong results. This suggests that much of the performance improvement observed in the \textit{network} and the updated \textit{\ac{ReAct} architecture} can be attributed to changes in \ac{URI} retrieval strategies. Validation tools likely contributed additional gains by preventing nonsensical triples from being included in the output.
+In contrast, the \textit{baseline architecture} relied solely on one supervisor, two extractors, and the \ac{URI} retrieval tool with an \ac{LLM}-generated summary, without advanced hallucination-prevention mechanisms. Even so, targeted prompt optimisation, error incorporation, and effective \ac{URI} search modes yielded strong results. This suggests that much of the performance improvement observed in the \textit{network} and the updated \textit{\ac{ReAct} architecture} can be attributed to changes in \ac{URI} retrieval strategies. Validation tools likely contributed additional gains by preventing nonsensical triples from being included in the output. \pagebreak[4]
 
 The experiments with \ac{KG} integration tools further indicate that data quality is critical. The \textit{network traversal tool}, operating on the full Wikidata dataset, suffered from limitations in \ac{SPARQL} query depth for type restriction checks, resulting in performance drops. By contrast, the \textit{semantic validation tool}, built on a filtered and loop-free subset of Wikidata, improved results. For such tools to work efficiently, datasets must be both loop-free and easily traversable; otherwise, queries risk becoming unacceptably slow or timing out.
 
@@ -1354,7 +1351,7 @@ To address this, agents were equipped with a full-triple search mode that used t
 
 The use of \acp{MAS} for \ac{cIE} was based on the assumption that their iterative nature could be leveraged to refine and improve results. However, approaches such as the \textit{\ac{SSA}} and \textit{\ac{SSSA}} did exhibit iterative behaviour but still performed worse than the \textit{\ac{ReAct}} or baseline architectures. As highlighted in Section~\ref{subsec:full_network_agent_architecture}, even in the best configuration, iteration occurred in only 4\% of all samples. This indicates that, within CIExMAS, the potential benefits of iterative behaviour could not be realised to any significant extent.
 
-After discussing the strengths and weaknesses of the configurations, it is important to examine the approach and experimental setup. Only 50 samples were used for testing, with even fewer for manual training. While this ensures comparability to the baseline models—since all were evaluated on the same subset—it may also have suppressed maximum achievable performance. \citet{Josifoski2023} reported a macro $F_{1}$ score of 0.93 for triple extraction with their best synthIE model on the full dataset, suggesting that these 50 samples may be inherently more challenging.
+After discussing the strengths and weaknesses of the configurations, it is important to examine the approach and experimental setup. Only 50 samples were used for testing, with even fewer for manual training. While this ensures comparability to the baseline models, since all were evaluated on the same subset, it may also have suppressed maximum achievable performance. \citet{Josifoski2023} reported a macro $F_{1}$ score of 0.93 for triple extraction with their best synthIE model on the full dataset, suggesting that these 50 samples producing a macro $F_{1}$ score of 0.831 on the same model may be inherently more challenging.
 
 Runtime constraints drove the decision to limit the sample size. Processing the 50 samples already required around five hours for the \textit{\ac{SSA}} architecture and about two hours for the \textit{network architecture} on a vLLM \texttt{Llama~3.3~70B} setup with 2$\times$Nvidia A100 GPUs. Scaling this to the roughly 50{,}000 samples in the whole dataset would have taken approximately 208 days for the \textit{\ac{SSA}} and 83 days for the \textit{network architecture}, making such an evaluation impractical.
 
@@ -1385,7 +1382,7 @@ Overall, CIExMAS has proven that \ac{cIE} can be performed effectively using a m
 \chapter{Conclusion and Outlook}
 \label{ch:conclusion_outlook}
 
-This thesis developed CIExMAS to address two research questions: to what extent \ac{LLM}-based \acp{MAS} can perform \ac{cIE} on unstructured text (RQ1), and which agentic architectures (e.g., single-agent, supervisor-agent, or agent networks) perform best in terms of accuracy and robustness (RQ2). An evaluation on a 50-sample subset of \texttt{synthIE-text} showed that the best CIExMAS configuration, the \textit{network architecture}, achieved a triple-level $F_{1}$ of 0.665. This corresponds to 80\% (relative) of the performance of synthIE$_{\text{T5-large}}$, which was fine-tuned on the train split of the synthIE dataset. By comparison, the GenIE model of \citet{Josifoski2021}, trained on a different and lower-quality dataset, reached only $F_{1}=0.392$ for the same metric on the same samples.
+This thesis developed CIExMAS to address two research questions: to what extent \ac{LLM}-based \acp{MAS} can perform \ac{cIE} on unstructured text (RQ1), and which agentic architectures (e.g., single-agent, supervisor-agent, or agent networks) perform best in terms of accuracy and robustness (RQ2). An evaluation on a 50-sample subset of the test split from the \texttt{synthIE-text} dataset showed that the best CIExMAS configuration, the \textit{network architecture}, achieved a triple-level $F_{1}$ score of 0.665. This corresponds to 80\% (relative) of the performance of synthIE$_{\text{T5-large}}$, which was fine-tuned on the train split of the related \texttt{synthIE-code} dataset. By comparison, the GenIE model of \citet{Josifoski2021}, trained on a different and lower-quality dataset, reached only $F_{1}=0.392$ for the same metric on the same samples.
 
 Concerning RQ1, the results demonstrate that \ac{LLM}-based \acp{MAS} can already perform \ac{cIE} to a high extent. Subject, object, and entity extraction achieved $F_{1}$ scores of at least 0.86, indicating consistently strong performance in these categories. As in other approaches, property extraction remained the main bottleneck, limiting the overall triple-level $F_{1}$ despite the strong performance in other categories.
 
@@ -1439,12 +1436,11 @@ In conclusion, CIExMAS demonstrates a subset of the overall potential of \ac{MAS
 
 \appendix
 
-\chapter{Additional Material}
+\chapter{Additional Results}
 \label{ch:additional_material}
 
 \section{REBEL Testing}
 \label{sec:rebel_testing}
-
 \begin{table}[h]
   \centering
   \begin{tabular}{l|rrrrrr}
